@@ -2,6 +2,11 @@
   "name": "tacos.mvc",
   "private": true,
   "version": "0.0.0",
+  "scripts": {
+    "debug": "ASPNETCORE_ENVIRONMENT=Development dotnet watch run",
+    "webpack": "node node_modules/webpack/bin/webpack.js --env.dev --watch",
+    "test": "karma start"
+  },
   "devDependencies": {
     "@types/history": "4.6.0",
     "@types/react": "15.0.35",
