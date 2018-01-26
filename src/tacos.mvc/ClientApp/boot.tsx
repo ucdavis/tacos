@@ -10,7 +10,9 @@ function renderApp() {
   // configuration and injects the app into a DOM element.
   ReactDOM.render(
     <AppContainer>
-        <div>Hello world!</div>
+      <div>
+        Hello world! <i className="fas fa-user" />
+      </div>
     </AppContainer>,
     document.getElementById("react-app")
   );
