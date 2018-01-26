@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using tacos.data;
 
 namespace tacos.mvc
 {
@@ -22,6 +24,9 @@ namespace tacos.mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // setup entity framework
+            services.AddDbContextPool<TacoDbContext>(o => o.UseSqlite("Data Source=tacos.db"));
+
             services.AddMvc();
         }
 
