@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Security.CAS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,8 @@ namespace tacos.mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CommonSettings>(Configuration.GetSection("Common"));
+
             // setup entity framework
             services.AddDbContextPool<TacoDbContext>(o => o.UseSqlite("Data Source=tacos.db"));
 
@@ -32,6 +35,11 @@ namespace tacos.mvc
                             .AddEntityFrameworkStores<TacoDbContext>()
                             .AddDefaultTokenProviders();
             
+            services.AddAuthentication()
+                .AddCAS("UCDavis", options => {
+                    options.CasServerUrlBase = Configuration["Common:CasBaseUrl"];
+                });
+
             services.AddMvc();
         }
 
