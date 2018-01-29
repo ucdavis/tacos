@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using tacos.data;
+using tacos.mvc.services;
 
 namespace tacos.mvc
 {
@@ -41,6 +42,9 @@ namespace tacos.mvc
                 });
 
             services.AddMvc();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IDirectorySearchService, IetWsSearchService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
