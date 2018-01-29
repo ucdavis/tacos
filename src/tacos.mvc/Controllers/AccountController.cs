@@ -333,7 +333,7 @@ namespace tacos.mvc.Controllers
                 var user = new User
                 {
                     Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                    UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
+                    UserName = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier),
                     FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName),
                     LastName = info.Principal.FindFirstValue(ClaimTypes.Surname),
                     Name = info.Principal.FindFirstValue(ClaimTypes.Name)
