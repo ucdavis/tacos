@@ -352,9 +352,7 @@ namespace tacos.mvc.Controllers
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                        //return RedirectToLocal(returnUrl);
-                        TempData["Message"] = "Please update you profile before continuing.";
-                        return this.RedirectToAction("Edit", "Profile");
+                        return RedirectToLocal(returnUrl);
                     }
                 }
                 

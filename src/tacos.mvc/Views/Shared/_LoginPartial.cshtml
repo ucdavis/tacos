@@ -7,13 +7,15 @@
 @if (User.Identity.IsAuthenticated)
 {
     var user = await UserManager.GetUserAsync(User);
-    <div>
-        Hello @user.Name!
-    </div>
+    if (user != null) {
+        <div>
+            Hello @user.Name!
+        </div>
+    } else {
+        <p><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></p>
+    }
 }
 else
 {
-
-        <p><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></p>
 
 }
