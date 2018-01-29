@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Security.CAS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using tacos.data;
+using tacos.mvc.services;
 
 namespace tacos.mvc
 {
@@ -24,10 +27,24 @@ namespace tacos.mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CommonSettings>(Configuration.GetSection("Common"));
+
             // setup entity framework
             services.AddDbContextPool<TacoDbContext>(o => o.UseSqlite("Data Source=tacos.db"));
 
+            services.AddIdentity<User, IdentityRole>()
+                            .AddEntityFrameworkStores<TacoDbContext>()
+                            .AddDefaultTokenProviders();
+            
+            services.AddAuthentication()
+                .AddCAS("UCDavis", options => {
+                    options.CasServerUrlBase = Configuration["Common:CasBaseUrl"];
+                });
+
             services.AddMvc();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IDirectorySearchService, IetWsSearchService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,15 +66,13 @@ namespace tacos.mvc
 
             app.UseStaticFiles();
 
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
             });
         }
     }
