@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,10 @@ namespace tacos.mvc
             // setup entity framework
             services.AddDbContextPool<TacoDbContext>(o => o.UseSqlite("Data Source=tacos.db"));
 
+            services.AddIdentity<User, IdentityRole>()
+                            .AddEntityFrameworkStores<TacoDbContext>()
+                            .AddDefaultTokenProviders();
+            
             services.AddMvc();
         }
 
