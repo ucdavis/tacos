@@ -1,0 +1,7 @@
+@model Submission[]
+
+<ul>
+@foreach(var submission in Model) {
+ <li>@submission.Created</li>   
+}
+</ul>

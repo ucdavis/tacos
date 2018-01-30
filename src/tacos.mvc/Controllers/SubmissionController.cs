@@ -21,9 +21,9 @@ namespace tacos.mvc.Controllers
         // list submissions
         public async Task<IActionResult> Index() {
             var submissions = await context.Submissions
-                .Where(x => x.Actor == User.Identity.Name).ToArrayAsync();
+                .Where(x => x.Actor == User.Identity.Name).AsNoTracking().ToArrayAsync();
 
-            return Json(submissions);
+            return View(submissions);
         }
 
         public IActionResult Create() {

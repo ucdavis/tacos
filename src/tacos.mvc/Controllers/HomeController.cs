@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace tacos.mvc.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : ApplicationController
     {
-        [Authorize]
         public IActionResult Index()
         {
             return View();
         }
 
+        [AllowAnonymous] // maybe?
         public IActionResult Error()
         {
             ViewData["RequestId"] = Activity.Current?.Id ?? HttpContext.TraceIdentifier;

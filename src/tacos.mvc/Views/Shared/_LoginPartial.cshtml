@@ -12,7 +12,7 @@
             Hello @user.Name!
         </div>
     } else {
-        <p><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></p>
+        <p>Hello @User.Identity.Name</p>
     }
 }
 else
