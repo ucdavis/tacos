@@ -25,5 +25,9 @@ namespace tacos.mvc.Controllers
 
             return Json(submissions);
         }
+
+        public IActionResult Create() {
+            return View();
+        }
     }
 }
