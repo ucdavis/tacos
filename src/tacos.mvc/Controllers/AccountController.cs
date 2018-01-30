@@ -49,7 +49,12 @@ namespace tacos.mvc.Controllers
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            
+            var defaultProvider = AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme;
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(defaultProvider, redirectUrl);
+            return Challenge(properties, defaultProvider);
+            // return View();
         }
 
         [HttpPost]
@@ -286,7 +291,7 @@ namespace tacos.mvc.Controllers
             }
 
             // setup claims properly to deal with how CAS represents things
-            if (info.LoginProvider.Equals("UCDavis", StringComparison.OrdinalIgnoreCase))
+            if (info.LoginProvider.Equals(AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase))
             {
                 // kerberos comes across in both name and nameidentifier
                 var kerb = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
