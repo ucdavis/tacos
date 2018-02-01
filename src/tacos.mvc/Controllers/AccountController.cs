@@ -49,7 +49,12 @@ namespace tacos.mvc.Controllers
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            
+            var defaultProvider = AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme;
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(defaultProvider, redirectUrl);
+            return Challenge(properties, defaultProvider);
+            // return View();
         }
 
         [HttpPost]
@@ -286,7 +291,7 @@ namespace tacos.mvc.Controllers
             }
 
             // setup claims properly to deal with how CAS represents things
-            if (info.LoginProvider.Equals("UCDavis", StringComparison.OrdinalIgnoreCase))
+            if (info.LoginProvider.Equals(AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase))
             {
                 // kerberos comes across in both name and nameidentifier
                 var kerb = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -332,8 +337,9 @@ namespace tacos.mvc.Controllers
 
                 var user = new User
                 {
+                    Id = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier),
                     Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                    UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
+                    UserName = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier),
                     FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName),
                     LastName = info.Principal.FindFirstValue(ClaimTypes.Surname),
                     Name = info.Principal.FindFirstValue(ClaimTypes.Name)
@@ -352,9 +358,7 @@ namespace tacos.mvc.Controllers
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                        //return RedirectToLocal(returnUrl);
-                        TempData["Message"] = "Please update you profile before continuing.";
-                        return this.RedirectToAction("Edit", "Profile");
+                        return RedirectToLocal(returnUrl);
                     }
                 }
                 

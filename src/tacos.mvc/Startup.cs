@@ -36,8 +36,8 @@ namespace tacos.mvc
                             .AddEntityFrameworkStores<TacoDbContext>()
                             .AddDefaultTokenProviders();
             
-            services.AddAuthentication()
-                .AddCAS("UCDavis", options => {
+            services.AddAuthentication(AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme)
+                .AddCAS(options => {
                     options.CasServerUrlBase = Configuration["Common:CasBaseUrl"];
                 });
 

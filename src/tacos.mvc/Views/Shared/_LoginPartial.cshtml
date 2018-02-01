@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Http
+
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+
+@if (User.Identity.IsAuthenticated)
+{
+    var user = await UserManager.GetUserAsync(User);
+    if (user != null) {
+        <div>
+            Hello @user.Name!
+        </div>
+    } else {
+        <p>Hello @User.Identity.Name</p>
+    }
+}
+else
+{
+
+}
