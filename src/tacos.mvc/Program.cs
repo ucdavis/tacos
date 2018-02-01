@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,8 +24,9 @@ namespace tacos.mvc
             using (var scope = host.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<TacoDbContext>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-                DbInitializer.Initialize(context);
+                Task.Run(() => DbInitializer.Initialize(context, userManager)).Wait();
             }
 #endif
 
