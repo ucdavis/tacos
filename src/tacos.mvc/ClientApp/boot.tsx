@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { AppContainer } from "react-hot-loader";
+import SubmissionContainer from './components/SubmissionContainer';
 import "./css/site.css";
 
 declare var window: any;
@@ -10,9 +11,7 @@ function renderApp() {
   // configuration and injects the app into a DOM element.
   ReactDOM.render(
     <AppContainer>
-      <div>
-        Hello world! <i className="fas fa-user" />
-      </div>
+      <SubmissionContainer />
     </AppContainer>,
     document.getElementById("react-app")
   );
