@@ -40,7 +40,12 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   }
 
   private requestUpdated = (i: number, request: IRequest) => {
-      console.log('update request', request);
+    console.log("update request", request);
+
+    const requests = this.state.requests;
+    requests[i] = request;
+
+    this.setState({ requests });
     // TODO: update the state
   };
 
