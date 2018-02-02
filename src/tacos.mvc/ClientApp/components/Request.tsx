@@ -12,8 +12,28 @@ export default class Request extends React.Component<IProps, {}> {
   public render() {
     return (
       <tr key={this.props.request.courseNumber}>
-        <td>{this.props.request.courseNumber}</td>
-        <td>{this.props.request.courseNumber}</td>
+        <td>
+          <input
+            type="text"
+            placeholder="Course Number"
+            className="form-control"
+            value={this.props.request.courseNumber}
+            onChange={() => this.requestChanged("courseNumber", "LDAS")}
+          />
+        </td>
+        <td>
+          <select
+            className="form-control"
+            id="exampleFormControlSelect1"
+            onChange={() => this.requestChanged("courseType", "3")}
+          >
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+        </td>
         <td>{this.props.request.courseNumber}</td>
         <td>0</td>
         <td>false</td>
@@ -21,8 +41,10 @@ export default class Request extends React.Component<IProps, {}> {
     );
   }
 
-  private requestChanged = () => {
-      // new request passed up
-      this.props.onEdit(this.props.index, this.props.request);
-  }
+  private requestChanged = (prop: string, val: string) => {
+    const request = { ...this.props.request, [prop]: val };
+
+    // new request passed up
+    this.props.onEdit(this.props.index, request);
+  };
 }

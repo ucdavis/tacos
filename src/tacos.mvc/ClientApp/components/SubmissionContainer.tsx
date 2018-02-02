@@ -40,6 +40,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   }
 
   private requestUpdated = (i: number, request: IRequest) => {
+      console.log('update request', request);
     // TODO: update the state
   };
 
@@ -82,7 +83,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     const requests = [
       ...this.state.requests,
       {
-        courseNumber: "LDA12",
+        courseNumber: "",
         courseType: "",
         requestType: "",
         result: 0,
