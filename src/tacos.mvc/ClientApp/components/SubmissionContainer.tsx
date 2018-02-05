@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Request from "./Request";
+import Summary from "./Summary";
 
 export interface IRequest {
   courseNumber: string;
@@ -38,7 +39,12 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     };
   }
   public render() {
-    return <div>{this.renderRequests()}</div>;
+    return (
+      <div>
+        {this.renderRequests()}
+        <Summary />
+      </div>
+    );
   }
 
   private requestUpdated = (i: number, request: IRequest) => {
