@@ -15,7 +15,7 @@ export default class CourseType extends React.PureComponent<IProps, {}> {
         <select
           className="custom-select"
           value={this.props.courseType}
-          onChange={e => this.props.onChange(e.currentTarget.value)}
+          onChange={e => this.props.onChange(e.target.value)}
         >
           <option value="STD">Standard</option>
           <option value="LEC">Lecture</option>

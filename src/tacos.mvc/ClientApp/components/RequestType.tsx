@@ -15,7 +15,7 @@ export default class RequestType extends React.PureComponent<IProps, {}> {
         <select
           className="custom-select"
           value={this.props.requestType}
-          onChange={e => this.props.onChange(e.currentTarget.value)}
+          onChange={e => this.props.onChange(e.target.value)}
         >
           <option value="TA">TA</option>
           <option value="READ">Reader</option>

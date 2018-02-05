@@ -42,10 +42,10 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     return courseNumber.length >= 4;
   };
 
-  private onNumberChanged = (event: React.FormEvent<HTMLInputElement>) => {
+  private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     // TODO: check to see if it is valid via ajax
 
-    const val = event.currentTarget.value;
+    const val = event.target.value;
 
     // TODO: testing, right now it'll just need to be 4+ chars long
     this.setState({ valid: this.isValid(val) });

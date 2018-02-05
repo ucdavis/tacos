@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IRequest } from "./SubmissionContainer";
 
+import Contest from "./Contest";
 import CourseNumber from "./CourseNumber";
 import CourseType from "./CourseType";
 import RequestType from "./RequestType";
@@ -41,12 +42,19 @@ export default class Request extends React.Component<IProps, {}> {
           />
         </td>
         <td>0</td>
-        <td>false</td>
+        <td>
+          <Contest
+            contest={this.props.request.contest}
+            contestReason={this.props.request.contestReason}
+            onContestChange={contest => this.requestChanged("contest", contest)}
+            onReasonChange={reason => this.requestChanged("contestReason", reason)}
+          />
+        </td>
       </tr>
     );
   }
 
-  private requestChanged = (prop: string, val: string) => {
+  private requestChanged = (prop: string, val: any) => {
     const request = { ...this.props.request, [prop]: val };
 
     // new request passed up
