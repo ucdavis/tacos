@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import { IRequest } from "./SubmissionContainer";
 
 import CourseNumber from "./CourseNumber";
+import CourseType from "./CourseType";
 
 interface IProps {
   request: IRequest;
@@ -23,17 +24,12 @@ export default class Request extends React.Component<IProps, {}> {
           />
         </td>
         <td>
-          <select
-            className="form-control"
-            id="exampleFormControlSelect1"
-            onChange={() => this.requestChanged("courseType", "3")}
-          >
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-          </select>
+          <CourseType
+            courseType={this.props.request.courseType}
+            onChange={courseType =>
+              this.requestChanged("courseType", courseType)
+            }
+          />
         </td>
         <td>{this.props.request.courseNumber}</td>
         <td>0</td>

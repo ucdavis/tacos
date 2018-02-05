@@ -23,8 +23,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     const requests: IRequest[] = [
       {
         courseNumber: "LDA12",
-        courseType: "",
-        requestType: "",
+        courseType: "LEC",
+        requestType: "TA",
         result: 0,
         contest: false
       }
@@ -89,8 +89,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       ...this.state.requests,
       {
         courseNumber: "",
-        courseType: "",
-        requestType: "",
+        courseType: "LEC",
+        requestType: "TA",
         result: 0,
         contest: false
       }
