@@ -4,6 +4,7 @@ import { IRequest } from "./SubmissionContainer";
 
 import CourseNumber from "./CourseNumber";
 import CourseType from "./CourseType";
+import RequestType from "./RequestType";
 
 interface IProps {
   request: IRequest;
@@ -31,7 +32,14 @@ export default class Request extends React.Component<IProps, {}> {
             }
           />
         </td>
-        <td>{this.props.request.courseNumber}</td>
+        <td>
+          <RequestType
+            requestType={this.props.request.requestType}
+            onChange={requestType =>
+              this.requestChanged("requestType", requestType)
+            }
+          />
+        </td>
         <td>0</td>
         <td>false</td>
       </tr>
