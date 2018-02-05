@@ -2,6 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IRequest } from "./SubmissionContainer";
 
+import CourseNumber from "./CourseNumber";
+
 interface IProps {
   request: IRequest;
   index: number;
@@ -11,14 +13,13 @@ interface IProps {
 export default class Request extends React.Component<IProps, {}> {
   public render() {
     return (
-      <tr key={this.props.request.courseNumber}>
+      <tr key={`request-${this.props.index}`}>
         <td>
-          <input
-            type="text"
-            placeholder="Course Number"
-            className="form-control"
-            value={this.props.request.courseNumber}
-            onChange={() => this.requestChanged("courseNumber", "LDAS")}
+          <CourseNumber
+            courseNumber={this.props.request.courseNumber}
+            onChange={courseNumber =>
+              this.requestChanged("courseNumber", courseNumber)
+            }
           />
         </td>
         <td>
