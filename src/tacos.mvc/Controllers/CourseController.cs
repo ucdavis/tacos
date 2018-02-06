@@ -11,8 +11,7 @@ namespace tacos.mvc.Controllers
 {
     public class CourseController : ApplicationController
     {
-        [Route("/course/{courseNumber}")]
-        [HttpGet]
+        [HttpGet("/course/{courseNumber}")]
         public IActionResult Get(string courseNumber) {
             // TODO: some basic validation checking
 
