@@ -120,7 +120,6 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       ...this.state.requests,
       {
         course: { name: '', number: '', timesOfferedPerYear: 0, averageEnrollment: 0, averageSectionsPerCourse: 0 },
-        courseNumber: "",
         courseType: "LEC",
         requestType: "TA",
         result: 0,
