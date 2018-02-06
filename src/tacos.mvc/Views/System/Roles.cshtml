@@ -1,0 +1,62 @@
+﻿@using tacos.mvc.Resources
+@model IList<dynamic>
+
+@{
+    ViewBag.Title = "Manage User Roles";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="col">
+    <table id="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Is Admin</th>
+                <th>Is User</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        @if (user.IsUser)
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@user.User.Id" asp-route-role=@RoleCodes.User asp-route-add="false" asp-antiforgery="true">
+                                <button class="btn btn-red" type="submit"><i class="fa fa-trash"></i> User</button>
+                            </form>
+
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@user.User.Id" asp-route-role=@RoleCodes.User asp-route-add="true" asp-antiforgery="true">
+                                <button class="btn btn-default" type="submit"><i class="fa fa-plus"></i> User</button>
+                            </form>
+                        }
+                        @if (user.IsAdmin)
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@user.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="false" asp-antiforgery="true">
+                                <button class="btn btn-red" type="submit"><i class="fa fa-trash"></i> Admin</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@user.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="true" asp-antiforgery="true">
+                                <button class="btn btn-default" type="submit"><i class="fa fa-plus"></i> Admin</button>
+                            </form>
+                        }
+
+
+                    </td>
+                    <td>@user.User.Name</td>
+                    <td>@user.User.Email</td>
+                    <td>@user.IsAdmin</td>
+                    <td>@user.IsUser</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
