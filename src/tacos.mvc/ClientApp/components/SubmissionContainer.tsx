@@ -8,7 +8,7 @@ export interface IRequest {
   courseType: string;
   requestType: string;
   result: number;
-  contest: boolean;
+  contested: boolean;
   contestReason: string;
 }
 
@@ -28,7 +28,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         courseType: "LEC",
         requestType: "TA",
         result: 0,
-        contest: false,
+        contested: false,
         contestReason: ""
       }
     ];
@@ -127,7 +127,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         courseType: "LEC",
         requestType: "TA",
         result: 0,
-        contest: false,
+        contested: false,
         contestReason: ""
       }
     ];
