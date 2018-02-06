@@ -29,5 +29,10 @@ namespace tacos.mvc.Controllers
         public IActionResult Create() {
             return View();
         }
+
+        [HttpPost]
+        public IActionResult Create([FromBody]Submission submission) {
+            return Json(submission);
+        }
     }
 }

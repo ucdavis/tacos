@@ -42,10 +42,37 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     return (
       <div>
         {this.renderRequests()}
-        <Summary />
+        <Summary canSubmit={true} onSubmit={this.submit} />
       </div>
     );
   }
+
+  private submit = () => {
+    // create the submission
+    const submission = {
+      metadata: "TODO",
+      requests: this.state.requests
+    };
+
+    fetch("/submission/create", {
+      body: JSON.stringify(submission),
+      headers: [
+        ["Accept", "application/json"],
+        ["Content-Type", "application/json"]
+      ],
+      method: "POST",
+      credentials: "include"
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
+
+        return res.json();
+      })
+      .then(console.log)
+      .catch(console.error);
+  };
 
   private requestUpdated = (i: number, request: IRequest) => {
     console.log("update request", request);
