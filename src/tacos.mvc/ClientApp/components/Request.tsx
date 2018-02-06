@@ -20,9 +20,7 @@ export default class Request extends React.Component<IProps, {}> {
         <td>
           <CourseNumber
             course={this.props.request.course}
-            onChange={course =>
-              this.requestChanged("course", course)
-            }
+            onChange={course => this.requestChanged("course", course)}
           />
         </td>
         <td>
@@ -41,7 +39,7 @@ export default class Request extends React.Component<IProps, {}> {
             }
           />
         </td>
-        <td>{this.props.request.result}</td>
+        <td>{this.props.request.calculatedTotal}</td>
         <td>
           <Contest
             contested={this.props.request.contested}

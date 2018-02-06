@@ -2,13 +2,13 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Request from "./Request";
 import Summary from "./Summary";
-import { formulas } from '../util/formulas';
+import { formulas } from "../util/formulas";
 
 export interface IRequest {
   course: ICourse;
   courseType: string;
   requestType: string;
-  result: number;
+  calculatedTotal: number;
   contested: boolean;
   contestReason: string;
 }
@@ -34,6 +34,10 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       department: "",
       requests: []
     };
+  }
+  componentDidMount() {
+    // on mount, add the first request
+    this.onAddRequest();
   }
   public render() {
     return (
@@ -75,8 +79,11 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     console.log("update request", request);
 
     // if the course info looks good, calculate totals
-    if (true) { // TODO: figure out valid course?
-      request.result = formulas[request.courseType].calculate(request.course);
+    if (true) {
+      // TODO: figure out valid course?
+      request.calculatedTotal = formulas[request.courseType].calculate(
+        request.course
+      );
     }
 
     const requests = this.state.requests;
@@ -124,10 +131,16 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     const requests = [
       ...this.state.requests,
       {
-        course: { name: '', number: '', timesOfferedPerYear: 0, averageEnrollment: 0, averageSectionsPerCourse: 0 },
+        course: {
+          name: "",
+          number: "",
+          timesOfferedPerYear: 0,
+          averageEnrollment: 0,
+          averageSectionsPerCourse: 0
+        },
         courseType: "STD",
         requestType: "TA",
-        result: 0,
+        calculatedTotal: 0,
         contested: false,
         contestReason: ""
       }
