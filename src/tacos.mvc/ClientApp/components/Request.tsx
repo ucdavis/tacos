@@ -19,9 +19,9 @@ export default class Request extends React.Component<IProps, {}> {
       <tr key={`request-${this.props.index}`}>
         <td>
           <CourseNumber
-            courseNumber={this.props.request.courseNumber}
-            onChange={courseNumber =>
-              this.requestChanged("courseNumber", courseNumber)
+            course={this.props.request.course}
+            onChange={course =>
+              this.requestChanged("course", course)
             }
           />
         </td>

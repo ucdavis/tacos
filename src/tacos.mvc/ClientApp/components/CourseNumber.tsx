@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { IRequest } from "./SubmissionContainer";
+import { IRequest, ICourse } from "./SubmissionContainer";
 
 interface IProps {
-  courseNumber: string;
-  onChange: (courseNumber: string) => void;
+  course: ICourse;
+  onChange: (course: ICourse) => void;
 }
 
 interface IState {
@@ -28,7 +28,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
         <input
           type="text"
           className="form-control"
-          value={this.props.courseNumber}
+          value={this.props.course.number}
           onChange={this.onNumberChanged}
         />
         <div className="input-group-append">
@@ -50,13 +50,13 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
 
   private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val = event.target.value;
-    this.props.onChange(val);
+    this.props.onChange({ ...this.props.course, number: val }); // TODO: default to blank course?
 
     if (val.length < 4) {
       this.setState({ querying: false, valid: false });
       return; // never valid if we are <4 chars
     }
-    
+
     this.setState({ querying: true, valid: false });
 
     // TODO: debounce
@@ -76,8 +76,9 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
 
         return res.json();
       })
-      .then(course => {
+      .then((course : ICourse) => {
         this.setState({ querying: false, valid: true });
+        this.props.onChange(course); // TODO: default to blank course?
       })
       .catch(err => {
         console.error(err);

@@ -4,12 +4,20 @@ import Request from "./Request";
 import Summary from "./Summary";
 
 export interface IRequest {
-  courseNumber: string;
+  course: ICourse;
   courseType: string;
   requestType: string;
   result: number;
   contested: boolean;
   contestReason: string;
+}
+
+export interface ICourse {
+  name: string;
+  number: string;
+  timesOfferedPerYear: number;
+  averageSectionsPerCourse: number;
+  averageEnrollment: number;
 }
 
 interface IState {
@@ -21,21 +29,9 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   constructor(props: any) {
     super(props);
 
-    // TODO: remove, this is just for testing.  In reality you will always start with no requests
-    const requests: IRequest[] = [
-      {
-        courseNumber: "LDA12",
-        courseType: "LEC",
-        requestType: "TA",
-        result: 0,
-        contested: false,
-        contestReason: ""
-      }
-    ];
-
     this.state = {
       department: "",
-      requests
+      requests: []
     };
   }
   public render() {
@@ -123,6 +119,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     const requests = [
       ...this.state.requests,
       {
+        course: { name: '', number: '', timesOfferedPerYear: 0, averageEnrollment: 0, averageSectionsPerCourse: 0 },
         courseNumber: "",
         courseType: "LEC",
         requestType: "TA",
