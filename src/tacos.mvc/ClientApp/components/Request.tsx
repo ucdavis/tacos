@@ -41,7 +41,7 @@ export default class Request extends React.Component<IProps, {}> {
             }
           />
         </td>
-        <td>0</td>
+        <td>{this.props.request.result}</td>
         <td>
           <Contest
             contested={this.props.request.contested}

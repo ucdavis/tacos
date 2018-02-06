@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Request from "./Request";
 import Summary from "./Summary";
+import { formulas } from '../util/formulas';
 
 export interface IRequest {
   course: ICourse;
@@ -73,6 +74,12 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   private requestUpdated = (i: number, request: IRequest) => {
     console.log("update request", request);
 
+    // if the course info looks good, calculate totals
+    if (true) { // TODO: figure out valid course?
+      const resultTotal = formulas[request.courseType].calculate(request.course); 
+      request.result = Math.round(resultTotal); // TODO: figure out how we want to round
+    }
+
     const requests = this.state.requests;
     requests[i] = request;
 
@@ -120,7 +127,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       ...this.state.requests,
       {
         course: { name: '', number: '', timesOfferedPerYear: 0, averageEnrollment: 0, averageSectionsPerCourse: 0 },
-        courseType: "LEC",
+        courseType: "STD",
         requestType: "TA",
         result: 0,
         contested: false,
