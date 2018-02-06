@@ -44,10 +44,14 @@ export default class Request extends React.Component<IProps, {}> {
         <td>0</td>
         <td>
           <Contest
-            contest={this.props.request.contest}
+            contested={this.props.request.contested}
             contestReason={this.props.request.contestReason}
-            onContestChange={contest => this.requestChanged("contest", contest)}
-            onReasonChange={reason => this.requestChanged("contestReason", reason)}
+            onContestedChange={contested =>
+              this.requestChanged("contested", contested)
+            }
+            onReasonChange={reason =>
+              this.requestChanged("contestReason", reason)
+            }
           />
         </td>
       </tr>

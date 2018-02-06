@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -28,6 +29,20 @@ namespace tacos.mvc.Controllers
 
         public IActionResult Create() {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody]Submission submission) {
+            // TODO: do we care about user name or other info?
+            submission.Actor = User.Identity.Name;
+
+            submission.Created = DateTime.UtcNow;
+
+            //             
+            context.Submissions.Add(submission);
+            await context.SaveChangesAsync();
+
+            return Json(new { success = true });
         }
     }
 }

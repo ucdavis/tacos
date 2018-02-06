@@ -3,9 +3,9 @@ import * as ReactDOM from "react-dom";
 import { IRequest } from "./SubmissionContainer";
 
 interface IProps {
-  contest: boolean;
+  contested: boolean;
   contestReason: string;
-  onContestChange: (contest: boolean) => void;
+  onContestedChange: (contest: boolean) => void;
   onReasonChange: (contestReason: string) => void;
 }
 
@@ -18,8 +18,8 @@ export default class Contest extends React.PureComponent<IProps, {}> {
           <input
             className="form-check-input"
             type="checkbox"
-            checked={this.props.contest}
-            onChange={e => this.props.onContestChange(e.target.checked)}
+            checked={this.props.contested}
+            onChange={e => this.props.onContestedChange(e.target.checked)}
             id="defaultCheck1"
           />
           <label className="form-check-label" htmlFor="defaultCheck1">
@@ -32,7 +32,7 @@ export default class Contest extends React.PureComponent<IProps, {}> {
   }
 
   private renderContestReason = () => {
-    if (this.props.contest) {
+    if (this.props.contested) {
       // only show if we are contesting
       return (
         <textarea

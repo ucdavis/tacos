@@ -2,7 +2,10 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IRequest } from "./SubmissionContainer";
 
-interface IProps {}
+interface IProps {
+  onSubmit : () => void;
+  canSubmit: boolean;
+}
 
 // the overall summary of totals, plus action/submit button
 export default class Summary extends React.PureComponent<IProps, {}> {
@@ -14,7 +17,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
       >
         <span className="navbar-brand">Request Total: XYZ</span>
         <div className="pull-right">
-          <button className="btn btn-primary" disabled>
+          <button className="btn btn-primary" disabled={!this.props.canSubmit} onClick={this.props.onSubmit}>
             Submit
           </button>
         </div>
