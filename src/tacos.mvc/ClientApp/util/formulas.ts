@@ -41,8 +41,68 @@ const labFormula: IFormula = {
     }
 }
 
+// Field courses
+const fieldFormula: IFormula = {
+    calculate: (course: ICourse) => {
+        // Half-time TA per 25 students
+        return (course.averageEnrollment / 25.0) * 0.5;
+    }
+}
+
+// "Lecture-only classes, automated grading
+// (No sections; grading is by Scantron or similar)"
+const lectureAutoGradingFormula: IFormula = {
+    calculate: (course: ICourse) => {
+        // "25% TA or Reader for first 150 students
+        // Additional 25% TA or Reader for each 100 after that"
+        if (course.averageEnrollment < 150) {
+            return 0.25
+        } else {
+            return 0.25 + (((course.averageEnrollment - 150) / 100.0) * 0.25);
+        }
+    }
+}
+
+// "Lecture-only classes, manual grading
+// (Tests require grader attention)"
+const lectureManualGradingFormula: IFormula = {
+    calculate: (course: ICourse) => {
+        // "Lecture-only classes, manual grading
+        // (Tests require grader attention)"        
+        if (course.averageEnrollment < 150) {
+            return 0.25
+        } else {
+            return 0.25 + (((course.averageEnrollment - 150) / 100.0) * 0.25);
+        }
+    }
+}
+
+// "Lecture-only classes, moderate writing
+// (5-10 page papers)"
+const lectureModerateWritingFormula: IFormula = {
+    calculate: (course: ICourse) => {
+        // 25% TA or Reader per 100 students
+        return (course.averageEnrollment / 100.0) * 0.25;
+    }
+}
+
+// "Lecture-only classes, writing-intensive or substantial project
+// (No sections; GE writing or ≥10 page papers: ' substantial project’ is a project that comprises at least 25% of the total course grade and requires input from faculty/TA’s over more than one class meeting for organization, planning, implementation, and/or evaluation/grading of student work"
+const lectureIntensiveFormula: IFormula = {
+    calculate: (course: ICourse) => {
+        // 25% TA or Reader per 40 students
+        return (course.averageEnrollment / 40.0) * 0.25;
+    }
+}
+
+
 export const formulas : IFormulas = {
     "STD": standardLectureFormula,
     "WRT": writingLectureFormula,
-    "LAB": labFormula
+    "LAB": labFormula,
+    "FLD": fieldFormula,
+    "AUTO": lectureAutoGradingFormula,
+    "MAN": lectureManualGradingFormula,
+    "MODW": lectureModerateWritingFormula,
+    "INT": lectureIntensiveFormula
 };
