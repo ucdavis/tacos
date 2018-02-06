@@ -19,9 +19,9 @@ namespace tacos.mvc.Controllers
             return Json(new Course {
                 Number = courseNumber,
                 Name = courseNumber,
-                TimesOfferedPerYear = 12,
+                TimesOfferedPerYear = 2,
                 AverageSectionsPerCourse = 3,
-                AverageEnrollment = 25
+                AverageEnrollment = 96
             });
         }
     }

@@ -16,7 +16,7 @@ interface IFormulas {
 const standardLectureFormula : IFormula = {
     calculate: (course: ICourse) => {
         // Half-time TA per 55 students
-        return (course.averageEnrollment / 55.0) * 55.5;
+        return roundTo((course.averageEnrollment / 55.0) * 0.5, 0.5);
     }
 }
 
@@ -26,7 +26,7 @@ const writingLectureFormula : IFormula = {
     calculate: (course: ICourse) => {
         // "Discussion sections average 20-25 students
         // Half-time TA is responsible for 2 discussion sections, i.e. 40 students"		
-        return (course.averageSectionsPerCourse / 2.0) * 0.5;
+        return roundTo((course.averageSectionsPerCourse / 2.0) * 0.5, 0.5);
     }
 }
 
@@ -37,7 +37,7 @@ const labFormula: IFormula = {
         // "Lab/studio sections average 15-20 students
         // Half-time TA is responsible for 2 lab/studio sections, i.e. 25-30 students
         // Alternative: 10-15 students per section if room size, equipment, or safety concerns require"
-        return (course.averageEnrollment / 30.0) * 0.5;
+        return roundTo((course.averageEnrollment / 30.0) * 0.5, 0.5);
     }
 }
 
@@ -45,7 +45,7 @@ const labFormula: IFormula = {
 const fieldFormula: IFormula = {
     calculate: (course: ICourse) => {
         // Half-time TA per 25 students
-        return (course.averageEnrollment / 25.0) * 0.5;
+        return roundTo((course.averageEnrollment / 25.0) * 0.5, 0.5);
     }
 }
 
@@ -58,7 +58,7 @@ const lectureAutoGradingFormula: IFormula = {
         if (course.averageEnrollment < 150) {
             return 0.25
         } else {
-            return 0.25 + (((course.averageEnrollment - 150) / 100.0) * 0.25);
+            return roundTo(0.25 + (((course.averageEnrollment - 150) / 100.0) * 0.25), 0.25);
         }
     }
 }
@@ -72,7 +72,7 @@ const lectureManualGradingFormula: IFormula = {
         if (course.averageEnrollment < 150) {
             return 0.25
         } else {
-            return 0.25 + (((course.averageEnrollment - 150) / 100.0) * 0.25);
+            return roundTo(0.25 + (((course.averageEnrollment - 150) / 100.0) * 0.25), 0.25);
         }
     }
 }
@@ -82,7 +82,7 @@ const lectureManualGradingFormula: IFormula = {
 const lectureModerateWritingFormula: IFormula = {
     calculate: (course: ICourse) => {
         // 25% TA or Reader per 100 students
-        return (course.averageEnrollment / 100.0) * 0.25;
+        return roundTo((course.averageEnrollment / 100.0) * 0.25, 0.25);
     }
 }
 
@@ -91,8 +91,12 @@ const lectureModerateWritingFormula: IFormula = {
 const lectureIntensiveFormula: IFormula = {
     calculate: (course: ICourse) => {
         // 25% TA or Reader per 40 students
-        return (course.averageEnrollment / 40.0) * 0.25;
+        return roundTo((course.averageEnrollment / 40.0) * 0.25, 0.25);
     }
+}
+
+function roundTo(number: number, round: number) : number {
+    return round * Math.round(number/round);
 }
 
 

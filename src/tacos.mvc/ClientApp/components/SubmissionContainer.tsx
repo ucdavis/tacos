@@ -76,15 +76,13 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
 
     // if the course info looks good, calculate totals
     if (true) { // TODO: figure out valid course?
-      const resultTotal = formulas[request.courseType].calculate(request.course); 
-      request.result = Math.round(resultTotal); // TODO: figure out how we want to round
+      request.result = formulas[request.courseType].calculate(request.course);
     }
 
     const requests = this.state.requests;
     requests[i] = request;
 
     this.setState({ requests });
-    // TODO: update the state
   };
 
   private renderRequests = () => {
