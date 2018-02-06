@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AspNetCore.Security.CAS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,13 +27,14 @@ namespace tacos.mvc
             services.Configure<CommonSettings>(Configuration.GetSection("Common"));
 
             // setup entity framework
-            services.AddDbContextPool<TacoDbContext>(o => o.UseSqlite("Data Source=tacos.db"));
+            services.AddDbContextPool<TacoDbContext>(o => 
+                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole>()
                             .AddEntityFrameworkStores<TacoDbContext>()
                             .AddDefaultTokenProviders();
             
-            services.AddAuthentication(AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme)
+            services.AddAuthentication(CasDefaults.AuthenticationScheme)
                 .AddCAS(options => {
                     options.CasServerUrlBase = Configuration["Common:CasBaseUrl"];
                 });

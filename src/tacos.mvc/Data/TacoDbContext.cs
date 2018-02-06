@@ -6,11 +6,10 @@ namespace tacos.data
 {
     public class TacoDbContext : IdentityDbContext<User>
     {
-        public TacoDbContext(DbContextOptions<TacoDbContext> options)
+        public TacoDbContext(DbContextOptions options)
             : base(options)
         { }
 
-        public new virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Submission> Submissions { get; set; }
 
         public virtual DbSet<Request> Requests { get; set; }

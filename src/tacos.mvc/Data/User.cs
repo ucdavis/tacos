@@ -18,5 +18,4 @@ namespace tacos.data
         [Display(Name = "Name")]
         public string Name { get; set; }
     }
-       
 }

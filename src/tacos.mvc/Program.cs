@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using tacos.data;
 
 namespace tacos.mvc
@@ -23,10 +18,13 @@ namespace tacos.mvc
             // automatically create and seed database
             using (var scope = host.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<TacoDbContext>();
+                var context     = scope.ServiceProvider.GetRequiredService<TacoDbContext>();
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-                Task.Run(() => DbInitializer.Initialize(context, userManager)).Wait();
+                var dbInitializer = new DbInitializer(context, userManager, roleManager);
+
+                Task.Run(() => dbInitializer.RecreateAndInitialize()).Wait();
             }
 #endif
 

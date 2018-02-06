@@ -1,0 +1,46 @@
+﻿@using tacos.mvc.Resources
+@model IList<tacos.mvc.Models.SystemViewModels.UserRoleViewModel>
+
+@{
+    ViewBag.Title = "Manage User Roles";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<table id="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Is Admin</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model)
+        {
+            <tr>
+                <td>
+                        
+                    @if (row.IsAdmin)
+                    {
+                        <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="false" asp-antiforgery="true">
+                            <button class="btn btn-red" type="submit"><i class="fa fa-trash"></i> Admin</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="true" asp-antiforgery="true">
+                            <button class="btn btn-default" type="submit"><i class="fa fa-plus"></i> Admin</button>
+                        </form>
+                    }
+
+
+                </td>
+                <td>@row.User.Name</td>
+                <td>@row.User.Email</td>
+                <td>@row.IsAdmin</td>
+            </tr>
+        }
+    </tbody>
+</table>
