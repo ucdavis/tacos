@@ -19,6 +19,7 @@ export interface ICourse {
   timesOfferedPerYear: number;
   averageSectionsPerCourse: number;
   averageEnrollment: number;
+  valid: boolean;
 }
 
 interface IState {
@@ -36,17 +37,27 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     };
   }
   componentDidMount() {
-    // on mount, add the first request
-    this.onAddRequest();
+    const existingRequestString = localStorage.getItem("requests");
+
+    if (existingRequestString) {
+      this.setState({ requests: JSON.parse(existingRequestString) });
+    } else {
+      this.onAddRequest(); // add a starter one
+    }
   }
   public render() {
     return (
       <div>
         {this.renderRequests()}
-        <Summary canSubmit={true} onSubmit={this.submit} />
+        <Summary canSubmit={this.isValidSubmission()} onSubmit={this.submit} />
       </div>
     );
   }
+
+  private isValidSubmission = (): boolean => {
+    // submission is valid if every course is valid
+    return this.state.requests.every(r => r.course.valid);
+  };
 
   private submit = () => {
     // create the submission
@@ -71,7 +82,11 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
 
         return res.json();
       })
-      .then(console.log)
+      .then(res => {
+        // TODO: make sure we have success
+        localStorage.removeItem("requests");
+        window.location.replace("/submission");
+      })
       .catch(console.error);
   };
 
@@ -88,6 +103,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
 
     const requests = this.state.requests;
     requests[i] = request;
+
+    localStorage.setItem("requests", JSON.stringify(requests));
 
     this.setState({ requests });
   };
@@ -136,7 +153,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
           number: "",
           timesOfferedPerYear: 0,
           averageEnrollment: 0,
-          averageSectionsPerCourse: 0
+          averageSectionsPerCourse: 0,
+          valid: false
         },
         courseType: "STD",
         requestType: "TA",

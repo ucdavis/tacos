@@ -28,7 +28,8 @@ namespace tacos.mvc
 
             // setup entity framework
             services.AddDbContextPool<TacoDbContext>(o => 
-                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                o.UseSqlite("Data Source=tacos.db"));
+                // o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole>()
                             .AddEntityFrameworkStores<TacoDbContext>()

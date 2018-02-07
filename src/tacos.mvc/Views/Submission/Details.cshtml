@@ -1,0 +1,30 @@
+@model Submission
+
+<h4>Details about your submission placed on @Model.Created.ToLongDateString()</h4>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var request in Model.Requests) {
+            <tr>
+                <td>@request.CourseNumber</td>
+                <td>@request.CalculatedTotal</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr class="table-info">
+            <td>
+                Total
+            </td>
+            <td>
+                @Model.Requests.Sum(x=>x.CalculatedTotal)
+            </td>
+        </tr>
+    </tfoot>
+</table>
