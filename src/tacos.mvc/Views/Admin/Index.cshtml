@@ -1,0 +1,20 @@
+@model Submission[]
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Submitter</th>
+            <th>Created</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var submission in Model) {
+            <tr>
+                <td>@submission.Id</td>
+                <td>@submission.Actor</td>
+                <td>@submission.Created</td>
+            </tr>
+        }
+    </tbody>
+</table>
