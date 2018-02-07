@@ -19,6 +19,7 @@ export interface ICourse {
   timesOfferedPerYear: number;
   averageSectionsPerCourse: number;
   averageEnrollment: number;
+  valid: boolean;
 }
 
 interface IState {
@@ -43,9 +44,14 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     return (
       <div>
         {this.renderRequests()}
-        <Summary canSubmit={true} onSubmit={this.submit} />
+        <Summary canSubmit={this.isValidSubmission()} onSubmit={this.submit} />
       </div>
     );
+  }
+
+  private isValidSubmission = () : boolean => {
+    // submission is valid if every course is valid
+    return this.state.requests.every(r => r.course.valid);
   }
 
   private submit = () => {
@@ -139,7 +145,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
           number: "",
           timesOfferedPerYear: 0,
           averageEnrollment: 0,
-          averageSectionsPerCourse: 0
+          averageSectionsPerCourse: 0,
+          valid: false,
         },
         courseType: "STD",
         requestType: "TA",

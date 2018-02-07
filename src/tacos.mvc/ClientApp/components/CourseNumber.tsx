@@ -12,6 +12,15 @@ interface IState {
   querying: boolean;
 }
 
+const defaultCourse = {
+  name: "",
+  number: "",
+  timesOfferedPerYear: 0,
+  averageEnrollment: 0,
+  averageSectionsPerCourse: 0,
+  valid: false
+};
+
 // render a textbox for inputing course number, or show course info if already selected
 export default class CourseNumber extends React.PureComponent<IProps, IState> {
   constructor(props: IProps) {
@@ -50,7 +59,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
 
   private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val = event.target.value;
-    this.props.onChange({ ...this.props.course, number: val }); // TODO: default to blank course?
+    this.props.onChange({ ...defaultCourse, number: val });
 
     if (val.length < 4) {
       this.setState({ querying: false, valid: false });
@@ -76,9 +85,9 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
 
         return res.json();
       })
-      .then((course : ICourse) => {
+      .then((course: ICourse) => {
         this.setState({ querying: false, valid: true });
-        this.props.onChange(course); // TODO: default to blank course?
+        this.props.onChange({ ...course, valid: true });
       })
       .catch(err => {
         console.error(err);
