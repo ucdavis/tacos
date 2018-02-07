@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tacos.data;
+using tacos.mvc.Models;
 
 namespace tacos.mvc.Controllers
 {
@@ -32,13 +33,20 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]Submission submission) {
-            // TODO: do we care about user name or other info?
-            submission.Actor = User.Identity.Name;
+        public async Task<IActionResult> Create([FromBody]SubmissionModel model) {
+            var submission = new Submission {
+                Actor = User.Identity.Name,
+                Created = DateTime.UtcNow,
+                Requests = model.Requests.Select(m => new Request {
+                    CourseNumber = m.Course.Number,
+                    CourseType = m.CourseType,
+                    RequestType = m.RequestType,
+                    Contested = m.Contested,
+                    ContestReason = m.ContestReason,
+                    CalculatedTotal = m.CalculatedTotal
+                }).ToArray()
+            };
 
-            submission.Created = DateTime.UtcNow;
-
-            //             
             context.Submissions.Add(submission);
             await context.SaveChangesAsync();
 
