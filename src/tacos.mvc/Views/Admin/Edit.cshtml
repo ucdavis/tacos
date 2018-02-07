@@ -1,3 +1,4 @@
+@using tacos.mvc.Resources 
 @model Submission
 
 <h4>Looking at submission @Model.Id by @Model.Actor</h4>
@@ -18,8 +19,8 @@
         @foreach(var request in Model.Requests) {
             <tr>
                 <td>@request.CourseNumber</td>
-                <td>@request.CourseType</td>
-                <td>@request.RequestType</td>
+                <td>@CourseInfo.Types[request.CourseType]</td>
+                <td>@CourseInfo.Requests[request.RequestType]</td>
                 <td>@request.Contested</td>
                 <td>@request.ContestReason</td>
                 <td>@request.CalculatedTotal</td>

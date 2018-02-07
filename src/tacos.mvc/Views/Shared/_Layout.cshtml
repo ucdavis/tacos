@@ -28,6 +28,11 @@
       <li class="nav-item">
         <a class="nav-link" asp-controller="submission" asp-action="index">Submissions</a>
       </li>
+      @if (User.IsInRole("Admin")) {
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="admin" asp-action="index">Admin</a>
+        </li>          
+      }
     </ul>
     <form class="form-inline my-2 my-lg-0">
         @await Html.PartialAsync("_LoginPartial")
