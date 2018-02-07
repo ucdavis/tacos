@@ -28,6 +28,13 @@ namespace tacos.mvc.Controllers
             return View(submissions);
         }
 
+        public async Task<IActionResult> Details(int id) {
+            // TODO: what permissions do we want?
+            var submission = await context.Submissions.Include(s=>s.Requests).SingleAsync(x=>x.Id == id);
+
+            return View(submission);
+        }
+
         public IActionResult Create() {
             return View();
         }

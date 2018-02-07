@@ -71,7 +71,10 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
 
         return res.json();
       })
-      .then(console.log)
+      .then(res => {
+        // TODO: make sure we have success
+        window.location.replace("/submission");
+      })
       .catch(console.error);
   };
 

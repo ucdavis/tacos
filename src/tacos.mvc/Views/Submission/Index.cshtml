@@ -1,7 +1,13 @@
 @model Submission[]
 
+<h3>Your submissions</h3>
+
 <ul>
 @foreach(var submission in Model) {
- <li>@submission.Created</li>   
+ <li>
+    <a asp-action="Details" asp-route-id="@submission.Id">
+        @submission.Created
+    </a>
+ </li>   
 }
 </ul>
