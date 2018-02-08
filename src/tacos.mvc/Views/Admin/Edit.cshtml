@@ -11,6 +11,7 @@
             <th>Request Type</th>
             <th>Contested?</th>
             <th>ContestReason</th>
+            <th>ContestTotal</th>
             <th>Total</th>
             <th>Approved?</th>
             <th></th>
@@ -24,6 +25,7 @@
                 <td>@CourseInfo.Requests[request.RequestType]</td>
                 <td>@request.Contested</td>
                 <td>@request.ContestReason</td>
+                <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
                 <td>@request.CalculatedTotal</td>
                 <td>@request.Approved</td>
                 <td>
