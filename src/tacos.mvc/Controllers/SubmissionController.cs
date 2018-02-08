@@ -50,6 +50,7 @@ namespace tacos.mvc.Controllers
                     RequestType = m.RequestType,
                     Contested = m.Contested,
                     ContestReason = m.ContestReason,
+                    ContestTotal = m.ContestTotal,
                     CalculatedTotal = m.CalculatedTotal
                 }).ToArray()
             };
