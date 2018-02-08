@@ -27,24 +27,29 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     super(props);
 
     this.state = {
-      valid: false,
+      valid: props.course.valid,
       querying: false
     };
   }
   public render() {
     return (
-      <div className="input-group mb-3">
-        <input
-          type="text"
-          className="form-control"
-          value={this.props.course.number}
-          onChange={this.onNumberChanged}
-        />
-        <div className="input-group-append">
-          <span className="input-group-text" id="basic-addon2">
-            {this.renderIndicator()}
-          </span>
+      <div>
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={this.props.course.number}
+            onChange={this.onNumberChanged}
+          />
+          <div className="input-group-append">
+            <span className="input-group-text" id="basic-addon2">
+              {this.renderIndicator()}
+            </span>
+          </div>
         </div>
+        <small className="form-text text-muted">
+          {this.props.course.name}
+        </small>
       </div>
     );
   }

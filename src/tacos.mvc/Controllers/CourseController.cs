@@ -18,7 +18,7 @@ namespace tacos.mvc.Controllers
             // TODO: get data from some API or db
             return Json(new Course {
                 Number = courseNumber,
-                Name = courseNumber,
+                Name = "Intro to " + courseNumber,
                 TimesOfferedPerYear = 2,
                 AverageSectionsPerCourse = 3,
                 AverageEnrollment = 96
