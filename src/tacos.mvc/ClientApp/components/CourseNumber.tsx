@@ -27,7 +27,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     super(props);
 
     this.state = {
-      valid: false,
+      valid: props.course.valid,
       querying: false
     };
   }
