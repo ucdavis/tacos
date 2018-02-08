@@ -11,6 +11,7 @@ export interface IRequest {
   calculatedTotal: number;
   contested: boolean;
   contestReason: string;
+  contestTotal: number;
 }
 
 export interface ICourse {
@@ -55,8 +56,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   }
 
   private isValidSubmission = (): boolean => {
-    // submission is valid if every course is valid
-    return this.state.requests.every(r => r.course.valid);
+    // submission is valid if every course is valid and every contest has a valid contestTotal
+    return this.state.requests.every(r => r.course.valid && (!r.contested || (r.contested && r.contestTotal >= 0 )));
   };
 
   private submit = () => {

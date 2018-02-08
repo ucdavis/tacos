@@ -44,8 +44,12 @@ export default class Request extends React.Component<IProps, {}> {
           <Contest
             contested={this.props.request.contested}
             contestReason={this.props.request.contestReason}
+            contestTotal={this.props.request.contestTotal}
             onContestedChange={contested =>
               this.requestChanged("contested", contested)
+            }
+            onContestTotalChange={contestTotal =>
+              this.requestChanged("contestTotal", contestTotal)
             }
             onReasonChange={reason =>
               this.requestChanged("contestReason", reason)
