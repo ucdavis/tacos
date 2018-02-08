@@ -13,6 +13,7 @@
             <th>ContestReason</th>
             <th>Total</th>
             <th>Approved?</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +26,12 @@
                 <td>@request.ContestReason</td>
                 <td>@request.CalculatedTotal</td>
                 <td>@request.Approved</td>
+                <td>
+                    <form class="form-inline" asp-action="Edit" method="POST">
+                        <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
+                        <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

@@ -37,5 +37,10 @@ namespace tacos.mvc.Controllers
 
             return View(submission);
         }
+
+        [HttpPost]
+        public IActionResult Edit(string decision) {
+            return Json(decision);
+        }
     }
 }
