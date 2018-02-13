@@ -161,7 +161,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         requestType: "TA",
         calculatedTotal: 0,
         contested: false,
-        contestReason: ""
+        contestReason: "",
+        contestTotal: 0,
       }
     ];
 
