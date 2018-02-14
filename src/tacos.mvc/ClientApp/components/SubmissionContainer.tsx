@@ -50,14 +50,34 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     return (
       <div>
         {this.renderRequests()}
-        <Summary canSubmit={this.isValidSubmission()} onSubmit={this.submit} />
+        <Summary
+          canSubmit={this.isValidSubmission()}
+          onSubmit={this.submit}
+          onReset={this.onReset}
+        />
       </div>
     );
   }
 
+  private onReset = () => {
+    // reset the form, clear storage
+    if (confirm("Are you sure you want to clear this form and start over?")) {
+      localStorage.removeItem("requests");
+      this.setState({ requests: [] });
+    }
+  };
+
   private isValidSubmission = (): boolean => {
+    // make sure we have at least one request
+    if (this.state.requests.length === 0) {
+      return false;
+    }
+
     // submission is valid if every course is valid and every contest has a valid contestTotal
-    return this.state.requests.every(r => r.course.valid && (!r.contested || (r.contested && r.contestTotal >= 0 )));
+    return this.state.requests.every(
+      r =>
+        r.course.valid && (!r.contested || (r.contested && r.contestTotal >= 0))
+    );
   };
 
   private submit = () => {
@@ -162,7 +182,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         calculatedTotal: 0,
         contested: false,
         contestReason: "",
-        contestTotal: 0,
+        contestTotal: 0
       }
     ];
 
