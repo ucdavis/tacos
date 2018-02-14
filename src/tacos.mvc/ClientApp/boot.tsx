@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { AppContainer } from "react-hot-loader";
 import SubmissionContainer from './components/SubmissionContainer';
-import "./css/site.css";
+import "./css/site.scss";
 
 declare var window: any;
 

@@ -15,7 +15,7 @@ module.exports = env => {
           "event-source-polyfill",
           "isomorphic-fetch",
           "react",
-          "react-dom",
+          "react-dom"
         ]
       },
       resolve: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
@@ -36,6 +36,14 @@ module.exports = env => {
             use: isDevBuild
               ? ["style-loader", "css-loader"]
               : ExtractTextPlugin.extract({ use: "css-loader?minimize" })
+          },
+          {
+            test: /\.scss$/,
+            use: isDevBuild
+              ? ["style-loader", "css-loader", "sass-loader"]
+              : ExtractTextPlugin.extract({
+                  use: ["css-loader", "sass-loader"]
+                })
           },
           { test: /\.(png|jpg|jpeg|gif|svg)$/, use: "url-loader?limit=25000" }
         ]
