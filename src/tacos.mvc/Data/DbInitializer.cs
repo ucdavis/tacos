@@ -94,7 +94,7 @@ namespace tacos.data {
         private void CreateSubmissions()
         {
             var submission = new Submission { Actor = "postit" };
-            var request = new Request { CourseNumber = "MAT16", CourseType = "STD", RequestType = "TA", CalculatedTotal = 2.5 };
+            var request = new Request { CourseNumber = "MAT16", CourseType = "STD", RequestType = "TA", CalculatedTotal = 2.5, Approved = true };
             var request2 = new Request { CourseNumber = "MAT17", CourseType = "LAB", RequestType = "TA", CalculatedTotal = 3.5, Contested = true, ContestReason = "Because I am special", ContestTotal = 5.25 };
 
             submission.Requests.Add(request);
