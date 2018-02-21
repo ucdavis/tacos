@@ -55,6 +55,13 @@ namespace tacos.mvc.Controllers
                 }).ToArray()
             };
 
+            // auto approve any uncontested requests
+            foreach(var request in submission.Requests) {
+                if (!request.Contested) {
+                    request.Approved = true;
+                }
+            }
+
             context.Submissions.Add(submission);
             await context.SaveChangesAsync();
 

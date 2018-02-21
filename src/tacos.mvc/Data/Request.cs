@@ -1,7 +1,8 @@
 namespace tacos.data
 {
     // request for a specific course
-    public class Request {
+    public class Request
+    {
         public int Id { get; set; }
 
         public Submission Submission { get; set; }
@@ -22,6 +23,23 @@ namespace tacos.data
 
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
-        public bool Approved { get; set; }
-    }        
+        public bool? Approved { get; set; }
+
+        public double Total
+        {
+            get
+            {
+                if (Approved.HasValue) {
+                    // if we've made a decision
+                    if (Approved.Value) {
+                        return Contested ? ContestTotal : CalculatedTotal;
+                    } else {
+                        return CalculatedTotal;
+                    }
+                } else {
+                    return 0;
+                }
+            }
+        }
+    }
 }

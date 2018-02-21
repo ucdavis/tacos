@@ -1,24 +1,51 @@
+@using tacos.mvc.Resources 
 @model Submission[]
+
+@{
+    var allRequests = Model.SelectMany(s=>s.Requests).OrderByDescending(x=>x.Contested).ThenBy(x=>x.CourseNumber);
+}
 
 <table class="table">
     <thead>
         <tr>
-            <th>Id</th>
-            <th>Submitter</th>
-            <th>Created</th>
+            <th>Course</th>
+            <th>Course Type</th>
+            <th>Request Type</th>
+            <th>ContestReason</th>
+            <th>ContestTotal</th>
+            <th>CalculatedTotal</th>
+            <th>Total</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach(var submission in Model) {
+        @foreach(var request in allRequests) {
             <tr>
+                <td>@request.CourseNumber</td>
+                <td>@CourseInfo.Types[request.CourseType]</td>
+                <td>@CourseInfo.Requests[request.RequestType]</td>
+                <td>@request.ContestReason</td>
+                <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
+                <td>@request.CalculatedTotal</td>
+                <td>@request.Total</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@submission.Id">
-                        @submission.Id
-                    </a>
+                    @if (!@request.Approved.HasValue) {
+                        <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
+                            <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
+                            <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
+                        </form>
+                    }
                 </td>
-                <td>@submission.Actor</td>
-                <td>@submission.Created</td>
             </tr>
         }
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5"></td>
+            <td>Total:</td>
+            <td colspan="2">
+                @allRequests.Sum(r=>r.Total)
+            </td>
+        </tr>
+    </tfoot>
 </table>
