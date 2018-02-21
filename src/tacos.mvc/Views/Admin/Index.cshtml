@@ -39,4 +39,13 @@
             </tr>
         }
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5"></td>
+            <td>Total:</td>
+            <td colspan="2">
+                @allRequests.Sum(r=>r.Total)
+            </td>
+        </tr>
+    </tfoot>
 </table>
