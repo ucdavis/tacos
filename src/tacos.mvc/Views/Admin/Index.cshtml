@@ -2,7 +2,7 @@
 @model Submission[]
 
 @{
-    var allRequests = Model.SelectMany(s=>s.Requests);
+    var allRequests = Model.SelectMany(s=>s.Requests).OrderByDescending(x=>x.Contested).ThenBy(x=>x.CourseNumber);
 }
 
 <table class="table">
