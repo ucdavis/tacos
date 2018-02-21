@@ -22,25 +22,24 @@ namespace tacos.mvc.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // get most recent submissions
+            // get most all submissions
             var submissions = await dbContext
-                .Submissions.OrderByDescending(s => s.Created).Take(100)
+                .Submissions.OrderByDescending(s => s.Created)
+                .Include(s=>s.Requests)
                 .AsNoTracking().ToArrayAsync();
 
             return View(submissions);
         }
 
-        public async Task<IActionResult> Edit(int id) {
-            // edit a specific submission
-            var submission = await dbContext.Submissions
-                .Include(s=>s.Requests).AsNoTracking().SingleAsync(x=>x.Id == id);
-
-            return View(submission);
-        }
-
         [HttpPost]
-        public IActionResult Edit(string decision) {
-            return Json(decision);
+        public async Task<IActionResult> Edit(int id, string decision) {
+            var request = await dbContext.Requests.SingleAsync(x=>x.Id == id);
+            
+            request.Approved = string.Equals(decision, "APPROVE", StringComparison.OrdinalIgnoreCase);
+
+            await dbContext.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
     }
 }
