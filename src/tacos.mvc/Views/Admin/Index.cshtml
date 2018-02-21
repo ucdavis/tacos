@@ -1,7 +1,9 @@
 @using tacos.mvc.Resources 
-@model Submission
+@model Submission[]
 
-<h4>Looking at submission @Model.Id by @Model.Actor</h4>
+@{
+    var allRequests = Model.SelectMany(s=>s.Requests);
+}
 
 <table class="table">
     <thead>
@@ -9,30 +11,30 @@
             <th>Course</th>
             <th>Course Type</th>
             <th>Request Type</th>
-            <th>Contested?</th>
             <th>ContestReason</th>
             <th>ContestTotal</th>
+            <th>CalculatedTotal</th>
             <th>Total</th>
-            <th>Approved?</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach(var request in Model.Requests) {
+        @foreach(var request in allRequests) {
             <tr>
                 <td>@request.CourseNumber</td>
                 <td>@CourseInfo.Types[request.CourseType]</td>
                 <td>@CourseInfo.Requests[request.RequestType]</td>
-                <td>@request.Contested</td>
                 <td>@request.ContestReason</td>
                 <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
                 <td>@request.CalculatedTotal</td>
-                <td>@request.Approved</td>
+                <td>@request.Total</td>
                 <td>
-                    <form class="form-inline" asp-action="Edit" method="POST">
-                        <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
-                        <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
-                    </form>
+                    @if (!@request.Approved.HasValue) {
+                        <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
+                            <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
+                            <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
+                        </form>
+                    }
                 </td>
             </tr>
         }
