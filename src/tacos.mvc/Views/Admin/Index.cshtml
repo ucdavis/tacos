@@ -2,10 +2,14 @@
 @model Submission[]
 
 @{
-    var allRequests = Model.SelectMany(s=>s.Requests).OrderByDescending(x=>x.Contested).ThenBy(x=>x.CourseNumber);
+    var allRequests = Model.SelectMany(s=>s.Requests);
 }
 
-<table class="table">
+@section styles {
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+}
+
+<table class="table" id="requestTable">
     <thead>
         <tr>
             <th>Course</th>
@@ -49,3 +53,18 @@
         </tr>
     </tfoot>
 </table>
+
+@section scripts {
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>   
+
+    <script>
+        $(document).ready( function () {
+            $('#requestTable').DataTable({
+                "paging": false,
+                "info": false,
+                "order": [[ 7, "desc" ], [0, "asc"]]
+            });
+        } );
+    </script>
+}
