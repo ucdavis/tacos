@@ -6,7 +6,7 @@
 }
 
 @section styles {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
 }
 
 <table class="table" id="requestTable">
@@ -55,15 +55,17 @@
 </table>
 
 @section scripts {
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>   
-
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-flash-1.5.1/b-html5-1.5.1/datatables.js"></script>
     <script>
         $(document).ready( function () {
             $('#requestTable').DataTable({
                 "paging": false,
                 "info": false,
-                "order": [[ 7, "desc" ], [0, "asc"]]
+                "order": [[ 7, "desc" ], [0, "asc"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel'
+                ]
             });
         } );
     </script>
