@@ -28,8 +28,10 @@ export default class Contest extends React.PureComponent<IProps, {}> {
             Contest
           </label>
         </div>
+        <div className="contest">
         <div>{this.renderContestTotal()}</div>
         <div>{this.renderContestReason()}</div>
+      </div>
       </div>
     );
   }
@@ -46,6 +48,7 @@ export default class Contest extends React.PureComponent<IProps, {}> {
     if (this.props.contested) {
       // only show if we are contesting
       return (
+
         <textarea
           className="form-control"
           placeholder="Reason for contesting the course request"

@@ -1,1 +1,138 @@
 /* site specific sass here */
+
+// // fonts
+@font-face {
+    font-family: 'proxima-nova-r';
+    src: url('../media/proximanova-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'proxima-nova-i';
+    src: url('../media/proximanova-regularit-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'proxima-nova-b';
+    src: url('../media/proximanova-bold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+$sans-italic:   "proxima-nova-i",serif;
+$sans-bold:     "proxima-nova-b",serif;
+$sans-reg:      "proxima-nova-r",serif;
+
+$primary-color:     #002855;
+$secondary-color:   #D2AC3A;
+$tertiary-color:    transparentize($secondary-color, .80);
+
+$gold:              #D2AC3A;
+$blue:              #004987;
+
+$accent:            #CCD4E0;
+
+$a-link:            transparentize($primary-color, .2);
+
+$primary-font: rgba(67,67,67,.99); //
+$secondary-font: rgba(67,67,67,.7); //
+$tertiary-font: rgba(67,67,67,.48); //
+
+
+$bg-color: transparentize($primary-color, .88); // background
+$borders: #C8C7CC; // border color
+
+$nav-active: #fff;
+
+
+// UC Davis Colors
+// Supplemental bright color palette for UC Davis
+$unitrans-red: #ba0c2f;
+$western-redbud: #c6007e;
+$california-poppy: #ed8800;
+$golden-lupine: #ffcd00;
+$sunny-grass: #78be20;
+$sky-blue: #00b5e2;
+$recpool-blue: #008eaa;
+$wine-grape: #642667;
+// Supplemental neutral color palette for UC Davis
+$mu-brick: #c26e60;
+$harthall-stucco: #e6a65d;
+$sage-green: #9caf88;
+$evergreen: #00573f;
+$wintersky-gray: #5b7f95;
+$cenwalk-gray: #b1b3b3;
+$cork-oak: #aca39a;
+$shingle-brown: #4f2c1d;
+// mixins
+@mixin breakpoint($point) {
+  @if $point==rufus {
+      @media (min-width: 768px) {
+          @content ;
+      }
+  }
+    @if $point==tablet {
+        @media (max-width: 768px) {
+            @content ;
+        }
+    }
+    @if $point==mobile {
+        @media (max-width: 640px) {
+            @content ;
+        }
+    }
+    @if $point==smbreak {
+        @media (min-width: 576px) {
+            @content ;
+        }
+    }
+    @if $point==smmaxbreak {
+        @media (max-width: 576px) {
+            @content ;
+        }
+    }
+    @if $point==mdbreak {
+        @media (max-width: 767px) {
+            @content ;
+        }
+    }
+}
+
+// nav {
+//     background-color: $primary-color!important;
+//     color: $secondary-color!important;
+// }
+
+// .navbar-brand{
+//     color: $secondary-color!important;
+// }
+
+.head_bleed {
+    background: #1e3a5b;
+      background: -moz-linear-gradient(left,#1e3a5b 0%,#1e3a5b 44%,#dbbc5b 57%,#dbbc5b 100%);
+      background: -webkit-linear-gradient(left,#1e3a5b 0%,#1e3a5b 44%,#dbbc5b 57%,#dbbc5b 100%);
+      background: linear-gradient(to right,#1e3a5b 0%,#1e3a5b 44%,#dbbc5b 57%,#dbbc5b 100%);
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$gradient-one',endColorstr='$gradient-two',GradientType=1);
+  }
+  .head_divider {
+      background: url(../media/banner.svg) center top/cover no-repeat;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+  .head_contents{
+      color: white;
+  }
+
+  .navbar-brand{
+    color: white;
+  }
+
+  .nav-link{
+    color: $secondary-color;
+  }
+
+  .navbar-expand-lg{
+    width: 100%;
+  }

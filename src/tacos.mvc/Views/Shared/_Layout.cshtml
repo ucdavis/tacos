@@ -19,32 +19,35 @@
     @RenderSection("styles", required: false)
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" asp-action="index" asp-controller="home">TA Calculated Outcomes System</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+    <div class="head_bleed">
+        <div class="head_divider head_contents">
+            <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" asp-action="index" asp-controller="home">TA Calculated Outcomes System</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" asp-controller="submission" asp-action="index">Submissions</a>
-      </li>
-      @if (User.IsInRole("Admin")) {
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="admin" asp-action="index">Admin</a>
-        </li>          
-        <li class="nav-item">
-            <a class="nav-link" asp-controller="system" asp-action="users">Users</a>
-        </li>          
-      }
-    </ul>
-    <form class="form-inline my-2 my-lg-0">
-        @await Html.PartialAsync("_LoginPartial")
-    </form>
-  </div>
-</nav>
-    
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="submission" asp-action="index">Submissions</a>
+            </li>
+            @if (User.IsInRole("Admin")) {
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="admin" asp-action="index">Admin</a>
+                </li>          
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="system" asp-action="users">Users</a>
+                </li>          
+            }
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                @await Html.PartialAsync("_LoginPartial")
+            </form>
+        </div>
+        </nav>
+        </div>
+    </div>
 
     <div class="container">
         @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string)) {
