@@ -16,9 +16,9 @@ export default class ContestDetail extends React.PureComponent<IProps, {}> {
     if (!this.props.contested) return null;
 
     return (
-      <div>
-        <div>{this.renderContestTotal()}</div>
-        <div>{this.renderContestReason()}</div>
+      <div className="contestRow">
+        <div className="contestRowComponents">{this.renderContestTotal()}</div>
+        <div className="contestRowComponents">{this.renderContestReason()}</div>
       </div>
     );
   }
