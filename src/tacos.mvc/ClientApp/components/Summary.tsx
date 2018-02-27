@@ -17,7 +17,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
       <div className="head_divider">
       <nav
         className="navbar fixed-bottom bg-blue"
-        style={{ backgroundColor: "#228ae6" }}
+        // style={{ backgroundColor: "#228ae6" }}
       >
         <span className="navbar-brand">Request Total: XYZ</span>
         <div className="pull-right">

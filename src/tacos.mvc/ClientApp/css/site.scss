@@ -136,3 +136,30 @@ $shingle-brown: #4f2c1d;
   .navbar-expand-lg{
     width: 100%;
   }
+
+  .navbar{
+    background: url(../media/banner.svg) center top/cover no-repeat;
+  }
+
+  .table{
+      margin-top: 3rem;
+      margin-bottom: 5rem;
+  }
+
+  .btn-primary{
+    background-color: $accent;
+    color: $primary-color;
+    border: none;
+  }
+
+  .input-group-text{
+    background-color: $accent;
+  }
+
+  .pull-right{
+    .btn-primary{
+        margin-left: 4px;
+        color: white;
+    }
+
+  }
