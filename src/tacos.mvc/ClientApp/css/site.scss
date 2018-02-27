@@ -170,6 +170,12 @@ $shingle-brown: #4f2c1d;
 .contestRow{
     background-color: $accent;
     padding: 0.75rem;
+
+    p{
+        color:$primary-color;
+        margin-top:0.5rem;
+        margin-bottom:0;
+    }
 }
 
 .contestRowComponents{

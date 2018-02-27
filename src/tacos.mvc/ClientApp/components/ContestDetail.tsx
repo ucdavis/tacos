@@ -17,7 +17,9 @@ export default class ContestDetail extends React.PureComponent<IProps, {}> {
 
     return (
       <div className="contestRow">
+        <p><b>Proposed number of TAs</b></p>
         <div className="contestRowComponents">{this.renderContestTotal()}</div>
+        <p><b>Reason for contesting</b></p>
         <div className="contestRowComponents">{this.renderContestReason()}</div>
       </div>
     );
