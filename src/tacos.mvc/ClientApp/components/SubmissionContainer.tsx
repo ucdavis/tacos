@@ -151,7 +151,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
             <th>Contest?</th>
           </tr>
         </thead>
-        <tbody>{requestList}</tbody>
+        {requestList}
         <tfoot>
           <tr>
             <td colSpan={5}>
