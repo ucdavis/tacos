@@ -45,7 +45,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             <span
               className="input-group-text"
               id="basic-addon2"
-              style={this.colorIndicator()}
+              style={{ color: this.state.valid ? "green" : "red" }}
             >
               {this.renderIndicator()}
             </span>
@@ -80,17 +80,11 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
   private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val = event.target.value;
     this.props.onChange({ ...defaultCourse, number: val });
-    // so default is this style:
-    var btnStyle = {
-      backgroundColor: "red"
-    };
 
-    if (val.length < 4) {
+    // only valid if we are at 6 chars
+    if (val.length !== 6) {
       this.setState({ querying: false, valid: false });
-      btnStyle = {
-        backgroundColor: "green"
-      };
-      return; // never valid if we are <4 chars
+      return;
     }
 
     this.setState({ querying: true, valid: false });
@@ -113,8 +107,12 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
         return res.json();
       })
       .then((course: ICourse) => {
-        this.setState({ querying: false, valid: true });
-        this.props.onChange({ ...course, valid: true });
+        if (course) {
+          this.setState({ querying: false, valid: true });
+          this.props.onChange({ ...course, valid: true });
+        } else {
+          this.setState({ querying: false, valid: false });
+        }
       })
       .catch(err => {
         console.error(err);
