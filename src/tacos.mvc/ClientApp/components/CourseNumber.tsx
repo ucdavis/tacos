@@ -42,31 +42,32 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             onChange={this.onNumberChanged}
           />
           <div className="input-group-append">
-            <span className="input-group-text" id="basic-addon2" style={this.colorIndicator()}>
+            <span
+              className="input-group-text"
+              id="basic-addon2"
+              style={this.colorIndicator()}
+            >
               {this.renderIndicator()}
             </span>
           </div>
         </div>
-        <small className="form-text text-muted">
-          {this.props.course.name}
-        </small>
+        <small className="form-text text-muted">{this.props.course.name}</small>
       </div>
     );
   }
 
   private colorIndicator = () => {
-    var colorInd = 'red'
+    var colorInd = "red";
 
     if (this.state.valid) {
-      colorInd = 'green';
+      colorInd = "green";
     }
     var styleColor = {
-      color: colorInd,
+      color: colorInd
     };
-    
-    return styleColor;
 
-  }
+    return styleColor;
+  };
 
   private renderIndicator = () => {
     if (this.state.querying) {
@@ -81,17 +82,16 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     this.props.onChange({ ...defaultCourse, number: val });
     // so default is this style:
     var btnStyle = {
-          backgroundColor: 'red'
-        }
+      backgroundColor: "red"
+    };
 
     if (val.length < 4) {
       this.setState({ querying: false, valid: false });
       btnStyle = {
-        backgroundColor: 'green'
-      }
+        backgroundColor: "green"
+      };
       return; // never valid if we are <4 chars
     }
-
 
     this.setState({ querying: true, valid: false });
 
