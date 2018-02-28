@@ -56,19 +56,6 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     );
   }
 
-  private colorIndicator = () => {
-    var colorInd = "red";
-
-    if (this.state.valid) {
-      colorInd = "green";
-    }
-    var styleColor = {
-      color: colorInd
-    };
-
-    return styleColor;
-  };
-
   private renderIndicator = () => {
     if (this.state.querying) {
       return <i className="fa fa-spin fa-spinner" />;
