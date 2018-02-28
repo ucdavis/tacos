@@ -43,7 +43,7 @@ namespace tacos.data {
         private void CreateCourses() {
             var lda2 = new Course {
                 Number = "LDA002",
-                Name = "",
+                Name = "Intro to LDA Placeholder",
                 TimesOfferedPerYear = 1,
                 AverageEnrollment = 98,
                 AverageSectionsPerCourse = 0
@@ -52,7 +52,7 @@ namespace tacos.data {
             
             var lda3 = new Course {
                 Number = "LDA003",
-                Name = "",
+                Name = "Advanced LDA Placeholder",
                 TimesOfferedPerYear = 1,
                 AverageEnrollment = 138,
                 AverageSectionsPerCourse = 7.5
@@ -60,7 +60,7 @@ namespace tacos.data {
 
             var lda170 = new Course {
                 Number = "LDA170",
-                Name = "",
+                Name = "LDA Ipsum",
                 TimesOfferedPerYear = 2,
                 AverageEnrollment = 16,
                 AverageSectionsPerCourse = 0
