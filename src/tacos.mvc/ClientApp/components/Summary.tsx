@@ -6,6 +6,7 @@ interface IProps {
   onSubmit : () => void;
   onReset : () => void;
   canSubmit: boolean;
+  total: number;
 }
 
 // the overall summary of totals, plus action/submit button
@@ -18,7 +19,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
       <nav
         className="navbar fixed-bottom bg-blue"
       >
-        <span className="navbar-brand">Request Total: XYZ</span>
+        <span className="navbar-brand">Request Total: {this.props.total > 0 ? this.props.total : '---'}</span>
         <div className="pull-right">
           <button className="btn btn-danger" onClick={this.props.onReset}>
             Reset

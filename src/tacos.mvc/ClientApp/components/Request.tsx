@@ -12,6 +12,7 @@ interface IProps {
   request: IRequest;
   index: number;
   onEdit: (i: number, request: IRequest) => void;
+  onRemove: (i: number) => void;
 }
 
 export default class Request extends React.Component<IProps, {}> {
@@ -49,6 +50,11 @@ export default class Request extends React.Component<IProps, {}> {
                 this.requestChanged("contested", contested)
               }
             />
+          </td>
+          <td>
+            <button className="btn btn-danger" onClick={() => this.props.onRemove(this.props.index)}>
+              <i className="fa fa-trash-alt" />
+            </button>
           </td>
         </tr>
         <tr key={`contest-${this.props.index}`}>

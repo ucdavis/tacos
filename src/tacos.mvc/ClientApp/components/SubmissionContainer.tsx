@@ -52,12 +52,25 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         {this.renderRequests()}
         <Summary
           canSubmit={this.isValidSubmission()}
+          total={this.submissionTotal()}
           onSubmit={this.submit}
           onReset={this.onReset}
         />
       </div>
     );
   }
+
+  private submissionTotal = () => {
+    if (!this.isValidSubmission()) return 0;
+
+    // we have a valid submission, go add up everything they have requested
+    const total = this.state.requests.reduce((acc, req) => {
+      // add in contested total if contested, otherwise the calc total
+      return acc + (req.contested ? req.contestTotal : req.calculatedTotal);
+    }, 0);
+
+    return total;
+  };
 
   private onReset = () => {
     // reset the form, clear storage
@@ -130,6 +143,19 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     this.setState({ requests });
   };
 
+  private removeRequest = (i: number) => {
+    console.log("remove request");
+
+    const requests = [...this.state.requests];
+    requests.splice(i, 1);
+
+    localStorage.setItem("requests", JSON.stringify(requests));
+
+    this.setState({
+      requests
+    });
+  };
+
   private renderRequests = () => {
     const requestList = this.state.requests.map((req, i) => (
       <Request
@@ -137,6 +163,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         request={req}
         index={i}
         onEdit={this.requestUpdated}
+        onRemove={this.removeRequest}
       />
     ));
 
@@ -149,6 +176,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
             <th>Request Type</th>
             <th>Result</th>
             <th>Contest?</th>
+            <th>Remove</th>
           </tr>
         </thead>
         {requestList}
