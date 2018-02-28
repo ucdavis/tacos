@@ -13,6 +13,8 @@ namespace tacos.data
         public virtual DbSet<Submission> Submissions { get; set; }
 
         public virtual DbSet<Request> Requests { get; set; }
+
+        public virtual DbSet<Course> Courses { get; set; }
     }
         
 }

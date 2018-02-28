@@ -61,9 +61,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   }
 
   private submissionTotal = () => {
-    if (!this.isValidSubmission()) return 0;
-
-    // we have a valid submission, go add up everything they have requested
+    // go add up everything they have requested
     const total = this.state.requests.reduce((acc, req) => {
       // add in contested total if contested, otherwise the calc total
       return acc + (req.contested ? req.contestTotal : req.calculatedTotal);
