@@ -70,7 +70,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     }, 0);
 
     return total;
-  }
+  };
 
   private onReset = () => {
     // reset the form, clear storage
@@ -143,6 +143,19 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     this.setState({ requests });
   };
 
+  private removeRequest = (i: number) => {
+    console.log("remove request");
+
+    const requests = [...this.state.requests];
+    requests.splice(i, 1);
+
+    localStorage.setItem("requests", JSON.stringify(requests));
+
+    this.setState({
+      requests
+    });
+  };
+
   private renderRequests = () => {
     const requestList = this.state.requests.map((req, i) => (
       <Request
@@ -150,6 +163,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         request={req}
         index={i}
         onEdit={this.requestUpdated}
+        onRemove={this.removeRequest}
       />
     ));
 
@@ -162,6 +176,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
             <th>Request Type</th>
             <th>Result</th>
             <th>Contest?</th>
+            <th>Remove</th>
           </tr>
         </thead>
         {requestList}
