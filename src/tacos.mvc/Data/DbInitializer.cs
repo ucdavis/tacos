@@ -35,7 +35,40 @@ namespace tacos.data {
 
             CreateSubmissions();
 
+            CreateCourses();
+
             _context.SaveChanges();
+        }
+
+        private void CreateCourses() {
+            var lda2 = new Course {
+                Number = "LDA002",
+                Name = "",
+                TimesOfferedPerYear = 1,
+                AverageEnrollment = 98,
+                AverageSectionsPerCourse = 0
+            };
+
+            
+            var lda3 = new Course {
+                Number = "LDA003",
+                Name = "",
+                TimesOfferedPerYear = 1,
+                AverageEnrollment = 138,
+                AverageSectionsPerCourse = 7.5
+            };
+
+            var lda170 = new Course {
+                Number = "LDA170",
+                Name = "",
+                TimesOfferedPerYear = 2,
+                AverageEnrollment = 16,
+                AverageSectionsPerCourse = 0
+            };
+
+            _context.Courses.Add(lda2);
+            _context.Courses.Add(lda3);
+            _context.Courses.Add(lda170);
         }
 
         private async Task CreateRoles()

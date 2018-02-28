@@ -9,8 +9,8 @@ namespace tacos.data
 
         public string Name { get; set; }
 
-        public int TimesOfferedPerYear { get; set; }
-        public int AverageSectionsPerCourse { get; set; }
+        public double TimesOfferedPerYear { get; set; }
+        public double AverageSectionsPerCourse { get; set; }
         public int AverageEnrollment { get; set; }
     }
 }
