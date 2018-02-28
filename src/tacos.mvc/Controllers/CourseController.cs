@@ -27,6 +27,8 @@ namespace tacos.mvc.Controllers
                 .Where(x => string.Equals(courseNumber, x.Number, StringComparison.OrdinalIgnoreCase))
                 .SingleOrDefaultAsync();
 
+            if (course == null) return NotFound();
+            
             return Json(course);
         }
     }

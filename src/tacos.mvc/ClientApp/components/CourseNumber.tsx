@@ -110,8 +110,6 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
         if (course) {
           this.setState({ querying: false, valid: true });
           this.props.onChange({ ...course, valid: true });
-        } else {
-          this.setState({ querying: false, valid: false });
         }
       })
       .catch(err => {
