@@ -45,7 +45,7 @@ module.exports = env => {
                   use: ["css-loader", "sass-loader"]
                 })
           },
-          { test: /\.(png|jpg|jpeg|gif|svg)$/, use: "url-loader?limit=25000" }
+          { test: /\.(png|jpg|jpeg|gif|svg|woff)$/, use: "url-loader?limit=25000" }
         ]
       },
       plugins: [

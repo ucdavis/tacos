@@ -12,9 +12,11 @@ interface IProps {
 export default class Summary extends React.PureComponent<IProps, {}> {
   public render() {
     return (
+
+      <div className="head-bleed">
+      <div className="head_divider">
       <nav
         className="navbar fixed-bottom bg-blue"
-        style={{ backgroundColor: "#228ae6" }}
       >
         <span className="navbar-brand">Request Total: XYZ</span>
         <div className="pull-right">
@@ -26,6 +28,8 @@ export default class Summary extends React.PureComponent<IProps, {}> {
           </button>
         </div>
       </nav>
+      </div>
+      </div>
     );
   }
 }
