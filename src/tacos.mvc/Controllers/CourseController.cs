@@ -11,18 +11,25 @@ namespace tacos.mvc.Controllers
 {
     public class CourseController : ApplicationController
     {
-        [HttpGet("/course/{courseNumber}")]
-        public IActionResult Get(string courseNumber) {
-            // TODO: some basic validation checking
+        private readonly TacoDbContext dbContext;
 
-            // TODO: get data from some API or db
-            return Json(new Course {
-                Number = courseNumber,
-                Name = "Intro to " + courseNumber,
-                TimesOfferedPerYear = 2,
-                AverageSectionsPerCourse = 3,
-                AverageEnrollment = 96
-            });
+        public CourseController(TacoDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
+        [HttpGet("/course/{courseNumber}")]
+        public async Task<IActionResult> Get(string courseNumber)
+        {
+            // make sure we have at least 4 chars
+            if (courseNumber == null || courseNumber.Length < 4) return null;
+
+            var course = await dbContext.Courses
+                .Where(x => string.Equals(courseNumber, x.Number, StringComparison.OrdinalIgnoreCase))
+                .SingleOrDefaultAsync();
+
+            if (course == null) return NotFound();
+            
+            return Json(course);
         }
     }
 }
