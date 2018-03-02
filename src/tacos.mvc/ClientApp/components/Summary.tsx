@@ -23,7 +23,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
           <button className="btn btn-danger" onClick={this.props.onReset}>
             Reset
           </button>
-          <button className="btn btn-primary" disabled={!this.props.canSubmit} onClick={this.props.onSubmit}>
+          <button className="btn btn-primary" id="submit-button" disabled={!this.props.canSubmit} onClick={this.props.onSubmit}>
             Submit
           </button>
         </div>

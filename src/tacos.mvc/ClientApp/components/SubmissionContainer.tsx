@@ -155,7 +155,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         <tfoot>
           <tr>
             <td colSpan={5}>
-              <button className="btn btn-primary" onClick={this.onAddRequest}>
+              <button className="btn btn-primary" id="add-new"onClick={this.onAddRequest}>
                 Add New
               </button>
             </td>
