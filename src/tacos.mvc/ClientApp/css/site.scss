@@ -161,29 +161,27 @@ $shingle-brown: #4f2c1d;
   background: url(../media/banner.svg) center top/cover no-repeat;
 }
 
-.table {
-  margin-top: 3rem;
-  margin-bottom: 5rem;
-  td {
-    border: none;
-  }
+.table{
+    margin-top: 3rem;
+    margin-bottom: 5rem;
+    td{
+        border: none;
+    }
 }
 
-.btn-primary {
-  background-color: $accent;
-  color: $primary-color;
-  border: none;
+#add-new{
+background-color: $accent;
+color: $primary-color;
+border: none;
 }
 
-.input-group-text {
-  background-color: $accent;
+.input-group-text{
+background-color: $accent;
 }
 
-.pull-right {
-  .btn-primary {
-    margin-left: 4px;
-    color: white;
-  }
+ 
+#submit-button{
+margin-left: 4px;
 }
 
 .contestRow {
