@@ -1,10 +1,6 @@
 @using tacos.mvc.Resources 
 @model Submission[]
 
-@{
-    var allRequests = Model.SelectMany(s=>s.Requests);
-}
-
 @section styles {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
 }
@@ -12,6 +8,9 @@
 <table class="table" id="requestTable">
     <thead>
         <tr>
+            <th>Submission</th>
+            <th>Submitter</th>
+            <th>Date</th>
             <th>Course</th>
             <th>Course Type</th>
             <th>Request Type</th>
@@ -23,24 +22,29 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var request in allRequests) {
-            <tr>
-                <td>@request.CourseNumber</td>
-                <td>@CourseInfo.Types[request.CourseType]</td>
-                <td>@CourseInfo.Requests[request.RequestType]</td>
-                <td>@request.ContestReason</td>
-                <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
-                <td>@request.CalculatedTotal</td>
-                <td>@request.Total</td>
-                <td>
-                    @if (!@request.Approved.HasValue) {
-                        <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
-                            <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
-                            <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
-                        </form>
-                    }
-                </td>
-            </tr>
+        @foreach(var submission in Model) {
+            @foreach(var request in submission.Requests) {
+                <tr>
+                    <td>@submission.Id</td>
+                    <td>@submission.Actor</td>
+                    <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
+                    <td>@request.CourseNumber</td>
+                    <td>@CourseInfo.Types[request.CourseType]</td>
+                    <td>@CourseInfo.Requests[request.RequestType]</td>
+                    <td>@request.ContestReason</td>
+                    <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
+                    <td>@request.CalculatedTotal</td>
+                    <td>@request.Total</td>
+                    <td>
+                        @if (!@request.Approved.HasValue) {
+                            <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
+                                <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
+                                <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
         }
     </tbody>
     <tfoot>
@@ -48,7 +52,7 @@
             <td colspan="5"></td>
             <td>Total:</td>
             <td colspan="2">
-                @allRequests.Sum(r=>r.Total)
+                @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total)
             </td>
         </tr>
     </tfoot>
@@ -61,7 +65,7 @@
             $('#requestTable').DataTable({
                 "paging": false,
                 "info": false,
-                "order": [[ 7, "desc" ], [0, "asc"]],
+                "order": [[ 10, "desc" ], [3, "asc"]],
                 dom: 'Bfrtip',
                 buttons: [
                     'excel'
