@@ -24,7 +24,7 @@ namespace tacos.mvc.Controllers
             if (courseNumber == null || courseNumber.Length < 4) return null;
 
             var course = await dbContext.Courses
-                .Where(x => string.Equals(courseNumber, x.Number, StringComparison.OrdinalIgnoreCase))
+                .Where(x => courseNumber == x.Number)
                 .SingleOrDefaultAsync();
 
             if (course == null) return NotFound();
