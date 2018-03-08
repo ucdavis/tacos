@@ -41,8 +41,11 @@ namespace tacos.mvc.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody]SubmissionModel model) {
+            var creator = await userManager.GetUserAsync(User);
+            var creatorDisplay = $"{creator.LastName}, {creator.FirstName} ({creator.UserName})";
+            
             var submission = new Submission {
-                Actor = User.Identity.Name,
+                Actor = creatorDisplay,
                 Created = DateTime.UtcNow,
                 Requests = model.Requests.Select(m => new Request {
                     CourseNumber = m.Course.Number,

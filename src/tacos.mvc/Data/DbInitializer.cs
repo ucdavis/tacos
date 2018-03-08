@@ -84,6 +84,8 @@ namespace tacos.data {
                 Email = "srkirkland@ucdavis.edu",
                 UserName = "postit",
                 Name = "Scott Kirkland",
+                FirstName = "Scott",
+                LastName = "Kirkland",
                 Id = "postit"
             };
 
