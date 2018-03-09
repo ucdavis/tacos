@@ -26,7 +26,7 @@
             @foreach(var request in submission.Requests) {
                 <tr>
                     <td>@submission.Id</td>
-                    <td>@submission.Actor</td>
+                    <td>@submission.ActorName (@submission.Actor)</td>
                     <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
                     <td>@request.CourseNumber</td>
                     <td>@CourseInfo.Types[request.CourseType]</td>

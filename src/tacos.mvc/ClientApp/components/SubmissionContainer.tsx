@@ -33,7 +33,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     super(props);
 
     this.state = {
-      department: "",
+      department: "APLS",
       requests: []
     };
   }
@@ -45,10 +45,29 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     } else {
       this.onAddRequest(); // add a starter one
     }
+
+    const existingDepartment = localStorage.getItem("department");
+
+    if (existingDepartment) {
+      this.setState({ department: existingDepartment });
+    }
   }
   public render() {
     return (
       <div>
+        <div className="form-group">
+          <label htmlFor="department">Your Department:</label>
+          <select
+            className="form-control"
+            id="department"
+            value={this.state.department}
+            onChange={this.onDepartmentChange}
+          >
+            <option>AANS</option>
+            <option>APLS</option>
+            <option>LAWR</option>
+          </select>
+        </div>
         {this.renderRequests()}
         <Summary
           canSubmit={this.isValidSubmission()}
@@ -59,6 +78,16 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       </div>
     );
   }
+
+  private onDepartmentChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const department = event.target.value;
+
+    this.setState({ department });
+
+    localStorage.setItem("department", department);
+  };
 
   private submissionTotal = () => {
     // go add up everything they have requested
@@ -74,6 +103,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     // reset the form, clear storage
     if (confirm("Are you sure you want to clear this form and start over?")) {
       localStorage.removeItem("requests");
+      localStorage.removeItem("department");
       this.setState({ requests: [] });
     }
   };
@@ -94,7 +124,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   private submit = () => {
     // create the submission
     const submission = {
-      metadata: "TODO",
+      department: this.state.department,
       requests: this.state.requests
     };
 
@@ -181,7 +211,11 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         <tfoot>
           <tr>
             <td colSpan={5}>
-              <button className="btn btn-primary" id="add-new"onClick={this.onAddRequest}>
+              <button
+                className="btn btn-primary"
+                id="add-new"
+                onClick={this.onAddRequest}
+              >
                 Add New
               </button>
             </td>

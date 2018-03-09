@@ -13,7 +13,10 @@ namespace tacos.data
         }
         public int Id { get; set; }
 
+        public string Department { get; set; }
+
         public string Actor { get; set; }
+        public string ActorName { get; set; }
 
         public DateTime Created { get; set; }
 
