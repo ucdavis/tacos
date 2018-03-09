@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Request from "./Request";
 import Summary from "./Summary";
+import Departments from "./Departments";
 import { formulas } from "../util/formulas";
 
 export interface IRequest {
@@ -55,19 +56,10 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   public render() {
     return (
       <div>
-        <div className="form-group">
-          <label htmlFor="department">Your Department:</label>
-          <select
-            className="form-control"
-            id="department"
-            value={this.state.department}
-            onChange={this.onDepartmentChange}
-          >
-            <option>AANS</option>
-            <option>APLS</option>
-            <option>LAWR</option>
-          </select>
-        </div>
+        <Departments
+          department={this.state.department}
+          onChange={this.onDepartmentChange}
+        />
         {this.renderRequests()}
         <Summary
           canSubmit={this.isValidSubmission()}
@@ -79,11 +71,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     );
   }
 
-  private onDepartmentChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const department = event.target.value;
-
+  private onDepartmentChange = (department: string) => {
     this.setState({ department });
 
     localStorage.setItem("department", department);

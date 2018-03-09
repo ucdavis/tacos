@@ -9,6 +9,7 @@
     <thead>
         <tr>
             <th>Submission</th>
+            <th>Department</th>
             <th>Submitter</th>
             <th>Date</th>
             <th>Course</th>
@@ -26,6 +27,7 @@
             @foreach(var request in submission.Requests) {
                 <tr>
                     <td>@submission.Id</td>
+                    <td>@submission.Department</td>
                     <td>@submission.ActorName (@submission.Actor)</td>
                     <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
                     <td>@request.CourseNumber</td>
@@ -65,7 +67,7 @@
             $('#requestTable').DataTable({
                 "paging": false,
                 "info": false,
-                "order": [[ 10, "desc" ], [3, "asc"]],
+                "order": [[ 11, "desc" ], [4, "asc"]],
                 dom: 'Bfrtip',
                 buttons: [
                     'excel'
