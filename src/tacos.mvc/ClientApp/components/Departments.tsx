@@ -18,9 +18,9 @@ export default class Departments extends React.PureComponent<IProps, {}> {
           value={this.props.department}
           onChange={e => this.props.onChange(e.target.value)}
         >
-          <option>AANS</option>
-          <option>APLS</option>
-          <option>LAWR</option>
+          <option value="AANS">Animal Science</option>
+          <option value="APLS">Plant Sciences</option>
+          <option value="LAWR">Land, Air, Water</option>
         </select>
       </div>
     );
