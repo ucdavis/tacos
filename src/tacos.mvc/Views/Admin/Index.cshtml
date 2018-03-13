@@ -51,11 +51,12 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="5"></td>
+            <td colspan="9"></td>
             <td>Total:</td>
-            <td colspan="2">
+            <td>
                 @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total)
             </td>
+            <td>&nbsp;</td>
         </tr>
     </tfoot>
 </table>
