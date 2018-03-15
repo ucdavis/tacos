@@ -12,7 +12,7 @@ install:
 - cmd: |
     cd src\tacos.mvc
     appveyor-retry yarn install
-    cd ..
+    cd ..\..\
 
 - cmd: appveyor-retry dotnet restore
 - cmd: echo %APPVEYOR_REPO_COMMIT_MESSAGE% > commit.txt 
