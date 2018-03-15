@@ -1,0 +1,33 @@
+version: 1.0.0.{build}
+
+environment:
+  configuration: Release
+  matrix:
+    - node_version: "8.9.4"
+
+image: Visual Studio 2017
+
+install:
+- ps: Install-Product node $env:node_version
+- cmd: |
+    cd src\tacos.mvc
+    appveyor-retry yarn install
+    cd ..\..\
+
+- cmd: appveyor-retry dotnet restore
+- cmd: echo %APPVEYOR_REPO_COMMIT_MESSAGE% > commit.txt 
+
+cache:
+- '%USERPROFILE%\.nuget\packages -> **\*.csproj'
+- '%LOCALAPPDATA%\yarn -> **\package.json'
+- src\tacos.mvc\node_modules -> **\package.json
+
+before_build:
+- ps: |
+    $path = (Get-Item .\src\tacos.mvc\tacos.mvc.csproj).FullName
+    $csproj = [xml](Get-Content $path)
+    $csproj.Project.PropertyGroup.Version = $Env:APPVEYOR_BUILD_VERSION
+    $csproj.Save($path)
+
+build_script:
+- cmd: dotnet build
