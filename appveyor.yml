@@ -30,5 +30,4 @@ before_build:
     $csproj.Save($path)
 
 build_script:
-- cmd: msbuild .\src\tacos.mvc\tacos.mvc.csproj /t:RunWebpack /p:Configuration=%configuration%
-- cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
+- cmd: dotnet build
