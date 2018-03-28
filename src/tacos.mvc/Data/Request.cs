@@ -21,6 +21,10 @@ namespace tacos.data
 
         public double ContestTotal { get; set; }
 
+        public double AverageSectionsPerCourse { get; set; }
+
+        public int AverageEnrollment { get; set; }
+
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
         public bool? Approved { get; set; }

@@ -56,7 +56,9 @@ namespace tacos.mvc.Controllers
                     Contested = m.Contested,
                     ContestReason = m.ContestReason,
                     ContestTotal = m.ContestTotal,
-                    CalculatedTotal = m.CalculatedTotal
+                    CalculatedTotal = m.CalculatedTotal,
+                    AverageSectionsPerCourse = m.Course.AverageSectionsPerCourse,
+                    AverageEnrollment = m.Course.AverageEnrollment
                 }).ToArray()
             };
 
