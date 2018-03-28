@@ -34,6 +34,8 @@ export default class Request extends React.Component<IProps, {}> {
               }
             />
           </td>
+          <td>{this.props.request.course.averageEnrollment}</td>
+          <td>{this.props.request.course.averageSectionsPerCourse}</td>
           <td>
             <RequestType
               requestType={this.props.request.requestType}
