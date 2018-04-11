@@ -71,6 +71,7 @@ namespace tacos.data {
         private async Task CreateRoles()
         {
             await _roleManager.CreateAsync(new IdentityRole(RoleCodes.Admin));
+            await _roleManager.CreateAsync(new IdentityRole(RoleCodes.Reviewer));
             await _roleManager.CreateAsync(new IdentityRole(RoleCodes.User));
         }
 
