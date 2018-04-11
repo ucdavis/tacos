@@ -32,6 +32,11 @@
             <li class="nav-item">
                 <a class="nav-link" asp-controller="submission" asp-action="index">Submissions</a>
             </li>
+            @if (User.IsInRole("Reviewer")) {
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="review" asp-action="index">Review</a>
+                </li>          
+            }
             @if (User.IsInRole("Admin")) {
                 <li class="nav-item">
                     <a class="nav-link" asp-controller="admin" asp-action="index">Admin</a>

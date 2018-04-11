@@ -1,0 +1,63 @@
+@using tacos.mvc.Resources 
+@model Submission[]
+
+@section styles {
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
+}
+
+<table class="table" id="requestTable">
+    <thead>
+        <tr>
+            <th>Department</th>
+            <th>Submitter</th>
+            <th>Date</th>
+            <th>Course</th>
+            <th>Course Type</th>
+            <th>Request Type</th>
+            <th>ContestReason</th>
+            <th>ContestTotal</th>
+            <th>CalculatedTotal</th>
+            <th>Approved</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var submission in Model) {
+            @foreach(var request in submission.Requests) {
+                <tr>
+                    <td>@submission.Department</td>
+                    <td>@submission.ActorName (@submission.Actor)</td>
+                    <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
+                    <td>@request.CourseNumber</td>
+                    <td>@CourseInfo.Types[request.CourseType]</td>
+                    <td>@CourseInfo.Requests[request.RequestType]</td>
+                    <td>@request.ContestReason</td>
+                    <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
+                    <td>@request.CalculatedTotal</td>
+                    <td>@request.Total</td>
+                </tr>
+            }
+        }
+    </tbody>
+    <tfoot>
+        <tr class="table-info">
+            <td colspan="8"></td>
+            <td>Total:</td>
+            <td>
+                @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total)
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+@section scripts {
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
+    <script>
+        $(document).ready( function () {
+            $('#requestTable').DataTable({
+                "paging": false,
+                "info": false,
+                "order": [[2, "desc"]],
+            });
+        } );
+    </script>
+}
