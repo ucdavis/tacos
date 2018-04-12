@@ -10,5 +10,6 @@ namespace tacos.mvc.Models.SystemViewModels
     {
         public User User { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsReviewer { get; set; }
     }
 }

@@ -28,15 +28,20 @@ namespace tacos.mvc.Controllers
             var users = _dbContext.Users.ToList();
 
             var admins = (await _userManager.GetUsersInRoleAsync(RoleCodes.Admin));
+            var reviewers = (await _userManager.GetUsersInRoleAsync(RoleCodes.Reviewer));
 
             var joined = from u in users
                          join a in admins
                          on u.Id equals a.Id into gj
+                         join r in reviewers
+                         on u.Id equals r.Id into rj
                          from match in gj.DefaultIfEmpty()
+                         from match2 in rj.DefaultIfEmpty()
                          select new UserRoleViewModel
                          {
                              User = u,
-                             IsAdmin = (match != null)
+                             IsAdmin = (match != null),
+                             IsReviewer = (match2 != null),
                          };
 
             return View(joined.ToList());
