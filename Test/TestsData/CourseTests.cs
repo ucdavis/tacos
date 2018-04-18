@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using tacos.data;
-using Test.Helpers;
+using TestHelpers.Helpers;
 using Xunit;
 
 namespace Test.TestsData
@@ -15,7 +13,7 @@ namespace Test.TestsData
         {
             #region Arrange
             var expectedFields = new List<NameAndType>();
-            expectedFields.Add(new NameAndType("AverageEnrollment", "System.Int32", new List<string>()));
+            expectedFields.Add(new NameAndType("AverageEnrollment", "System.Double", new List<string>()));
             expectedFields.Add(new NameAndType("AverageSectionsPerCourse", "System.Double", new List<string>()));
             expectedFields.Add(new NameAndType("Name", "System.String", new List<string>()));
             expectedFields.Add(new NameAndType("Number", "System.String", new List<string>
