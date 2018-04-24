@@ -10,11 +10,11 @@ namespace tacos.mvc.Models
 
         public string RequestType { get; set; }
 
-        public bool Contested { get; set; }
+        public bool Exception { get; set; }
 
-        public string ContestReason { get; set; }
+        public string ExceptionReason { get; set; }
 
-        public double ContestTotal { get; set; }
+        public double ExceptionTotal { get; set; }
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
     }

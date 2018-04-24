@@ -15,11 +15,11 @@ namespace tacos.data
 
         public string RequestType { get; set; }
 
-        public bool Contested { get; set; }
+        public bool Exception { get; set; }
 
-        public string ContestReason { get; set; }
+        public string ExceptionReason { get; set; }
 
-        public double ContestTotal { get; set; }
+        public double ExceptionTotal { get; set; }
 
         public double AverageSectionsPerCourse { get; set; }
 
@@ -36,7 +36,7 @@ namespace tacos.data
                 if (Approved.HasValue) {
                     // if we've made a decision
                     if (Approved.Value) {
-                        return Contested ? ContestTotal : CalculatedTotal;
+                        return Exception ? ExceptionTotal : CalculatedTotal;
                     } else {
                         return CalculatedTotal;
                     }

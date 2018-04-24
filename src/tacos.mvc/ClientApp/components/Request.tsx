@@ -2,8 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { IRequest } from "./SubmissionContainer";
 
-import Contest from "./Contest";
-import ContestDetail from './ContestDetail';
+import Exception from "./Exception";
+import ExceptionDetail from './ExceptionDetail';
 import CourseNumber from "./CourseNumber";
 import CourseType from "./CourseType";
 import RequestType from "./RequestType";
@@ -43,11 +43,12 @@ export default class Request extends React.Component<IProps, {}> {
             />
           </td>
           <td>{this.props.request.calculatedTotal}</td>
+          <td>Annual</td>
           <td>
-            <Contest
-              contested={this.props.request.contested}
-              onContestedChange={contested =>
-                this.requestChanged("contested", contested)
+            <Exception
+              exception={this.props.request.exception}
+              onExceptionChange={exception =>
+                this.requestChanged("exception", exception)
               }
             />
           </td>
@@ -57,17 +58,17 @@ export default class Request extends React.Component<IProps, {}> {
             </button>
           </td>
         </tr>
-        <tr key={`contest-${this.props.index}`}>
-          <td colSpan={5}>
-            <ContestDetail
-              contested={this.props.request.contested}
-              contestReason={this.props.request.contestReason}
-              contestTotal={this.props.request.contestTotal}
-              onContestTotalChange={contestTotal =>
-                this.requestChanged("contestTotal", contestTotal)
+        <tr key={`exception-${this.props.index}`}>
+          <td colSpan={7}>
+            <ExceptionDetail
+              exception={this.props.request.exception}
+              exceptionReason={this.props.request.exceptionReason}
+              exceptionTotal={this.props.request.exceptionTotal}
+              onExceptionTotalChange={exceptionTotal =>
+                this.requestChanged("exceptionTotal", exceptionTotal)
               }
               onReasonChange={reason =>
-                this.requestChanged("contestReason", reason)
+                this.requestChanged("exceptionReason", reason)
               }
             />
           </td>
