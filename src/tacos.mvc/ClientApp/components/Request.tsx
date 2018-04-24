@@ -43,6 +43,7 @@ export default class Request extends React.Component<IProps, {}> {
             />
           </td>
           <td>{this.props.request.calculatedTotal}</td>
+          <td>Annual</td>
           <td>
             <Contest
               contested={this.props.request.contested}
