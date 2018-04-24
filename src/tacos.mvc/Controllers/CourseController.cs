@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,9 @@ namespace tacos.mvc.Controllers
         {
             // make sure we have at least 4 chars
             if (courseNumber == null || courseNumber.Length < 4) return null;
-
+            var parsedCourseNumber = Regex.Replace(courseNumber, @"\s", "");
             var course = await dbContext.Courses
-                .Where(x => courseNumber == x.Number)
+                .Where(x => parsedCourseNumber == x.Number)
                 .SingleOrDefaultAsync();
 
             if (course == null) return NotFound();
