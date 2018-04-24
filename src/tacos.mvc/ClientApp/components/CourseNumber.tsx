@@ -65,12 +65,11 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
   };
 
   private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    var val = event.target.value;
+    const val = event.target.value;
     this.props.onChange({ ...defaultCourse, number: val });
-    val = val.split(" ").join("");
 
-    // only valid if we are at 6 chars
-    if (val.length !== 6) {
+    // only valid if we are at 6+ chars
+    if (val.length < 6) {
       this.setState({ querying: false, valid: false });
       return;
     }
