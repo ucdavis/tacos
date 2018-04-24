@@ -47,7 +47,7 @@ export default class Request extends React.Component<IProps, {}> {
           <td>
             <Exception
               exception={this.props.request.exception}
-              onExceptionedChange={exception =>
+              onExceptionChange={exception =>
                 this.requestChanged("exception", exception)
               }
             />

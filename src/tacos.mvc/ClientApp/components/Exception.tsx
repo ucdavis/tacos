@@ -4,7 +4,7 @@ import { IRequest } from "./SubmissionContainer";
 
 interface IProps {
   exception: boolean;
-  onExceptionedChange: (exception: boolean) => void;
+  onExceptionChange: (exception: boolean) => void;
 }
 
 // render a textbox for inputing course number, or show course info if already selected
@@ -17,7 +17,7 @@ export default class Exception extends React.PureComponent<IProps, {}> {
             className="form-check-input"
             type="checkbox"
             checked={this.props.exception}
-            onChange={e => this.props.onExceptionedChange(e.target.checked)}
+            onChange={e => this.props.onExceptionChange(e.target.checked)}
             id="defaultCheck1"
           />
           <label className="form-check-label" htmlFor="defaultCheck1">
