@@ -190,8 +190,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
             <th>Course Number</th>
             <th>Course Type</th>
             <th>Request Type</th>
-            <th>Result</th>
-            <th>Contest?</th>
+            <th>TAs per course</th>
+            <th>Exception?</th>
             <th>Remove</th>
           </tr>
         </thead>

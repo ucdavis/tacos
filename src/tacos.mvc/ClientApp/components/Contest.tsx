@@ -21,7 +21,7 @@ export default class Contest extends React.PureComponent<IProps, {}> {
             id="defaultCheck1"
           />
           <label className="form-check-label" htmlFor="defaultCheck1">
-            Contest
+            Exception
           </label>
         </div>
       </div>
