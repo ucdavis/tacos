@@ -59,7 +59,7 @@ export default class Request extends React.Component<IProps, {}> {
           </td>
         </tr>
         <tr key={`contest-${this.props.index}`}>
-          <td colSpan={5}>
+          <td colSpan={7}>
             <ContestDetail
               contested={this.props.request.contested}
               contestReason={this.props.request.contestReason}
