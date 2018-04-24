@@ -14,7 +14,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
   public render() {
     return (
 
-      <div className="head-bleed">
+      <div className="head_bleed">
       <div className="head_divider">
       <nav
         className="navbar fixed-bottom bg-blue"

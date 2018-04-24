@@ -53,18 +53,18 @@ namespace tacos.mvc.Controllers
                     CourseNumber = m.Course.Number,
                     CourseType = m.CourseType,
                     RequestType = m.RequestType,
-                    Contested = m.Contested,
-                    ContestReason = m.ContestReason,
-                    ContestTotal = m.ContestTotal,
+                    Exception = m.Exception,
+                    ExceptionReason = m.ExceptionReason,
+                    ExceptionTotal = m.ExceptionTotal,
                     CalculatedTotal = m.CalculatedTotal,
                     AverageSectionsPerCourse = m.Course.AverageSectionsPerCourse,
                     AverageEnrollment = m.Course.AverageEnrollment
                 }).ToArray()
             };
 
-            // auto approve any uncontested requests
+            // auto approve any unexception requests
             foreach(var request in submission.Requests) {
-                if (!request.Contested) {
+                if (!request.Exception) {
                     request.Approved = true;
                 }
             }

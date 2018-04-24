@@ -10,9 +10,9 @@ export interface IRequest {
   courseType: string;
   requestType: string;
   calculatedTotal: number;
-  contested: boolean;
-  contestReason: string;
-  contestTotal: number;
+  exception: boolean;
+  exceptionReason: string;
+  exceptionTotal: number;
 }
 
 export interface ICourse {
@@ -80,8 +80,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   private submissionTotal = () => {
     // go add up everything they have requested
     const total = this.state.requests.reduce((acc, req) => {
-      // add in contested total if contested, otherwise the calc total
-      return acc + (req.contested ? req.contestTotal : req.calculatedTotal);
+      // add in exception total if exception, otherwise the calc total
+      return acc + (req.exception ? req.exceptionTotal : req.calculatedTotal);
     }, 0);
 
     return total;
@@ -102,10 +102,10 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       return false;
     }
 
-    // submission is valid if every course is valid and every contest has a valid contestTotal
+    // submission is valid if every course is valid and every exception has a valid exceptionTotal
     return this.state.requests.every(
       r =>
-        r.course.valid && (!r.contested || (r.contested && r.contestTotal >= 0))
+        r.course.valid && (!r.exception || (r.exception && r.exceptionTotal >= 0))
     );
   };
 
@@ -229,9 +229,9 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         courseType: "STD",
         requestType: "TA",
         calculatedTotal: 0,
-        contested: false,
-        contestReason: "",
-        contestTotal: 0
+        exception: false,
+        exceptionReason: "",
+        exceptionTotal: 0
       }
     ];
 

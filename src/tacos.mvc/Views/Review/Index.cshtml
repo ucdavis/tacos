@@ -14,8 +14,8 @@
             <th>Course</th>
             <th>Course Type</th>
             <th>Request Type</th>
-            <th>ContestReason</th>
-            <th>ContestTotal</th>
+            <th>ExceptionReason</th>
+            <th>ExceptionTotal</th>
             <th>CalculatedTotal</th>
             <th>Approved</th>
         </tr>
@@ -30,8 +30,8 @@
                     <td>@request.CourseNumber</td>
                     <td>@CourseInfo.Types[request.CourseType]</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
-                    <td>@request.ContestReason</td>
-                    <td>@(request.Contested ? request.ContestTotal.ToString() : "")</td>
+                    <td>@request.ExceptionReason</td>
+                    <td>@(request.Exception ? request.ExceptionTotal.ToString() : "")</td>
                     <td>@request.CalculatedTotal</td>
                     <td>@request.Total</td>
                 </tr>
