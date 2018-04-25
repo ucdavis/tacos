@@ -1,8 +1,9 @@
 ﻿CREATE TABLE [dbo].[Courses] (
-    [Number]                   NVARCHAR (450) NOT NULL,
-    [AverageEnrollment]        INT            NOT NULL,
-    [AverageSectionsPerCourse] FLOAT (53)     NOT NULL,
-    [Name]                     NVARCHAR (MAX) NULL,
+    [Number]                   [NVARCHAR] (20) NOT NULL,
+    [AverageEnrollment]        [FLOAT]         NOT NULL,
+    [AverageSectionsPerCourse] [FLOAT]         NOT NULL,
+    [Name]                     [NVARCHAR] (255)    NULL,
+    [TimesOfferedPerYear]      [FLOAT]             NULL,
     CONSTRAINT [PK_Courses] PRIMARY KEY CLUSTERED ([Number] ASC)
 );
 
