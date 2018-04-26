@@ -6,24 +6,26 @@
     <thead>
         <tr>
             <th>Course</th>
-            <th>Total</th>
+            <th>Requested Exception</th>
+            <th>Total Requested</th>
         </tr>
     </thead>
     <tbody>
         @foreach(var request in Model.Requests) {
             <tr>
                 <td>@request.CourseNumber</td>
-                <td>@request.CalculatedTotal</td>
+                <td>@request.ExceptionAnnualizedTotal</td>
+                <td>@request.Total</td>
             </tr>
         }
     </tbody>
     <tfoot>
         <tr class="table-info">
-            <td>
+            <td colspan="2">
                 Total
             </td>
             <td>
-                @Model.Requests.Sum(x=>x.CalculatedTotal)
+                @Model.Requests.Sum(x=>x.AnnualizedTotal)
             </td>
         </tr>
     </tfoot>

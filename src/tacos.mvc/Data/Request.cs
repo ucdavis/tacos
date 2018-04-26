@@ -21,13 +21,20 @@ namespace tacos.data
 
         public double ExceptionTotal { get; set; }
 
+        public double ExceptionAnnualizedTotal { get; set; }
+
         public double AverageSectionsPerCourse { get; set; }
 
         public double AverageEnrollment { get; set; }
 
+        public double TimesOfferedPerYear { get; set; }
+
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
-        public bool? Approved { get; set; }
+
+        public double AnnualizedTotal { get; set; }
+        
+        public bool? Approved { get; set; }        
 
         public double Total
         {
@@ -36,9 +43,9 @@ namespace tacos.data
                 if (Approved.HasValue) {
                     // if we've made a decision
                     if (Approved.Value) {
-                        return Exception ? ExceptionTotal : CalculatedTotal;
+                        return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
                     } else {
-                        return CalculatedTotal;
+                        return AnnualizedTotal;
                     }
                 } else {
                     return 0;
