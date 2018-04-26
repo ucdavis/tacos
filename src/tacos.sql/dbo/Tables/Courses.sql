@@ -3,7 +3,7 @@
     [AverageEnrollment]        [FLOAT]         NOT NULL,
     [AverageSectionsPerCourse] [FLOAT]         NOT NULL,
     [Name]                     [NVARCHAR] (255)    NULL,
-    [TimesOfferedPerYear]      [FLOAT]             NULL,
+    [TimesOfferedPerYear]      [FLOAT]         NOT NULL,
     CONSTRAINT [PK_Courses] PRIMARY KEY CLUSTERED ([Number] ASC)
 );
 
