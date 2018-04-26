@@ -45,7 +45,8 @@ namespace tacos.data {
                 Number = "LDA002",
                 Name = "Intro to LDA Placeholder",
                 AverageEnrollment = 98,
-                AverageSectionsPerCourse = 0
+                AverageSectionsPerCourse = 0,
+                TimesOfferedPerYear = 20
             };
 
             
@@ -53,14 +54,16 @@ namespace tacos.data {
                 Number = "LDA003",
                 Name = "Advanced LDA Placeholder",
                 AverageEnrollment = 138,
-                AverageSectionsPerCourse = 7.5
+                AverageSectionsPerCourse = 7.5,
+                TimesOfferedPerYear = 30
             };
 
             var lda170 = new Course {
                 Number = "LDA170",
                 Name = "LDA Ipsum",
                 AverageEnrollment = 16,
-                AverageSectionsPerCourse = 0
+                AverageSectionsPerCourse = 0,
+                TimesOfferedPerYear = 10
             };
 
             _context.Courses.Add(lda2);
@@ -127,8 +130,8 @@ namespace tacos.data {
         private void CreateSubmissions()
         {
             var submission = new Submission { Actor = "postit" };
-            var request = new Request { CourseNumber = "MAT16", CourseType = "STD", RequestType = "TA", CalculatedTotal = 2.5, Approved = true };
-            var request2 = new Request { CourseNumber = "MAT17", CourseType = "LAB", RequestType = "TA", CalculatedTotal = 3.5, Exception = true, ExceptionReason = "Because I am special", ExceptionTotal = 5.25 };
+            var request = new Request { CourseNumber = "MAT16", CourseType = "STD", RequestType = "TA", CalculatedTotal = 2.5, AnnualizedTotal = 20.5, Approved = true };
+            var request2 = new Request { CourseNumber = "MAT17", CourseType = "LAB", RequestType = "TA", CalculatedTotal = 3.5, AnnualizedTotal = 30, Exception = true, ExceptionReason = "Because I am special", ExceptionTotal = 5.25 };
 
             submission.Requests.Add(request);
             submission.Requests.Add(request2);

@@ -10,9 +10,11 @@ export interface IRequest {
   courseType: string;
   requestType: string;
   calculatedTotal: number;
+  annualizedTotal: number;
   exception: boolean;
   exceptionReason: string;
   exceptionTotal: number;
+  exceptionAnnualizedTotal: number;
 }
 
 export interface ICourse {
@@ -80,8 +82,11 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   private submissionTotal = () => {
     // go add up everything they have requested
     const total = this.state.requests.reduce((acc, req) => {
-      // add in exception total if exception, otherwise the calc total
-      return acc + (req.exception ? req.exceptionTotal : req.calculatedTotal);
+      // add in exception total if exception, otherwise the annualized total
+      return (
+        acc +
+        (req.exception ? req.exceptionAnnualizedTotal : req.annualizedTotal)
+      );
     }, 0);
 
     return total;
@@ -105,7 +110,8 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     // submission is valid if every course is valid and every exception has a valid exceptionTotal
     return this.state.requests.every(
       r =>
-        r.course.valid && (!r.exception || (r.exception && r.exceptionTotal >= 0))
+        r.course.valid &&
+        (!r.exception || (r.exception && r.exceptionTotal >= 0))
     );
   };
 
@@ -149,6 +155,11 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       request.calculatedTotal = formulas[request.courseType].calculate(
         request.course
       );
+
+      request.exceptionAnnualizedTotal = request.exceptionTotal * request.course.timesOfferedPerYear;
+
+      request.annualizedTotal =
+        request.calculatedTotal * request.course.timesOfferedPerYear;
     }
 
     const requests = this.state.requests;
@@ -229,9 +240,11 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         courseType: "STD",
         requestType: "TA",
         calculatedTotal: 0,
+        annualizedTotal: 0,
         exception: false,
         exceptionReason: "",
-        exceptionTotal: 0
+        exceptionTotal: 0,
+        exceptionAnnualizedTotal: 0,
       }
     ];
 

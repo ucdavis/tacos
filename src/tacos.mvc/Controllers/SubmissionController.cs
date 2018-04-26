@@ -56,7 +56,9 @@ namespace tacos.mvc.Controllers
                     Exception = m.Exception,
                     ExceptionReason = m.ExceptionReason,
                     ExceptionTotal = m.ExceptionTotal,
+                    ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal,
                     CalculatedTotal = m.CalculatedTotal,
+                    AnnualizedTotal = m.AnnualizedTotal,
                     AverageSectionsPerCourse = m.Course.AverageSectionsPerCourse,
                     AverageEnrollment = m.Course.AverageEnrollment
                 }).ToArray()

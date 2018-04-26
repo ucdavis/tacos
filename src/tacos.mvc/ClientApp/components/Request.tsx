@@ -43,7 +43,7 @@ export default class Request extends React.Component<IProps, {}> {
             />
           </td>
           <td>{this.props.request.calculatedTotal}</td>
-          <td>Annual</td>
+          <td>{this.props.request.annualizedTotal}</td>
           <td>
             <Exception
               exception={this.props.request.exception}
