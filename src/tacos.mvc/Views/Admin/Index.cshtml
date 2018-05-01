@@ -38,9 +38,9 @@
                     <td>@request.AverageEnrollment</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
                     <td>@request.ExceptionReason</td>
-                    <td>@(request.Exception ? request.ExceptionAnnualizedTotal.ToString() : "")</td>
-                    <td>@request.AnnualizedTotal</td>
-                    <td>@request.Total</td>
+                    <td>@(request.Exception ? request.ExceptionAnnualizedTotal.ToString("f3") : "")</td>
+                    <td>@request.AnnualizedTotal.ToString("f3")</td>
+                    <td>@request.Total.ToString("f3")</td>
                     <td>
                         @if (!@request.Approved.HasValue) {
                             <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
@@ -58,7 +58,7 @@
             <td colspan="11"></td>
             <td>Total:</td>
             <td>
-                @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total)
+                @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total).ToString("f3")
             </td>
             <td>&nbsp;</td>
         </tr>

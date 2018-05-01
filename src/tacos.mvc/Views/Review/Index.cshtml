@@ -31,9 +31,9 @@
                     <td>@CourseInfo.Types[request.CourseType]</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
                     <td>@request.ExceptionReason</td>
-                    <td>@(request.Exception ? request.ExceptionAnnualizedTotal.ToString() : "")</td>
-                    <td>@request.AnnualizedTotal</td>
-                    <td>@request.Total</td>
+                    <td>@(request.Exception ? request.ExceptionAnnualizedTotal.ToString("f3") : "")</td>
+                    <td>@request.AnnualizedTotal.ToString("f3")</td>
+                    <td>@request.Total.ToString("f3")</td>
                 </tr>
             }
         }
@@ -43,7 +43,7 @@
             <td colspan="8"></td>
             <td>Total:</td>
             <td>
-                @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total)
+                @Model.SelectMany(x=>x.Requests).Sum(r=>r.Total).ToString("f3")
             </td>
         </tr>
     </tfoot>
