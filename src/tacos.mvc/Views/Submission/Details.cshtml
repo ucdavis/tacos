@@ -14,8 +14,8 @@
         @foreach(var request in Model.Requests) {
             <tr>
                 <td>@request.CourseNumber</td>
-                <td>@request.ExceptionAnnualizedTotal</td>
-                <td>@request.Total</td>
+                <td>@request.ExceptionAnnualizedTotal.ToString("f3")</td>
+                <td>@request.Total.ToString("f3")</td>
             </tr>
         }
     </tbody>
@@ -25,7 +25,7 @@
                 Total
             </td>
             <td>
-                @Model.Requests.Sum(x=>x.AnnualizedTotal)
+                @Model.Requests.Sum(x=>x.Total).ToString("f3")
             </td>
         </tr>
     </tfoot>
