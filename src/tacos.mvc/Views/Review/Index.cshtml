@@ -15,8 +15,8 @@
             <th>Course Type</th>
             <th>Request Type</th>
             <th>ExceptionReason</th>
-            <th>ExceptionTotal</th>
-            <th>CalculatedTotal</th>
+            <th>Exception Annualized Total</th>
+            <th>Annualized Total</th>
             <th>Approved</th>
         </tr>
     </thead>
@@ -31,8 +31,8 @@
                     <td>@CourseInfo.Types[request.CourseType]</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
                     <td>@request.ExceptionReason</td>
-                    <td>@(request.Exception ? request.ExceptionTotal.ToString() : "")</td>
-                    <td>@request.CalculatedTotal</td>
+                    <td>@(request.Exception ? request.ExceptionAnnualizedTotal.ToString() : "")</td>
+                    <td>@request.AnnualizedTotal</td>
                     <td>@request.Total</td>
                 </tr>
             }
