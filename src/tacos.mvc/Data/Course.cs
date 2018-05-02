@@ -11,5 +11,6 @@ namespace tacos.data
 
         public double AverageSectionsPerCourse { get; set; }
         public double AverageEnrollment { get; set; }
+        public double TimesOfferedPerYear { get; set; }
     }
 }
