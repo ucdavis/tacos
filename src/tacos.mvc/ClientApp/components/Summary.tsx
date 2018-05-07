@@ -19,7 +19,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
       <nav
         className="navbar fixed-bottom bg-blue"
       >
-        <span className="navbar-brand">Request Total: {this.props.total > 0 ? this.props.total : '---'}</span>
+        <span className="navbar-brand">Request Total: {this.props.total > 0 ? this.props.total.toFixed(3) : '---'}</span>
         <div className="pull-right">
           <button className="btn btn-danger" onClick={this.props.onReset}>
             Reset

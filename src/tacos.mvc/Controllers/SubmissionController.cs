@@ -60,7 +60,8 @@ namespace tacos.mvc.Controllers
                     CalculatedTotal = m.CalculatedTotal,
                     AnnualizedTotal = m.AnnualizedTotal,
                     AverageSectionsPerCourse = m.Course.AverageSectionsPerCourse,
-                    AverageEnrollment = m.Course.AverageEnrollment
+                    AverageEnrollment = m.Course.AverageEnrollment,
+                    TimesOfferedPerYear = m.Course.TimesOfferedPerYear
                 }).ToArray()
             };
 
