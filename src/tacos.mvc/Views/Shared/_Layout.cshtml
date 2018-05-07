@@ -32,21 +32,21 @@
 
         <div class="navbar-row collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
+                <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "submission" ? "active" : "")">
                     <a class="nav-link" asp-controller="submission" asp-action="index">Submissions</a>
                 </li>
                 @if (User.IsInRole("Reviewer"))
                 {
-                    <li class="nav-item">
+                    <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "review" ? "active" : "")">
                         <a class="nav-link" asp-controller="review" asp-action="index">Review</a>
                     </li>
                 }
                 @if (User.IsInRole("Admin"))
                 {
-                    <li class="nav-item">
+                    <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "admin" ? "active" : "")">
                         <a class="nav-link" asp-controller="admin" asp-action="index">Admin</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "system" ? "active" : "")">
                         <a class="nav-link" asp-controller="system" asp-action="users">Users</a>
                     </li>
                 }
@@ -64,7 +64,7 @@
     <environment names="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>    
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     </environment>
     <environment names="Staging,Production">
         <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
