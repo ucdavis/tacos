@@ -147,20 +147,16 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   };
 
   private requestUpdated = (i: number, request: IRequest) => {
-    console.log("update request", request);
-
+    const annualizationRatio = 4.0 / 12.0;
     // if the course info looks good, calculate totals
-    if (true) {
-      // TODO: figure out valid course?
-      request.calculatedTotal = formulas[request.courseType].calculate(
-        request.course
-      );
+    request.calculatedTotal = formulas[request.courseType].calculate(
+      request.course
+    );
 
-      request.exceptionAnnualizedTotal = request.exceptionTotal * request.course.timesOfferedPerYear;
+    request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
 
-      request.annualizedTotal =
-        request.calculatedTotal * request.course.timesOfferedPerYear;
-    }
+    request.annualizedTotal =
+      request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
 
     const requests = this.state.requests;
     requests[i] = request;
@@ -243,7 +239,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         annualizedTotal: 0,
         exception: false,
         exceptionReason: "",
-        exceptionTotal: 0,
+        exceptionTotal: 0.00,
         exceptionAnnualizedTotal: 0,
       }
     ];
