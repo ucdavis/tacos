@@ -33,8 +33,6 @@ namespace tacos.data {
 
             await CreateUsers();
 
-            CreateSubmissions();
-
             CreateCourses();
 
             _context.SaveChanges();
@@ -103,6 +101,7 @@ namespace tacos.data {
             await _userManager.CreateAsync(scottUser);
             await _userManager.AddLoginAsync(scottUser, scottInfo);
             await _userManager.AddToRoleAsync(scottUser, RoleCodes.Admin);
+            await _userManager.AddToRoleAsync(scottUser, RoleCodes.Reviewer);
 
             var johnUser = new User()
             {
@@ -125,18 +124,6 @@ namespace tacos.data {
             await _userManager.CreateAsync(johnUser);
             await _userManager.AddLoginAsync(johnUser, johnInfo);
             await _userManager.AddToRoleAsync(johnUser, RoleCodes.Admin);
-        }
-
-        private void CreateSubmissions()
-        {
-            var submission = new Submission { Actor = "postit" };
-            var request = new Request { CourseNumber = "MAT16", CourseType = "STD", RequestType = "TA", CalculatedTotal = 2.5, AnnualizedTotal = 20.5, Approved = true };
-            var request2 = new Request { CourseNumber = "MAT17", CourseType = "LAB", RequestType = "TA", CalculatedTotal = 3.5, AnnualizedTotal = 30, Exception = true, ExceptionReason = "Because I am special", ExceptionTotal = 5.25 };
-
-            submission.Requests.Add(request);
-            submission.Requests.Add(request2);
-
-            _context.Submissions.Add(submission);
         }
     }
 }

@@ -36,7 +36,23 @@ namespace tacos.data
         
         public bool? Approved { get; set; }        
 
-        public double Total
+        public double ApprovedTotal
+        {
+            get
+            {
+                if (Approved.HasValue) {
+                    // if we've made a decision
+                    if (Approved.Value) {
+                        return Exception ? ExceptionTotal : CalculatedTotal;
+                    } else {
+                        return CalculatedTotal;
+                    }
+                } else {
+                    return 0;
+                }
+            }
+        }
+        public double ApprovedAnnualizedTotal
         {
             get
             {
