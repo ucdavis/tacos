@@ -184,7 +184,9 @@ ClientBin/
 *.publishsettings
 orleans.codegen.cs
 
+# Node
 /node_modules
+npm-debug.log*
 
 # RIA/Silverlight projects
 Generated_Code/
