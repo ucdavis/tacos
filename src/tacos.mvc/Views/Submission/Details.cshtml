@@ -6,26 +6,28 @@
     <thead>
         <tr>
             <th>Course</th>
-            <th>Requested Exception</th>
-            <th>Total Requested</th>
+            <th>Exception TAs per course</th>
+            <th>Approved TAs per course</th>
+            <th>Approved Annualized Total</th>
         </tr>
     </thead>
     <tbody>
         @foreach(var request in Model.Requests) {
             <tr>
                 <td>@request.CourseNumber</td>
-                <td>@request.ExceptionAnnualizedTotal.ToString("f3")</td>
-                <td>@request.Total.ToString("f3")</td>
+                <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
+                <td>@request.ApprovedTotal.ToString("f3")</td>
+                <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
             </tr>
         }
     </tbody>
     <tfoot>
         <tr class="table-info">
-            <td colspan="2">
+            <td colspan="3">
                 Total
             </td>
             <td>
-                @Model.Requests.Sum(x=>x.Total).ToString("f3")
+                @Model.Requests.Sum(x=>x.ApprovedAnnualizedTotal).ToString("f3")
             </td>
         </tr>
     </tfoot>
