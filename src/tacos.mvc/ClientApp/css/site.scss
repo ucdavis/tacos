@@ -161,7 +161,15 @@ $shingle-brown: #4f2c1d;
 
 .navbar {
   background: url(../media/banner.svg) center top/cover no-repeat;
-} */
+} 
+
+#add-new{
+    background-color: $accent;
+    color: $primary-color;
+    border: none;
+}
+
+*/
 
 .table{
     margin-top: 3rem;
@@ -171,11 +179,6 @@ $shingle-brown: #4f2c1d;
     }
 }
 
-#add-new{
-background-color: $accent;
-color: $primary-color;
-border: none;
-}
 
 .input-group-text{
 background-color: $accent;
