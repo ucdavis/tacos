@@ -32,9 +32,10 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     };
   }
   public render() {
+    let courseName = this.props.course.name;
     return (
       <div>
-        <div className="input-group mb-3">
+        <div className="input-group">
           <input
             type="text"
             className="form-control"
@@ -51,7 +52,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             </span>
           </div>
         </div>
-        <small className="form-text text-muted">{this.props.course.name}</small>
+        {courseName && courseName != "" && <small className="form-text text-muted">{this.props.course.name}</small>}
       </div>
     );
   }
