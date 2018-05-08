@@ -11,7 +11,7 @@ interface IProps {
 export default class RequestType extends React.PureComponent<IProps, {}> {
   public render() {
     return (
-      <div>
+      <div className="input-group">
         <select
           className="custom-select"
           value={this.props.requestType}

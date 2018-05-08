@@ -58,6 +58,7 @@ export default class Request extends React.Component<IProps, {}> {
             </button>
           </td>
         </tr>
+        {this.props.request.exception &&
         <tr key={`exception-${this.props.index}`}>
           <td colSpan={7}>
             <ExceptionDetail
@@ -72,7 +73,7 @@ export default class Request extends React.Component<IProps, {}> {
               }
             />
           </td>
-        </tr>
+        </tr>}
       </tbody>
     );
   }

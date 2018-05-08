@@ -13,23 +13,16 @@ interface IProps {
 export default class Summary extends React.PureComponent<IProps, {}> {
   public render() {
     return (
-
-      <div className="head_bleed">
-      <div className="head_divider">
-      <nav
-        className="navbar fixed-bottom bg-blue"
-      >
-        <span className="navbar-brand">Request Total: {this.props.total > 0 ? this.props.total.toFixed(3) : '---'}</span>
-        <div className="pull-right">
-          <button className="btn btn-danger" onClick={this.props.onReset}>
-            Reset
-          </button>
-          <button className="btn btn-primary" id="submit-button" disabled={!this.props.canSubmit} onClick={this.props.onSubmit}>
-            Submit
-          </button>
+      <div className="navbar navbar-default navbar-expand-xs fixed-bottom" role="navigation">
+        <div className="navbar-banner">
+          <div className="container-fluid d-flex justify-content-between">
+            <a className="navbar-brand navbar-brand mr-auto" href="#">Request Total: {this.props.total > 0 ? this.props.total.toFixed(3) : '---'}</a>
+            <div>
+              <button className="btn btn-danger" onClick={this.props.onReset}>Reset</button>
+              <button className="btn btn-primary" id="submit-button" disabled={!this.props.canSubmit} onClick={this.props.onSubmit}>Submit</button>
+            </div>
+          </div>
         </div>
-      </nav>
-      </div>
       </div>
     );
   }
