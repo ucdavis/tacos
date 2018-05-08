@@ -19,7 +19,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
       <div className="exceptionRow">
         <p><b>Proposed number of TAs per course</b></p>
         <div className="exceptionRowComponents">{this.renderExceptionTotal()}</div>
-        <p><b>Reason for requesting an exception. Requests for additional TA or Reader support for courses with unusually special circumpstances will be considered.</b></p>
+        <p><b>Reason for requesting an exception. Requests for additional TA or Reader support for courses with unusually special circumstances will be considered.</b></p>
         <div className="exceptionRowComponents">{this.renderExceptionReason()}</div>
       </div>
     );
