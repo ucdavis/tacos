@@ -52,7 +52,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             </span>
           </div>
         </div>
-        {courseName && courseName != "" && <small className="form-text text-muted">{this.props.course.name}</small>}
+        {courseName && courseName != "" && <small className="form-text text-muted">{courseName}</small>}
       </div>
     );
   }
