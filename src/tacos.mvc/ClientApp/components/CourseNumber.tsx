@@ -8,7 +8,6 @@ interface IProps {
 }
 
 interface IState {
-  valid: boolean;
   querying: boolean;
 }
 
@@ -27,7 +26,6 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     super(props);
 
     this.state = {
-      valid: props.course.valid,
       querying: false
     };
   }
@@ -46,7 +44,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             <span
               className="input-group-text"
               id="basic-addon2"
-              style={{ color: this.state.valid ? "green" : "red" }}
+              style={{ color: this.props.course.valid ? "green" : "red" }}
             >
               {this.renderIndicator()}
             </span>
@@ -61,7 +59,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     if (this.state.querying) {
       return <i className="fa fa-spin fa-spinner" />;
     } else {
-      return <i className={`fa fa-${this.state.valid ? "check" : "times"}`} />;
+      return <i className={`fa fa-${this.props.course.valid ? "check" : "times"}`} />;
     }
   };
 
@@ -71,11 +69,11 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
 
     // only valid if we are at 6+ chars
     if (val.length < 6) {
-      this.setState({ querying: false, valid: false });
+      this.setState({ querying: false });
       return;
     }
 
-    this.setState({ querying: true, valid: false });
+    this.setState({ querying: true });
 
     // TODO: debounce
 
@@ -96,14 +94,14 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
       })
       .then((course: ICourse) => {
         if (course) {
-          this.setState({ querying: false, valid: true });
+          this.setState({ querying: false });
           this.props.onChange({ ...course, valid: true });
         }
       })
       .catch(err => {
         console.error(err);
 
-        this.setState({ querying: false, valid: false });
+        this.setState({ querying: false });
       });
   };
 }

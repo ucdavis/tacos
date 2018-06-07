@@ -13,6 +13,8 @@
             <th>Date</th>
             <th>Course</th>
             <th>Course Type</th>
+            <th>Average Sections</th>
+            <th>Average Enrollment</th>
             <th>Request Type</th>
             <th>ExceptionReason</th>
             <th>Exception TAs per course</th>
@@ -29,6 +31,8 @@
                     <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
                     <td>@request.CourseNumber</td>
                     <td>@CourseInfo.Types[request.CourseType]</td>
+                    <td>@request.AverageSectionsPerCourse</td>
+                    <td>@request.AverageEnrollment</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
                     <td>@request.ExceptionReason</td>
                     <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
@@ -40,7 +44,7 @@
     </tbody>
     <tfoot>
         <tr class="table-info">
-            <td colspan="8"></td>
+            <td colspan="10"></td>
             <td>Total:</td>
             <td>
                 @Model.SelectMany(x=>x.Requests).Sum(r=>r.ApprovedAnnualizedTotal).ToString("f3")
@@ -57,6 +61,10 @@
                 "paging": false,
                 "info": false,
                 "order": [[2, "desc"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel'
+                ]
             });
         } );
     </script>
