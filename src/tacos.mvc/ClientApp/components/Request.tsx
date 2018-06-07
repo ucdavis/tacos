@@ -42,8 +42,8 @@ export default class Request extends React.Component<IProps, {}> {
               }
             />
           </td>
-          <td>{this.props.request.calculatedTotal.toFixed(3)}</td>
-          <td>{this.props.request.annualizedTotal.toFixed(3)}</td>
+          <td>{this.props.request.calculatedTotal && this.props.request.calculatedTotal.toFixed(3)}</td>
+          <td>{this.props.request.annualizedTotal && this.props.request.annualizedTotal.toFixed(3)}</td>
           <td>
             <Exception
               exception={this.props.request.exception}
