@@ -195,8 +195,19 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
         <thead>
           <tr>
             <th>Course Number</th>
-            <th>Course Type</th>
-            <th>Request Type</th>
+            <th>
+              Course Type
+              &nbsp;&nbsp;
+                <a target="_blank" href="/CAES-TA-Guidelines 2018-21.pdf">
+                  Criteria Info  <i className="fas fa-external-link-alt"></i>
+                </a>
+                
+            </th>
+            <th>
+              <span data-toggle="tooltip" data-placement="top" title="For courses that require both TAs and Readers, select the majority position type.">
+                Request Type <i className="fas fa-question-circle"></i>
+              </span>
+            </th>
             <th>TAs per course</th>
             <th>Annual TA FTE</th>
             <th>Exception?</th>
