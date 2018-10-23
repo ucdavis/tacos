@@ -6,10 +6,20 @@
     [SubjectCode]          NVARCHAR (4)  NOT NULL,
     [CourseNumber]         NVARCHAR (7)  NOT NULL,
     [CourseName]           VARCHAR (255) NULL,
-    [Enrollment]           INT           NULL,
-    [NumCreditSections]    INT           NULL,
-    [NumNonCreditSections] INT           NULL
-);
+    [Enrollment]           INT           NOT NULL,
+    [NumCreditSections]    INT           NOT NULL,
+    [NumNonCreditSections] INT           NOT NULL,
+ CONSTRAINT [PK_DESII_CoursesForLastSixQuarters] PRIMARY KEY NONCLUSTERED 
+(
+	[AcademicTermCode] ASC,
+	[SubjectCode] ASC,
+	[CourseNumber] ASC,
+	[CourseName] ASC,
+	[Enrollment] ASC,
+	[NumCreditSections] ASC,
+	[NumNonCreditSections] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY];
 
 
 GO

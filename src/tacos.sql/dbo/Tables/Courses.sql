@@ -4,6 +4,8 @@
     [AverageSectionsPerCourse] [FLOAT]         NOT NULL,
     [Name]                     [NVARCHAR] (255)    NULL,
     [TimesOfferedPerYear]      [FLOAT]         NOT NULL,
+	[IsCrossListed] [bit] NULL,
+	[IsOfferedWithinPastTwoYears] [bit] NULL,
     CONSTRAINT [PK_Courses] PRIMARY KEY CLUSTERED ([Number] ASC)
 );
 
