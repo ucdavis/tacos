@@ -1,13 +1,28 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using tacos.mvc.Data;
+
 namespace tacos.data
 {
     // request for a specific course
     public class Request
     {
+        public Request()
+        {
+            UpdatedOn = DateTime.UtcNow;
+        }
+
+        [Key]
         public int Id { get; set; }
 
-        public Submission Submission { get; set; }
+        public DateTime UpdatedOn { get; set; }
 
-        public int SubmissionId { get; set; }
+        public string UpdatedBy { get; set; }
+
+        [Required]
+        public Department Department { get; set; }
+
+        public int DepartmentId { get; set; }
 
         public string CourseNumber { get; set; }
 
@@ -40,32 +55,30 @@ namespace tacos.data
         {
             get
             {
-                if (Approved.HasValue) {
-                    // if we've made a decision
-                    if (Approved.Value) {
-                        return Exception ? ExceptionTotal : CalculatedTotal;
-                    } else {
-                        return CalculatedTotal;
-                    }
-                } else {
-                    return 0;
+                if (!Approved.HasValue) return 0;
+
+                // if we've made a decision
+                if (Approved.Value) {
+                    return Exception ? ExceptionTotal : CalculatedTotal;
                 }
+
+                return CalculatedTotal;
             }
         }
+
         public double ApprovedAnnualizedTotal
         {
             get
             {
-                if (Approved.HasValue) {
-                    // if we've made a decision
-                    if (Approved.Value) {
-                        return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
-                    } else {
-                        return AnnualizedTotal;
-                    }
-                } else {
-                    return 0;
+                if (!Approved.HasValue) return 0;
+
+                // if we've made a decision
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
                 }
+
+                return AnnualizedTotal;
             }
         }
     }

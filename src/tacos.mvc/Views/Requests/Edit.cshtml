@@ -1,0 +1,15 @@
+﻿@using Newtonsoft.Json
+@model Request
+
+<div class="container my-4">
+    <div id="react-app">Loading...</div>
+</div>
+
+@section scripts {
+    
+    <script>
+        window.model = @(JsonConvert.SerializeObject(Model));
+    </script>
+
+    <script src="~/dist/edit.js" asp-append-version="true"></script>
+}

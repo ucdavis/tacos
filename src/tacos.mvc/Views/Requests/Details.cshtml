@@ -1,0 +1,22 @@
+@model Request
+
+<div class="container">
+    <h3>Details about your request:</h3>
+
+    <dl>
+        <dt>Course</dt>
+        <dd>@Model.CourseNumber</dd>
+        
+        <dt>Requested Date</dt>
+        <dd>@Model.UpdatedOn.ToString("d")</dd>
+
+        <dt>Exception TAs per course</dt>
+        <dd>@(Model.Exception ?  Model.ExceptionTotal.ToString("f3") : "No exception requested")</dd>
+
+        <dt>Approved TAs per course</dt>
+        <dd>@Model.ApprovedTotal.ToString("f3")</dd>
+
+        <dt>Approved Annualized Total</dt>
+        <dd>@Model.ApprovedAnnualizedTotal.ToString("f3")</dd>
+    </dl>
+</div>

@@ -23,12 +23,13 @@ namespace tacos.mvc.Controllers
         public async Task<IActionResult> Index()
         {
             // get most all submissions
-            var submissions = await dbContext
-                .Submissions.OrderByDescending(s => s.Created)
-                .Include(s=>s.Requests)
-                .AsNoTracking().ToArrayAsync();
+            var requests = await dbContext
+                .Requests
+                .OrderByDescending(s => s.UpdatedOn)
+                .AsNoTracking()
+                .ToArrayAsync();
 
-            return View(submissions);
+            return View(requests);
         }
 
         [HttpPost]

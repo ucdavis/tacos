@@ -24,9 +24,9 @@ namespace tacos.mvc.Controllers
         {
             // get most all submissions
             var submissions = await dbContext
-                .Submissions.OrderByDescending(s => s.Created)
-                .Include(s => s.Requests)
-                .AsNoTracking().ToArrayAsync();
+                .Requests
+                .AsNoTracking()
+                .ToArrayAsync();
 
             return View(submissions);
         }

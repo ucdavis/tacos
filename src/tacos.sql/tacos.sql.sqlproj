@@ -65,7 +65,6 @@
     <RefactorLog Include="tacos.sql.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\Submissions.sql" />
     <Build Include="dbo\Tables\Requests.sql" />
     <Build Include="dbo\Tables\AspNetUserTokens.sql" />
     <Build Include="dbo\Tables\AspNetUsers.sql" />
