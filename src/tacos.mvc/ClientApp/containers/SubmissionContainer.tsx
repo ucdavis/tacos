@@ -1,46 +1,38 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import Request from "./Request";
-import Summary from "./Summary";
-import Departments from "./Departments";
+
+import Request from "../components/Request";
+import Summary from "../components/Summary";
+import Departments from "../components/Departments";
+
 import { formulas } from "../util/formulas";
 
-export interface IRequest {
-  course: ICourse;
-  courseType: string;
-  requestType: string;
-  calculatedTotal: number;
-  annualizedTotal: number;
-  exception: boolean;
-  exceptionReason: string;
-  exceptionTotal: number;
-  exceptionAnnualizedTotal: number;
-}
+import { IRequest } from '../models/IRequest';
+import { IDepartment } from "../models/IDepartment";
+import { ISubmission } from "ClientApp/models/ISubmission";
 
-export interface ICourse {
-  name: string;
-  number: string;
-  timesOfferedPerYear: number;
-  averageSectionsPerCourse: number;
-  averageEnrollment: number;
-  valid: boolean;
+interface IProps {
+  departments: IDepartment[];
 }
 
 interface IState {
-  department: string;
+  selectedDepartmentId: number;
   requests: IRequest[];
 }
 
-export default class SubmissionContainer extends React.Component<{}, IState> {
-  constructor(props: any) {
+export default class SubmissionContainer extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
     super(props);
 
+    const selectedDepartmentId = props.departments[0].id;
+
     this.state = {
-      department: "APLS",
+      selectedDepartmentId,
       requests: []
     };
   }
+
   componentDidMount() {
+    // reload state from local storage
     const existingRequestString = localStorage.getItem("requests");
 
     if (existingRequestString) {
@@ -49,17 +41,22 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       this.onAddRequest(); // add a starter one
     }
 
-    const existingDepartment = localStorage.getItem("department");
+    const selectedDepartmentId = localStorage.getItem("selectedDepartmentId");
 
-    if (existingDepartment) {
-      this.setState({ department: existingDepartment });
+    if (selectedDepartmentId) {
+      this.setState({ selectedDepartmentId: parseInt(selectedDepartmentId, 10) });
     }
   }
+
   public render() {
+    const { departments } = this.props;
+    const { selectedDepartmentId } = this.state;
+
     return (
       <div>
         <Departments
-          department={this.state.department}
+          departmentId={selectedDepartmentId}
+          departments={departments}
           onChange={this.onDepartmentChange}
         />
         {this.renderRequests()}
@@ -73,20 +70,20 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     );
   }
 
-  private onDepartmentChange = (department: string) => {
-    this.setState({ department });
+  private onDepartmentChange = (value: number) => {
+    this.setState({ selectedDepartmentId: value });
 
-    localStorage.setItem("department", department);
+    localStorage.setItem("selectedDepartmentId", `${value}`);
   };
 
   private submissionTotal = () => {
+    const { requests } = this.state;
+
     // go add up everything they have requested
-    const total = this.state.requests.reduce((acc, req) => {
+    const total = requests.reduce((acc, req) => {
       // add in exception total if exception, otherwise the annualized total
-      return (
-        acc +
-        (req.exception ? req.exceptionAnnualizedTotal : req.annualizedTotal)
-      );
+      const value = (req.exception ? req.exceptionAnnualizedTotal : req.annualizedTotal);
+      return acc + value;
     }, 0);
 
     return total;
@@ -96,7 +93,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
     // reset the form, clear storage
     if (confirm("Are you sure you want to clear this form and start over?")) {
       localStorage.removeItem("requests");
-      localStorage.removeItem("department");
+      localStorage.removeItem("selectedDepartmentId");
       this.setState({ requests: [] });
     }
   };
@@ -116,13 +113,15 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
   };
 
   private submit = () => {
+    const { selectedDepartmentId, requests } = this.state;
+
     // create the submission
-    const submission = {
-      department: this.state.department,
-      requests: this.state.requests
+    const submission: ISubmission = {
+      departmentId: selectedDepartmentId,
+      requests: requests
     };
 
-    fetch("/submission/create", {
+    fetch("/requests/create", {
       body: JSON.stringify(submission),
       headers: [
         ["Accept", "application/json"],
@@ -141,7 +140,7 @@ export default class SubmissionContainer extends React.Component<{}, IState> {
       .then(res => {
         // TODO: make sure we have success
         localStorage.removeItem("requests");
-        window.location.replace("/submission");
+        window.location.replace("/requests");
       })
       .catch(console.error);
   };
