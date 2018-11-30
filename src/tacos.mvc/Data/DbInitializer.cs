@@ -1,10 +1,11 @@
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using tacos.mvc.Data;
 using tacos.mvc.Resources;
 
-namespace tacos.data {
+namespace tacos.data
+{
     public class DbInitializer
     {
         private readonly TacoDbContext _context;
@@ -25,7 +26,8 @@ namespace tacos.data {
             await Initialize();
         }
 
-        public async Task Initialize() {
+        public async Task Initialize()
+        {
 
             _context.Database.EnsureCreated();
 
@@ -33,13 +35,38 @@ namespace tacos.data {
 
             await CreateUsers();
 
+            CreateDepartments();
+
             CreateCourses();
 
             _context.SaveChanges();
         }
 
-        private void CreateCourses() {
-            var lda2 = new Course {
+        private void CreateDepartments()
+        {
+            _context.Departments.AddRange(
+                new Department { Code = "AARE", Name = "Agricultural & Resource Economics" },
+                new Department { Code = "AANS", Name = "Animal Science" },
+                new Department { Code = "ABAE", Name = "Biological & Agricultural Engineering" },
+                new Department { Code = "AENM", Name = "Entomology & Nematology" },
+                new Department { Code = "ADES", Name = "Environmental Science & Policy" },
+                new Department { Code = "AETX", Name = "Environmental Toxicology" },
+                new Department { Code = "AFST", Name = "Food Science & Technology" },
+                new Department { Code = "AHCE", Name = "Human Ecology" },
+                new Department { Code = "ALAW", Name = "Land, Air & Water Resources" },
+                new Department { Code = "ANUT", Name = "Nutrition" },
+                new Department { Code = "APPA", Name = "Plant Pathology" },
+                new Department { Code = "APLS", Name = "Plant Sciences" },
+                new Department { Code = "ATXC", Name = "Textiles & Clothing" },
+                new Department { Code = "AVIT", Name = "Viticulture & Enology" },
+                new Department { Code = "AWFC", Name = "Wildlife, Fish & Conservation Biology" }
+            );
+        }
+
+        private void CreateCourses()
+        {
+            var lda2 = new Course
+            {
                 Number = "LDA002",
                 Name = "Intro to LDA Placeholder",
                 AverageEnrollment = 98,
@@ -47,8 +74,9 @@ namespace tacos.data {
                 TimesOfferedPerYear = 20
             };
 
-            
-            var lda3 = new Course {
+
+            var lda3 = new Course
+            {
                 Number = "LDA003",
                 Name = "Advanced LDA Placeholder",
                 AverageEnrollment = 138,
@@ -56,7 +84,8 @@ namespace tacos.data {
                 TimesOfferedPerYear = 30
             };
 
-            var lda170 = new Course {
+            var lda170 = new Course
+            {
                 Number = "LDA170",
                 Name = "LDA Ipsum",
                 AverageEnrollment = 16,
