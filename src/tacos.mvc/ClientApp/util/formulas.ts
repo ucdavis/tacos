@@ -1,4 +1,4 @@
-import { ICourse } from "../components/SubmissionContainer";
+import { ICourse } from "../models/ICourse";
 
 // dictionary where props are equal to different course types
 
