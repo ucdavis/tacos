@@ -219,3 +219,5 @@ _Pvt_Extensions
 *.db
 .vscode/
 src/tacos.mvc/npm-shrinkwrap.json
+
+*.jfm
