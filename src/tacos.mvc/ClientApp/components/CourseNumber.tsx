@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { IRequest, ICourse } from "./SubmissionContainer";
+
+import { ICourse } from "../models/ICourse";
 
 interface IProps {
   course: ICourse;

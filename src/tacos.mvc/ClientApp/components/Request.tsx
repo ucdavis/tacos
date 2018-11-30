@@ -1,6 +1,6 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { IRequest } from "./SubmissionContainer";
+
+import { IRequest } from "../models/IRequest";
 
 import Exception from "./Exception";
 import ExceptionDetail from './ExceptionDetail';

@@ -1,6 +1,4 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { IRequest } from "./SubmissionContainer";
 
 interface IProps {
   requestType: string;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
+import { IDepartment } from "ClientApp/models/IDepartment";
 
 interface IProps {
   department: string;
