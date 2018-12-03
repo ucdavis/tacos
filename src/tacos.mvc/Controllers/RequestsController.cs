@@ -11,17 +11,14 @@ namespace tacos.mvc.Controllers
 {
     public class RequestsController : ApplicationController
     {
-
-        private readonly TacoDbContext context;
-
-        private readonly UserManager<User> userManager;
+        private readonly TacoDbContext _context;
+        private readonly UserManager<User> _userManager;
 
         public RequestsController(TacoDbContext context, UserManager<User> userManager)
         {
-            this.context = context;
-            this.userManager = userManager;
+            this._context = context;
+            this._userManager = userManager;
         }
-
 
         // list submissions
         public async Task<IActionResult> Index()
