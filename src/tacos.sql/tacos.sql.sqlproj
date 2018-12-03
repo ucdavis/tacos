@@ -74,6 +74,8 @@
     <Build Include="dbo\Tables\AspNetRoles.sql" />
     <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
     <Build Include="dbo\Tables\Courses.sql" />
+    <Build Include="dbo\Tables\Departments.sql" />
+    <Build Include="dbo\Tables\DepartmentRoles.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="comparisons\SqlSchemaCompare_Localhost.scmp" />
