@@ -145,6 +145,23 @@ namespace tacos.mvc.Controllers
                 else
                 {
                     // copy out values to a history entry
+                    var history = new RequestHistory()
+                    {
+                        Request                  = request,
+                        RequestId                = request.Id,
+                        UpdatedOn                = request.UpdatedOn,
+                        UpdatedBy                = request.UpdatedBy,
+                        CourseType               = request.CourseType,
+                        RequestType              = request.RequestType,
+                        Exception                = request.Exception,
+                        ExceptionReason          = request.ExceptionReason,
+                        ExceptionTotal           = request.ExceptionTotal,
+                        ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
+                        CalculatedTotal          = request.CalculatedTotal,
+                        AnnualizedTotal          = request.AnnualizedTotal,
+                        Approved                 = request.Approved,
+                    };
+                    request.History.Add(history);
                 }
 
                 // update values

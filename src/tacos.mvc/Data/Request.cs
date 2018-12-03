@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using tacos.mvc.Data;
@@ -11,6 +12,7 @@ namespace tacos.data
         public Request()
         {
             UpdatedOn = DateTime.UtcNow;
+            History = new List<RequestHistory>();
         }
 
         [Key]
@@ -86,6 +88,8 @@ namespace tacos.data
             }
         }
 
+
+        public IList<RequestHistory> History { get; set; }
 
         public static void OnModelCreating(ModelBuilder builder)
         {

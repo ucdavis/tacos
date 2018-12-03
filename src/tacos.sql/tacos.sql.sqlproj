@@ -76,6 +76,7 @@
     <Build Include="dbo\Tables\Courses.sql" />
     <Build Include="dbo\Tables\Departments.sql" />
     <Build Include="dbo\Tables\DepartmentRoles.sql" />
+    <Build Include="dbo\Tables\RequestHistory.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="comparisons\SqlSchemaCompare_Localhost.scmp" />
