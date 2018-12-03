@@ -7,7 +7,7 @@ import SubmissionContainer from '../containers/SubmissionContainer';
 import { IDepartment } from "../models/IDepartment";
 import { IRequest } from "../models/IRequest";
 
-declare var departments: IDepartment[];
+declare var department: IDepartment;
 declare var model: IRequest[];
 
 function renderApp() {
@@ -15,7 +15,7 @@ function renderApp() {
   // configuration and injects the app into a DOM element.
   ReactDOM.render(
     <AppContainer>
-      <SubmissionContainer departments={departments} requests={model} />
+      <SubmissionContainer department={department} requests={model} />
     </AppContainer>,
     document.getElementById("react-app")
   );
