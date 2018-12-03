@@ -17,5 +17,12 @@ namespace tacos.data
         public virtual DbSet<Request> Requests { get; set; }
 
         public virtual DbSet<Course> Courses { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            Request.OnModelCreating(builder);
+        }
     }
 }

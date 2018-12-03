@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using tacos.mvc.Data;
 
 namespace tacos.data
@@ -23,6 +24,9 @@ namespace tacos.data
         public Department Department { get; set; }
 
         public int DepartmentId { get; set; }
+
+        [Required]
+        public Course Course { get; set; }
 
         public string CourseNumber { get; set; }
 
@@ -80,6 +84,15 @@ namespace tacos.data
 
                 return AnnualizedTotal;
             }
+        }
+
+
+        public static void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Request>()
+                .HasOne(r => r.Course)
+                .WithMany()
+                .HasForeignKey(r => r.CourseNumber);
         }
     }
 }
