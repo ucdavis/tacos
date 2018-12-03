@@ -102,6 +102,12 @@ namespace tacos.mvc.Controllers
             return View(requests);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Submit([FromBody]SubmissionModel model)
+        {
+            // get user's departments
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
 
             // find matching department
             var department = departments.SingleOrDefault(d => d.Id == model.DepartmentId);
@@ -112,34 +118,53 @@ namespace tacos.mvc.Controllers
 
             var creatorName = $"{user.LastName}, {user.FirstName}";
 
-            var requests = model.Requests.Select(m => new Request
+            var requests = new List<Request>();
+            foreach (var m in model.Requests)
             {
-                DepartmentId             = department.Id,
-                CourseNumber             = m.Course.Number,
-                CourseType               = m.CourseType,
-                RequestType              = m.RequestType,
-                Exception                = m.Exception,
-                ExceptionReason          = m.ExceptionReason,
-                ExceptionTotal           = m.ExceptionTotal,
-                ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal,
-                CalculatedTotal          = m.CalculatedTotal,
-                AnnualizedTotal          = m.AnnualizedTotal,
-                AverageSectionsPerCourse = m.Course.AverageSectionsPerCourse,
-                AverageEnrollment        = m.Course.AverageEnrollment,
-                TimesOfferedPerYear      = m.Course.TimesOfferedPerYear,
-            }).ToArray();
+                // find course
+                var course = await _context.Courses.FindAsync(m.CourseNumber);
 
-            // auto approve any un-exception requests
-            foreach (var request in requests)
-            {
+                // find or create new request
+                var request = await _context.Requests
+                    .FirstOrDefaultAsync(r =>
+                        string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+
+                // create request if necessary
+                if (request == null)
+                {
+                    request = new Request()
+                    {
+                        DepartmentId             = department.Id,
+                        CourseNumber             = course.Number,
+                        AverageSectionsPerCourse = course.AverageSectionsPerCourse,
+                        AverageEnrollment        = course.AverageEnrollment,
+                        TimesOfferedPerYear      = course.TimesOfferedPerYear,
+                    };
+                    _context.Requests.Add(request);
+                }
+                else
+                {
+                    // copy out values to a history entry
+                }
+
+                // update values
+                request.CourseType               = m.CourseType;
+                request.RequestType              = m.RequestType;
+                request.Exception                = m.Exception;
+                request.ExceptionReason          = m.ExceptionReason;
+                request.ExceptionTotal           = m.ExceptionTotal;
+                request.ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal;
+                request.CalculatedTotal          = m.CalculatedTotal;
+                request.AnnualizedTotal          = m.AnnualizedTotal;
+
+                // auto approve any un-exception requests
                 if (!request.Exception)
                 {
                     request.Approved = true;
                 }
             }
 
-            context.Requests.AddRange(requests);
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return Json(new { success = true });
         }
