@@ -12,7 +12,7 @@ module.exports = env => {
       entry: {
         app: "./ClientApp/app.tsx",
         create: "./ClientApp/pages/CreateSubmission.tsx",
-        edit: "./ClientApp/pages/EditSubmission.tsx.tsx",
+        edit: "./ClientApp/pages/EditSubmission.tsx",
         vendor: [
           "event-source-polyfill",
           "isomorphic-fetch",
