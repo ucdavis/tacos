@@ -1,9 +1,27 @@
+@using tacos.mvc.Data
 @using tacos.mvc.Resources
 @model Request[]
+
+@{
+    var department = (Department)ViewBag.Department;
+    var departments = (IList<Department>)ViewBag.Departments;
+
+    var departmentSelectItems = departments.Select(d => new SelectListItem()
+    {
+        Value = d.Code,
+        Text = d.Name,
+        Selected = (d.Id == department.Id),
+    });
+}
 
 <div class="container my-4">
 
     <h3>Your submissions</h3>
+    
+    <div class="form-group">
+        <label>Department:</label>
+        <select class="form-control" id="departmentSelect" asp-items="departmentSelectItems"></select>
+    </div>
 
     <table id="requestTable" class="table table-bordered">
         <thead>
@@ -15,36 +33,40 @@
             </tr>
         </thead>
         <tbody>
-        @foreach (var request in Model)
-        {
-            <tr>
-                <td>
-                    <a asp-action="Details" asp-route-id="@request.Id">
-                        @request.CourseNumber
-                    </a>
-                </td>
-                <td>
-                    @CourseInfo.Types[request.CourseType]
-                </td>
-                <td data-order="@request.UpdatedOn.Ticks">
-                    @request.UpdatedOn.ToString("d")
-                </td>
-                <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                </td>
-            </tr>
-        }
+            @foreach (var request in Model)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@request.Id">
+                            @request.CourseNumber
+                        </a>
+                    </td>
+                    <td>
+                        @CourseInfo.Types[request.CourseType]
+                    </td>
+                    <td data-order="@request.UpdatedOn.Ticks">
+                        @request.UpdatedOn.ToString("d")
+                    </td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
-
-    <a class="btn btn-primary" asp-controller="Requests" asp-action="create">Create New Submission</a>
+    <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code">Edit Submissions</a>
 </div>
 
 @section scripts
 {
     <script>
+        $('#departmentSelect').change(function(event) {
+            var code = $(this).val();
+            window.location.href = "/requests/?code=" + code;
+        });
+
         $('#requestTable').DataTable({
             "columnDefs": [
                 {
