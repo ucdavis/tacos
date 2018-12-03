@@ -12,6 +12,7 @@ import { ISubmission } from "ClientApp/models/ISubmission";
 
 interface IProps {
   departments: IDepartment[];
+  requests?: IRequest[];
 }
 
 interface IState {
@@ -27,7 +28,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
     this.state = {
       selectedDepartmentId,
-      requests: []
+      requests: props.requests || [],
     };
   }
 
@@ -118,8 +119,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
       const { selectedDepartmentId, requests } = this.state;
   
       // create the submission
-    const submission: ISubmission = {
-      departmentId: selectedDepartmentId,
+      const submission: ISubmission = {
+        departmentId: selectedDepartmentId,
         requests: requests
       };
   
@@ -127,7 +128,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         body: JSON.stringify(submission),
         headers: [
           ["Accept", "application/json"],
-        ["Content-Type", "application/json"]
+          ["Content-Type", "application/json"]
         ],
         method: "POST",
         credentials: "include"

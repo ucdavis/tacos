@@ -5,17 +5,17 @@ import { AppContainer } from "react-hot-loader";
 import SubmissionContainer from '../containers/SubmissionContainer';
 
 import { IDepartment } from "../models/IDepartment";
-import { ISubmission } from "../models/ISubmission";
+import { IRequest } from "../models/IRequest";
 
 declare var departments: IDepartment[];
-declare var model: ISubmission;
+declare var model: IRequest[];
 
 function renderApp() {
   // This code starts up the React app when it runs in a browser. It sets up the routing
   // configuration and injects the app into a DOM element.
   ReactDOM.render(
     <AppContainer>
-      <SubmissionContainer departments={departments} />
+      <SubmissionContainer departments={departments} requests={model} />
     </AppContainer>,
     document.getElementById("react-app")
   );
