@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tacos.data;
+using tacos.mvc.Data;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models;
 
@@ -173,6 +174,7 @@ namespace tacos.mvc.Controllers
                 request.ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal;
                 request.CalculatedTotal          = m.CalculatedTotal;
                 request.AnnualizedTotal          = m.AnnualizedTotal;
+                request.Approved                 = false;
 
                 // auto approve any un-exception requests
                 if (!request.Exception)
