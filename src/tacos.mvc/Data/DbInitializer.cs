@@ -1,6 +1,8 @@
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using tacos.mvc.Data;
 using tacos.mvc.Resources;
 
@@ -21,46 +23,62 @@ namespace tacos.data
 
         public async Task RecreateAndInitialize()
         {
-            await _context.Database.EnsureDeletedAsync();
+            _context.Database.EnsureDeleted();
 
             await Initialize();
         }
 
         public async Task Initialize()
         {
-
             _context.Database.EnsureCreated();
 
+            // seed basic information
             await CreateRoles();
-
             await CreateUsers();
-
-            CreateDepartments();
-
-            CreateCourses();
+            await CreateDepartments();
 
             _context.SaveChanges();
         }
 
-        private void CreateDepartments()
+        private async Task CreateDepartments()
         {
-            _context.Departments.AddRange(
-                new Department { Code = "AARE", Name = "Agricultural & Resource Economics" },
-                new Department { Code = "AANS", Name = "Animal Science" },
-                new Department { Code = "ABAE", Name = "Biological & Agricultural Engineering" },
-                new Department { Code = "AENM", Name = "Entomology & Nematology" },
-                new Department { Code = "ADES", Name = "Environmental Science & Policy" },
-                new Department { Code = "AETX", Name = "Environmental Toxicology" },
-                new Department { Code = "AFST", Name = "Food Science & Technology" },
-                new Department { Code = "AHCE", Name = "Human Ecology" },
-                new Department { Code = "ALAW", Name = "Land, Air & Water Resources" },
-                new Department { Code = "ANUT", Name = "Nutrition" },
-                new Department { Code = "APPA", Name = "Plant Pathology" },
-                new Department { Code = "APLS", Name = "Plant Sciences" },
-                new Department { Code = "ATXC", Name = "Textiles & Clothing" },
-                new Department { Code = "AVIT", Name = "Viticulture & Enology" },
-                new Department { Code = "AWFC", Name = "Wildlife, Fish & Conservation Biology" }
-            );
+            var departments = new[]
+            {
+                new Department {Code = "AARE", Name = "Agricultural & Resource Economics"},
+                new Department {Code = "AANS", Name = "Animal Science"},
+                new Department {Code = "ABAE", Name = "Biological & Agricultural Engineering"},
+                new Department {Code = "AENM", Name = "Entomology & Nematology"},
+                new Department {Code = "ADES", Name = "Environmental Science & Policy"},
+                new Department {Code = "AETX", Name = "Environmental Toxicology"},
+                new Department {Code = "AFST", Name = "Food Science & Technology"},
+                new Department {Code = "AHCE", Name = "Human Ecology"},
+                new Department {Code = "ALAW", Name = "Land, Air & Water Resources"},
+                new Department {Code = "ANUT", Name = "Nutrition"},
+                new Department {Code = "APPA", Name = "Plant Pathology"},
+                new Department {Code = "APLS", Name = "Plant Sciences"},
+                new Department {Code = "ATXC", Name = "Textiles & Clothing"},
+                new Department {Code = "AVIT", Name = "Viticulture & Enology"},
+                new Department {Code = "AWFC", Name = "Wildlife, Fish & Conservation Biology"}
+            };
+
+            foreach (var department in departments)
+            {
+                await FindOrCreateDepartment(department);
+            }
+        }
+
+        private async Task FindOrCreateDepartment(Department department)
+        {
+            var foundDepartment = await _context.Departments
+                .SingleOrDefaultAsync(d => string.Equals(d.Code, department.Code, StringComparison.OrdinalIgnoreCase));
+
+            if (foundDepartment != null)
+            {
+                return;
+            }
+
+            _context.Departments.Add(department);
+            await _context.SaveChangesAsync();
         }
 
         private void CreateCourses()
@@ -100,9 +118,20 @@ namespace tacos.data
 
         private async Task CreateRoles()
         {
-            await _roleManager.CreateAsync(new IdentityRole(RoleCodes.Admin));
-            await _roleManager.CreateAsync(new IdentityRole(RoleCodes.Reviewer));
-            await _roleManager.CreateAsync(new IdentityRole(RoleCodes.User));
+            await FindOrCreateRole(new IdentityRole(RoleCodes.Admin));
+            await FindOrCreateRole(new IdentityRole(RoleCodes.Reviewer));
+            await FindOrCreateRole(new IdentityRole(RoleCodes.User));
+        }
+
+        private async Task FindOrCreateRole(IdentityRole role)
+        {
+            var foundRole = await _roleManager.FindByNameAsync(role.Name);
+            if (foundRole != null)
+            {
+                return;
+            }
+
+            await _roleManager.CreateAsync(role);
         }
 
         private async Task CreateUsers()
@@ -116,21 +145,7 @@ namespace tacos.data
                 LastName = "Kirkland",
                 Id = "postit"
             };
-
-            var scottPrincipal = new ClaimsPrincipal();
-            scottPrincipal.AddIdentity(new ClaimsIdentity(new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, "postit"),
-                new Claim(ClaimTypes.Name, "Scott Kirkland")
-            }));
-
-            var scottInfo = new ExternalLoginInfo(scottPrincipal, AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme,
-                "postit", null);
-
-            await _userManager.CreateAsync(scottUser);
-            await _userManager.AddLoginAsync(scottUser, scottInfo);
-            await _userManager.AddToRoleAsync(scottUser, RoleCodes.Admin);
-            await _userManager.AddToRoleAsync(scottUser, RoleCodes.Reviewer);
+            await FindOrCreateUser(scottUser);
 
             var johnUser = new User()
             {
@@ -139,20 +154,30 @@ namespace tacos.data
                 Name = "John Knoll",
                 Id = "jpknoll"
             };
+            await FindOrCreateUser(johnUser);
+        }
 
-            var johnPrincipal = new ClaimsPrincipal();
-            johnPrincipal.AddIdentity(new ClaimsIdentity(new[]
+        private async Task FindOrCreateUser(User user)
+        {
+            var foundUser = await _userManager.FindByIdAsync(user.Id);
+            if (foundUser != null)
             {
-                new Claim(ClaimTypes.NameIdentifier, "jpknoll"),
-                new Claim(ClaimTypes.Name, "John Knoll"),
+                return;
+            }
+
+            var principal = new ClaimsPrincipal();
+            principal.AddIdentity(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.Name)
             }));
 
-            var johnInfo = new ExternalLoginInfo(johnPrincipal, AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme,
-                "jpknoll", null);
+            var info = new ExternalLoginInfo(principal, AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme, user.Id, null);
 
-            await _userManager.CreateAsync(johnUser);
-            await _userManager.AddLoginAsync(johnUser, johnInfo);
-            await _userManager.AddToRoleAsync(johnUser, RoleCodes.Admin);
+            await _userManager.CreateAsync(user);
+            await _userManager.AddLoginAsync(user, info);
+            await _userManager.AddToRoleAsync(user, RoleCodes.Admin);
+            await _userManager.AddToRoleAsync(user, RoleCodes.Reviewer);
         }
     }
 }
