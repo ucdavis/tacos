@@ -55,7 +55,7 @@ namespace tacos.mvc.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var request = await context.Requests
+            var request = await _context.Requests
                 .SingleAsync(x => x.Id == id);
 
             return View(request);
@@ -64,37 +64,44 @@ namespace tacos.mvc.Controllers
         public async Task<IActionResult> Create()
         {
             // get user's departments
-            var user = await userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
 
-            var departmentRoles = await context.DepartmentRoles
-                .Where(r => r.User.Id == user.Id)
-                .Include(r => r.Department)
-                .AsNoTracking()
-                .ToListAsync();
-
-            ViewBag.Departments = departmentRoles
-                .Select(r => r.Department)
-                .Distinct()
-                .ToList();
+            ViewBag.Departments = departments;
 
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody]SubmissionModel model)
+        public async Task<IActionResult> Edit(string code)
         {
             // get user's departments
-            var user = await userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
 
-            var departmentRoles = await context.DepartmentRoles
-                .Where(r => r.User.Id == user.Id)
-                .Include(r => r.Department)
+            ViewBag.Departments = departments;
+
+            var department = !string.IsNullOrWhiteSpace(code)
+                ? departments.SingleOrDefault(d => string.Equals(d.Code, code, StringComparison.OrdinalIgnoreCase))
+                : departments.FirstOrDefault();
+
+            if (department == null)
+            {
+                // could not find a valid department
+                return Forbid();
+            }
+
+            ViewBag.Department = department;
+
+            // get requests for department
+            var requests = await _context.Requests
+                .Include(r => r.Course)
+                .Where(r => r.Department.Id == department.Id)
                 .AsNoTracking()
-                .ToListAsync();
+                .ToArrayAsync();
 
-            var departments = departmentRoles
-                .Select(r => r.Department)
-                .Distinct();
+            return View(requests);
+        }
+
 
             // find matching department
             var department = departments.SingleOrDefault(d => d.Id == model.DepartmentId);
