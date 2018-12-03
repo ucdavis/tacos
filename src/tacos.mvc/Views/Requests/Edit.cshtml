@@ -4,6 +4,7 @@
 @model IList<Request>
 
 @{
+    var department = (Department)ViewBag.Department;
     var departments = (IList<Department>)ViewBag.Departments;
 }
 
@@ -14,6 +15,7 @@
 @section scripts {
     
     <script>
+        window.department = @(Html.Raw(JsonConvert.SerializeObject(department, JsonHelpers.GetDefaultJsonSerializerSettings())));
         window.departments = @(Html.Raw(JsonConvert.SerializeObject(departments, JsonHelpers.GetDefaultJsonSerializerSettings())));
         window.model = @(Html.Raw(JsonConvert.SerializeObject(Model, JsonHelpers.GetDefaultJsonSerializerSettings())));
     </script>
