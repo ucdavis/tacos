@@ -23,8 +23,7 @@ namespace tacos.mvc
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
                 var dbInitializer = new DbInitializer(context, userManager, roleManager);
-
-                Task.Run(() => dbInitializer.RecreateAndInitialize()).Wait();
+                dbInitializer.Initialize().GetAwaiter().GetResult();
             }
 #endif
 
