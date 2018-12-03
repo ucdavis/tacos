@@ -11,4 +11,6 @@ export interface IRequest {
     exceptionReason: string;
     exceptionTotal: number;
     exceptionAnnualizedTotal: number;
+
+    isDirty: boolean;
   }

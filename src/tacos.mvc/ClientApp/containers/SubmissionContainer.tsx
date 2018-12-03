@@ -255,6 +255,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         exceptionReason: "",
         exceptionTotal: 0.00,
         exceptionAnnualizedTotal: 0,
+                isDirty: true
       }
     ];
 
