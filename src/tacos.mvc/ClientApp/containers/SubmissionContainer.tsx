@@ -107,7 +107,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     // submission is valid if every course is valid and every exception has a valid exceptionTotal
     return this.state.requests.every(
       r =>
-        r.course.valid &&
+        (!!r.course && !!r.course.number) &&
         (!r.exception || (r.exception && r.exceptionTotal >= 0))
     );
   };
