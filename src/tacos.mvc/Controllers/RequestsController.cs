@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tacos.data;
+using tacos.mvc.Extensions;
 using tacos.mvc.Models;
 
 namespace tacos.mvc.Controllers
@@ -21,31 +23,32 @@ namespace tacos.mvc.Controllers
         }
 
         // list submissions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string code)
         {
             // get user's departments
-            var user = await userManager.GetUserAsync(User);
-
-            var departmentRoles = await context.DepartmentRoles
-                .Where(r => r.User.Id == user.Id)
-                .Include(r => r.Department)
-                .AsNoTracking()
-                .ToListAsync();
-
-            var departments = departmentRoles
-                .Select(r => r.Department)
-                .Distinct()
-                .ToList();
-
-            var departmentIds = departments.Select(d => d.Id).ToArray();
-
-            // get all department requests
-            var requests = await context.Requests
-                .Where(r => departmentIds.Contains(r.Department.Id))
-                .AsNoTracking()
-                .ToArrayAsync();
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
 
             ViewBag.Departments = departments;
+
+            var department = !string.IsNullOrWhiteSpace(code)
+                ? departments.SingleOrDefault(d => string.Equals(d.Code, code, StringComparison.OrdinalIgnoreCase))
+                : departments.FirstOrDefault();
+
+            if (department == null)
+            {
+                // could not find a valid department
+                return Forbid();
+            }
+
+            ViewBag.Department = department;
+
+            // get requests for department
+            var requests = await _context.Requests
+                .Include(r => r.Department)
+                .Where(r => r.Department.Id == department.Id)
+                .AsNoTracking()
+                .ToArrayAsync();
 
             return View(requests);
         }
