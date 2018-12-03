@@ -2,14 +2,16 @@ import * as React from "react";
 import { IDepartment } from "ClientApp/models/IDepartment";
 
 interface IProps {
-  departmentId: number;
+  value: IDepartment | undefined;
   departments: IDepartment[];
-  onChange: (departmentId: number) => void;
+  onChange: (department: IDepartment | undefined) => void;
 }
 
 export default class Departments extends React.PureComponent<IProps, {}> {
   public render() {
-    const { departmentId, departments } = this.props;
+    const { value, departments } = this.props;
+
+    const departmentId = value && value.id;
 
     return (
       <div>
@@ -29,7 +31,10 @@ export default class Departments extends React.PureComponent<IProps, {}> {
   }
 
   private onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = parseInt(e.target.value, 10);
-    this.props.onChange(value);
+      const { departments } = this.props;
+
+      const id = parseInt(e.target.value, 10);
+      const department = departments.find(d => d.id == id);
+    this.props.onChange(department);
   }
 }
