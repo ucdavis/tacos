@@ -30,7 +30,7 @@
                     @request.UpdatedOn.ToString("d")
                 </td>
                 <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@request.Id" class="btn btn-primary">
+                    <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Edit
                     </a>
                 </td>
