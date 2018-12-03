@@ -1,12 +1,13 @@
 import * as React from "react";
 
-import { IRequest } from "../models/IRequest";
-
-import Exception from "./Exception";
-import ExceptionDetail from './ExceptionDetail';
 import CourseNumber from "./CourseNumber";
 import CourseType from "./CourseType";
+import Exception from "./Exception";
+import ExceptionDetail from './ExceptionDetail';
 import RequestType from "./RequestType";
+
+import { ICourse } from "../models/ICourse";
+import { IRequest } from "../models/IRequest";
 
 interface IProps {
   request: IRequest;
@@ -23,7 +24,7 @@ export default class Request extends React.Component<IProps, {}> {
           <td>
             <CourseNumber
               course={this.props.request.course}
-              onChange={course => this.requestChanged("course", course)}
+              onChange={this.onCourseChange}
             />
           </td>
           <td>
@@ -76,6 +77,11 @@ export default class Request extends React.Component<IProps, {}> {
         </tr>}
       </tbody>
     );
+  }
+
+  private onCourseChange = (course: ICourse) => {
+    this.requestChanged("courseNumber", course.number);
+    this.requestChanged("course", course)
   }
 
   private requestChanged = (prop: string, val: any) => {

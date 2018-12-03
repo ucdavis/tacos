@@ -2,6 +2,7 @@ import { ICourse } from './ICourse';
 
 export interface IRequest {
     course: ICourse;
+    courseNumber: string;
     courseType: string;
     requestType: string;
     calculatedTotal: number;
