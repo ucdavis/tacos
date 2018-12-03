@@ -5,7 +5,7 @@ namespace tacos.mvc.Models
 {
     public class RequestModel
     {
-        public Course Course { get; set; }
+        public string CourseNumber { get; set; }
 
         public string CourseType { get; set; }
 
