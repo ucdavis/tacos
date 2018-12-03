@@ -112,37 +112,40 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     );
   };
 
-  private submit = () => {
-    const { selectedDepartmentId, requests } = this.state;
+  private submit = async () => {
 
-    // create the submission
+    try {
+      const { selectedDepartmentId, requests } = this.state;
+  
+      // create the submission
     const submission: ISubmission = {
       departmentId: selectedDepartmentId,
-      requests: requests
-    };
-
-    fetch("/requests/create", {
-      body: JSON.stringify(submission),
-      headers: [
-        ["Accept", "application/json"],
+        requests: requests
+      };
+  
+      const response = await fetch("/requests/submit", {
+        body: JSON.stringify(submission),
+        headers: [
+          ["Accept", "application/json"],
         ["Content-Type", "application/json"]
-      ],
-      method: "POST",
-      credentials: "include"
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
+        ],
+        method: "POST",
+        credentials: "include"
+      });
 
-        return res.json();
-      })
-      .then(res => {
-        // TODO: make sure we have success
-        localStorage.removeItem("requests");
-        window.location.replace("/requests");
-      })
-      .catch(console.error);
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const result = await response.json();
+
+      // TODO: make sure we have success
+      localStorage.removeItem("requests");
+      window.location.replace("/requests");
+    }
+    catch (err) {
+      console.error(err);
+    }
   };
 
   private requestUpdated = (i: number, request: IRequest) => {
