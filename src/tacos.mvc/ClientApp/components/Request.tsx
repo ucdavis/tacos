@@ -18,18 +18,21 @@ interface IProps {
 
 export default class Request extends React.Component<IProps, {}> {
   public render() {
+
+    const { request } = this.props;
+
     return (
       <tbody>
         <tr key={`request-${this.props.index}`}>
           <td>
             <CourseNumber
-              course={this.props.request.course}
+              course={request.course}
               onChange={this.onCourseChange}
             />
           </td>
           <td>
             <CourseType
-              courseType={this.props.request.courseType}
+              courseType={request.courseType}
               onChange={courseType =>
                 this.requestChanged("courseType", courseType)
               }
@@ -37,17 +40,17 @@ export default class Request extends React.Component<IProps, {}> {
           </td>
           <td>
             <RequestType
-              requestType={this.props.request.requestType}
+              requestType={request.requestType}
               onChange={requestType =>
                 this.requestChanged("requestType", requestType)
               }
             />
           </td>
-          <td>{this.props.request.calculatedTotal && this.props.request.calculatedTotal.toFixed(3)}</td>
-          <td>{this.props.request.annualizedTotal && this.props.request.annualizedTotal.toFixed(3)}</td>
+          <td>{request.calculatedTotal && request.calculatedTotal.toFixed(3)}</td>
+          <td>{request.annualizedTotal && request.annualizedTotal.toFixed(3)}</td>
           <td>
             <Exception
-              exception={this.props.request.exception}
+              exception={request.exception}
               onExceptionChange={exception =>
                 this.requestChanged("exception", exception)
               }
@@ -57,6 +60,11 @@ export default class Request extends React.Component<IProps, {}> {
             <button className="btn btn-danger" onClick={() => this.props.onRemove(this.props.index)}>
               <i className="fa fa-trash-alt" />
             </button>
+          </td>
+          <td>
+              { request.isDirty &&
+                <i className="far fa-edit fa-xs" title="This class has pending edits."></i>
+             }
           </td>
         </tr>
         {this.props.request.exception &&

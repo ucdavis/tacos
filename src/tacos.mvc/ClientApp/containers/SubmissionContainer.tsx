@@ -36,12 +36,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     }
 
     public render() {
+        const { requests } = this.state;
+
+        const pending = requests.filter(r => r.isDirty).length;
+
         return (
             <div>
                 {this.renderRequests()}
                 <Summary
                     canSubmit={this.isValidSubmission()}
                     total={this.submissionTotal()}
+                    pending={pending}
                     onSubmit={this.submit}
                     onReset={this.onReset}
                 />
@@ -68,7 +73,9 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         // reset the form, clear storage
         if (confirm("Are you sure you want to clear this form and start over?")) {
             LocalStorageService.clearRequests(department);
-            this.setState({ requests: [] });
+            this.setState({
+                requests: this.props.requests || [],
+            });
         }
     };
 
@@ -190,6 +197,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                         <th>Annual TA FTE</th>
                         <th>Exception?</th>
                         <th>Remove</th>
+                        <th></th>
                     </tr>
                 </thead>
                 {requestList}
@@ -230,7 +238,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 exceptionReason: "",
                 exceptionTotal: 0.0,
                 exceptionAnnualizedTotal: 0,
-                isDirty: true
+                isDirty: false,
             }
         ];
 
