@@ -6,14 +6,14 @@ import SubmissionContainer from '../containers/SubmissionContainer';
 
 import { IDepartment } from "../models/IDepartment";
 
-declare var departments: IDepartment[];
+declare var department: IDepartment;
 
 function renderApp() {
   // This code starts up the React app when it runs in a browser. It sets up the routing
   // configuration and injects the app into a DOM element.
   ReactDOM.render(
     <AppContainer>
-      <SubmissionContainer departments={departments} />
+      <SubmissionContainer department={department} />
     </AppContainer>,
     document.getElementById("react-app")
   );
