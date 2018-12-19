@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using tacos.data;
 
@@ -21,6 +21,8 @@ namespace tacos.mvc.Data
 
         public string UpdatedBy { get; set; }
 
+        public string CourseNumber { get; set; }
+
         public string CourseType { get; set; }
 
         public string RequestType { get; set; }
@@ -39,5 +41,11 @@ namespace tacos.mvc.Data
         public double AnnualizedTotal { get; set; }
 
         public bool? Approved { get; set; }
+
+        public double AverageSectionsPerCourse { get; set; }
+
+        public double AverageEnrollment { get; set; }
+
+        public double TimesOfferedPerYear { get; set; }
     }
 }
