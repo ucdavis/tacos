@@ -1,7 +1,7 @@
-﻿CREATE TABLE [dbo].[DepartmentRoles] (
+CREATE TABLE [dbo].[DepartmentRoles] (
     [Id]           INT            IDENTITY (1, 1) NOT NULL,
     [DepartmentId] INT            NOT NULL,
-    [Role]         NVARCHAR (MAX) NOT NULL,
+    [Role]         NVARCHAR (50) NOT NULL,
     [UserId]       NVARCHAR (450) NOT NULL,
     CONSTRAINT [PK_DepartmentRoles] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_DepartmentRoles_AspNetUsers_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[AspNetUsers] ([Id]) ON DELETE CASCADE,
