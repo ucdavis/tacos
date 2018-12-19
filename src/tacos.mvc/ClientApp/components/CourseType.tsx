@@ -10,13 +10,13 @@ export default class CourseType extends React.PureComponent<IProps, {}> {
   public render() {
     return (
       <div className="input-group">
-        <select
-          className="custom-select"
-          value={this.props.courseType}
-          onChange={e => this.props.onChange(e.target.value)}
-        >
-          <option value="STD">Standard lecture</option>
-          <option value="WRT">Writing intensive lecture</option>
+                <select
+                    className="custom-select"
+                    value={this.props.courseType}
+                    onChange={this.onChange}
+                >
+                    <option value="STD">Standard lecture</option>
+                    <option value="WRT">Writing intensive lecture</option>
           <option value="LAB">Lab or Studio classes</option>
           <option value="FLD">Field classes</option>
           <option value="AUTO">Lecture only, automated grading</option>
@@ -27,4 +27,8 @@ export default class CourseType extends React.PureComponent<IProps, {}> {
       </div>
     );
   }
+
+    private onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        this.props.onChange(e.target.value);
+    };
 }
