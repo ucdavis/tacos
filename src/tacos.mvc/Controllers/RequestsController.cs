@@ -62,17 +62,6 @@ namespace tacos.mvc.Controllers
             return View(request);
         }
 
-        public async Task<IActionResult> Create()
-        {
-            // get user's departments
-            var user = await _userManager.GetUserAsync(User);
-            var departments = await _context.GetUsersDepartments(user);
-
-            ViewBag.Departments = departments;
-
-            return View();
-        }
-
         public async Task<IActionResult> Edit(string code)
         {
             // get user's departments
@@ -137,32 +126,8 @@ namespace tacos.mvc.Controllers
                     {
                         DepartmentId             = department.Id,
                         CourseNumber             = course.Number,
-                        AverageSectionsPerCourse = course.AverageSectionsPerCourse,
-                        AverageEnrollment        = course.AverageEnrollment,
-                        TimesOfferedPerYear      = course.TimesOfferedPerYear,
                     };
                     _context.Requests.Add(request);
-                }
-                else
-                {
-                    // copy out values to a history entry
-                    var history = new RequestHistory()
-                    {
-                        Request                  = request,
-                        RequestId                = request.Id,
-                        UpdatedOn                = request.UpdatedOn,
-                        UpdatedBy                = request.UpdatedBy,
-                        CourseType               = request.CourseType,
-                        RequestType              = request.RequestType,
-                        Exception                = request.Exception,
-                        ExceptionReason          = request.ExceptionReason,
-                        ExceptionTotal           = request.ExceptionTotal,
-                        ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
-                        CalculatedTotal          = request.CalculatedTotal,
-                        AnnualizedTotal          = request.AnnualizedTotal,
-                        Approved                 = request.Approved,
-                    };
-                    request.History.Add(history);
                 }
 
                 // update values
@@ -181,6 +146,29 @@ namespace tacos.mvc.Controllers
                 {
                     request.Approved = true;
                 }
+
+                // always create a history entry, with this new data even on new entries, include course snapshot
+                var history = new RequestHistory()
+                {
+                    Request                  = request,
+                    RequestId                = request.Id,
+                    UpdatedOn                = request.UpdatedOn,
+                    UpdatedBy                = request.UpdatedBy,
+                    CourseType               = request.CourseType,
+                    RequestType              = request.RequestType,
+                    Exception                = request.Exception,
+                    ExceptionReason          = request.ExceptionReason,
+                    ExceptionTotal           = request.ExceptionTotal,
+                    ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
+                    CalculatedTotal          = request.CalculatedTotal,
+                    AnnualizedTotal          = request.AnnualizedTotal,
+                    Approved                 = request.Approved,
+                    CourseNumber             = course.Number,
+                    AverageSectionsPerCourse = course.AverageSectionsPerCourse,
+                    AverageEnrollment        = course.AverageEnrollment,
+                    TimesOfferedPerYear      = course.TimesOfferedPerYear,
+                };
+                request.History.Add(history);
             }
 
             await _context.SaveChangesAsync();
