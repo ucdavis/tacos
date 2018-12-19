@@ -29,8 +29,8 @@
                 <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
                 <td>@request.CourseNumber</td>
                 <td>@CourseInfo.Types[request.CourseType]</td>
-                <td>@request.AverageSectionsPerCourse</td>
-                <td>@request.AverageEnrollment</td>
+                <td>@request.Course.AverageSectionsPerCourse</td>
+                <td>@request.Course.AverageEnrollment</td>
                 <td>@CourseInfo.Requests[request.RequestType]</td>
                 <td>@request.ExceptionReason</td>
                 <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
