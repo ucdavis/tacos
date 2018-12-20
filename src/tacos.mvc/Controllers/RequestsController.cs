@@ -151,7 +151,7 @@ namespace tacos.mvc.Controllers
                 var history = new RequestHistory()
                 {
                     Request                  = request,
-                    RequestId                = request.Id,
+                    Department               = department,
                     UpdatedOn                = request.UpdatedOn,
                     UpdatedBy                = request.UpdatedBy,
                     CourseType               = request.CourseType,
