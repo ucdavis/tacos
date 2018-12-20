@@ -13,6 +13,10 @@ namespace tacos.mvc.Data
         [Key]
         public int Id { get; set; }
 
+        public Department Department { get; set; }
+
+        public int DepartmentId { get; set; }
+
         public Request Request { get; set; }
 
         public int RequestId { get; set; }
