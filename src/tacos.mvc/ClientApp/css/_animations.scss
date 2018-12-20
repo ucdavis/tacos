@@ -1,0 +1,11 @@
+@keyframes background-flash {
+    0% {
+        background-color: inherit;
+    }
+    50% {
+        background-color: grey;
+    }
+    100% {
+        background-color: inherit;
+    }
+}

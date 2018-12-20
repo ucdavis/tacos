@@ -1,8 +1,8 @@
 import * as React from "react";
+import { parse as QueryParse } from "query-string";
 
 import Request from "../components/Request";
 import Summary from "../components/Summary";
-import Departments from "../components/Departments";
 
 import { formulas } from "../util/formulas";
 
@@ -22,17 +22,55 @@ interface IState {
 }
 
 export default class SubmissionContainer extends React.Component<IProps, IState> {
+    
     constructor(props: IProps) {
         super(props);
 
+        // check local storage first
         let requests = LocalStorageService.getRequests(props.department);
         if (!requests.length) {
             requests = props.requests || [];
         }
 
         this.state = {
-            requests: requests
+            requests: requests,
         };
+    }
+
+    public componentDidMount() {
+        const { requests } = this.props;
+
+        const [host, controller, action, id] = location.pathname.split('/');
+        const { jsAction } = QueryParse(location.search);
+        if (!jsAction) {
+            return;
+        }
+
+        if (jsAction === 'create') {
+            this.onAddRequest();
+            return;
+        }
+
+        if (jsAction === 'edit' && requests) {
+            const parsedId = parseInt(id, 10);
+            if (!parsedId) {
+                return;
+            }
+
+            // find matching request
+            const index = requests.findIndex(r => r.id == parsedId);
+            if (index < 0) {
+                return;
+            }
+
+            let request = requests[index];
+            request = { ...request, isFocused: true };
+            this.requestUpdated(index, request);
+
+            window.location.hash = `request-${request.id}`;
+
+            return;
+        }
     }
 
     public render() {
@@ -52,6 +90,72 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 />
             </div>
         );
+    }
+
+    private renderRequests = () => {
+        const { requests } = this.state;
+
+        return (
+            <table className="table">
+                <thead>
+                    <tr>
+                        <th>Course Number</th>
+                        <th>
+                            Course Type &nbsp;&nbsp;
+                            <a target="_blank" href="/CAES-TA-Guidelines 2018-21.pdf">
+                                Criteria Info <i className="fas fa-external-link-alt" />
+                            </a>
+                        </th>
+                        <th>
+                            <span
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="For courses that require both TAs and Readers, select the majority position type."
+                            >
+                                Request Type <i className="fas fa-question-circle" />
+                            </span>
+                        </th>
+                        <th>TAs per course</th>
+                        <th>Annual TA FTE</th>
+                        <th>Exception?</th>
+                        <th>Remove</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                { requests.map(this.renderRequest) }
+                <tfoot>
+                    <tr>
+                        <td colSpan={5}>
+                            <button
+                                className="btn btn-primary"
+                                id="add-new"
+                                onClick={this.onAddRequest}
+                            >
+                                Add New
+                            </button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        );
+    };
+
+    private renderRequest = (request: IRequest, index: number) => {
+
+        return (
+            <Request
+                key={`course-${index}`}
+                request={request}
+                index={index}
+                onEdit={this.requestUpdated}
+                onRemove={this.removeRequest}
+            />
+        );
+    }
+
+
+    private setSubmissionRefs = () => {
+
     }
 
     private submissionTotal = () => {
@@ -162,62 +266,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({ requests });
     };
 
-    private renderRequests = () => {
-        const requestList = this.state.requests.map((req, i) => (
-            <Request
-                key={`course-${i}`}
-                request={req}
-                index={i}
-                onEdit={this.requestUpdated}
-                onRemove={this.removeRequest}
-            />
-        ));
-
-        return (
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th>Course Number</th>
-                        <th>
-                            Course Type &nbsp;&nbsp;
-                            <a target="_blank" href="/CAES-TA-Guidelines 2018-21.pdf">
-                                Criteria Info <i className="fas fa-external-link-alt" />
-                            </a>
-                        </th>
-                        <th>
-                            <span
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="For courses that require both TAs and Readers, select the majority position type."
-                            >
-                                Request Type <i className="fas fa-question-circle" />
-                            </span>
-                        </th>
-                        <th>TAs per course</th>
-                        <th>Annual TA FTE</th>
-                        <th>Exception?</th>
-                        <th>Remove</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                {requestList}
-                <tfoot>
-                    <tr>
-                        <td colSpan={5}>
-                            <button
-                                className="btn btn-primary"
-                                id="add-new"
-                                onClick={this.onAddRequest}
-                            >
-                                Add New
-                            </button>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        );
-    };
-
+    
     private onAddRequest = () => {
         const requests: IRequest[] = [
             ...this.state.requests,

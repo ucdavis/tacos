@@ -1,6 +1,8 @@
 import { ICourse } from './ICourse';
 
 export interface IRequest {
+    id?: number;
+
     course: ICourse;
     courseNumber: string;
     courseType: string;
@@ -13,4 +15,5 @@ export interface IRequest {
     exceptionAnnualizedTotal: number;
 
     isDirty: boolean;
+    isFocused: boolean;
   }

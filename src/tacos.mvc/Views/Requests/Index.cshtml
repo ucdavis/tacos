@@ -48,7 +48,7 @@
                         @request.UpdatedOn.ToString("d")
                     </td>
                     <td class="text-center">
-                        <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" class="btn btn-primary">
+                        <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                     </td>
@@ -56,7 +56,7 @@
             }
         </tbody>
     </table>
-    <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code">Edit Submissions</a>
+    <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Edit Submissions</a>
 </div>
 
 @section scripts
