@@ -162,8 +162,8 @@ namespace tacos.mvc.Controllers
                 // always create a history entry, with this new data even on new entries, include course snapshot
                 var history = new RequestHistory()
                 {
-                    Request                  = request,
-                    Department               = department,
+                    RequestId                = request.Id,
+                    DepartmentId             = department.Id,
                     UpdatedOn                = request.UpdatedOn,
                     UpdatedBy                = request.UpdatedBy,
                     CourseType               = request.CourseType,
