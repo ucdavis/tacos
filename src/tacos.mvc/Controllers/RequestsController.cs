@@ -117,9 +117,6 @@ namespace tacos.mvc.Controllers
                 return BadRequest("Matching department not found among user's permission set.");
             }
 
-            var creatorName = $"{user.LastName}, {user.FirstName}";
-
-            var requests = new List<Request>();
             foreach (var m in model.Requests)
             {
                 // find course
@@ -151,6 +148,7 @@ namespace tacos.mvc.Controllers
                 request.CalculatedTotal          = m.CalculatedTotal;
                 request.AnnualizedTotal          = m.AnnualizedTotal;
                 request.Approved                 = false;
+                request.UpdatedBy                = user.Name;
 
                 // auto approve any un-exception requests
                 if (!request.Exception)
