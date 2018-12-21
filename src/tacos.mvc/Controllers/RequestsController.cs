@@ -147,8 +147,11 @@ namespace tacos.mvc.Controllers
                 request.ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal;
                 request.CalculatedTotal          = m.CalculatedTotal;
                 request.AnnualizedTotal          = m.AnnualizedTotal;
-                request.Approved                 = false;
+                request.UpdatedOn                = DateTime.UtcNow;
                 request.UpdatedBy                = user.Name;
+
+                // clear approval
+                request.Approved = null;
 
                 // auto approve any un-exception requests
                 if (!request.Exception)
