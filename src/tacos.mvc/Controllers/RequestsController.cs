@@ -56,7 +56,18 @@ namespace tacos.mvc.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            // get user's departments
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
+
+            ViewBag.Departments = departments;
+
+            var departmentIds = departments.Select(d => d.Id).ToArray();
+
             var request = await _context.Requests
+                .Include(r => r.Course)
+                .Include(r => r.History)
+                .Where(r => departmentIds.Contains(r.DepartmentId))
                 .SingleAsync(x => x.Id == id);
 
             return View(request);

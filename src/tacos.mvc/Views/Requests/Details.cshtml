@@ -1,22 +1,107 @@
+@using tacos.mvc.Resources
 @model Request
 
+
+@{
+    var history = Model.History.OrderByDescending(h => h.UpdatedOn).Skip(1);
+}
+
 <div class="container">
-    <h3>Details about your request:</h3>
+    <h3>Course Information</h3>
 
     <dl>
-        <dt>Course</dt>
+        <dt>Course Number</dt>
         <dd>@Model.CourseNumber</dd>
-        
-        <dt>Requested Date</dt>
+
+        <dt>Name</dt>
+        <dd>@Model.Course.Name</dd>
+
+        <dt>Course Type <span class="text-muted">(as reported in request)</span></dt>
+        <dd>@CourseInfo.Types[Model.CourseType]</dd>
+
+        <dt>Average Enrollment</dt>
+        <dd>@Model.Course.AverageEnrollment</dd>
+
+        <dt>Average Sections per Course</dt>
+        <dd>@Model.Course.AverageSectionsPerCourse</dd>
+
+        <dt>Times Offered per Year</dt>
+        <dd>@Model.Course.TimesOfferedPerYear</dd>
+    </dl>
+    
+    <h3>Request Details</h3>
+    
+    <dl>
+        <dt>Submitted Date</dt>
         <dd>@Model.UpdatedOn.ToString("d")</dd>
 
-        <dt>Exception TAs per course</dt>
-        <dd>@(Model.Exception ?  Model.ExceptionTotal.ToString("f3") : "No exception requested")</dd>
+        <dt>Submitted By</dt>
+        <dd>@Model.UpdatedBy</dd>
 
-        <dt>Approved TAs per course</dt>
+        <dt>Suggested TAs per Course</dt>
+        <dd>@Model.CalculatedTotal</dd>
+        
+        <dt>Exception Requested?</dt>
+        <dd>@(Model.Exception ? "Yes" : "No")</dd>
+
+        @if (Model.Exception)
+        {
+            <dt>Requested TAs per Course</dt>
+            <dd>@Model.ExceptionTotal.ToString("f3")</dd>
+
+            <dt>Request</dt>
+            <dd>@Model.ExceptionReason</dd>
+
+            <dt>Reviewed?</dt>
+            <dd>@(Model.Approved.HasValue ? "Yes" : "No")</dd>
+
+            if (Model.Approved.HasValue)
+            {
+                <dt>Approved?</dt>
+                <dd>@(Model.Approved.Value ? "Yes" : "No")</dd>
+            }
+        }
+
+        <dt>Approved TAs per Course</dt>
         <dd>@Model.ApprovedTotal.ToString("f3")</dd>
 
         <dt>Approved Annualized Total</dt>
         <dd>@Model.ApprovedAnnualizedTotal.ToString("f3")</dd>
     </dl>
+
+
+    <h3>History of this request</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Course Number</th>
+                <th>Course Type</th>
+                <th>Suggested Total</th>
+                <th>Requested Total</th>
+                <th>Reason</th>
+                <th>Reviewed?</th>
+                <th>Approved?</th>
+                <th>Updated On</th>
+                <th>Updated By</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var h in history)
+        {
+            <tr>
+                <td>@h.CourseNumber</td>
+                <td>@CourseInfo.Types[h.CourseType]</td>
+                <td>@(h.CalculatedTotal)</td>
+                <td>@(h.Exception ? h.ExceptionTotal.ToString() : "")</td>
+                <td>@(h.Exception ? h.ExceptionReason : "")</td>
+                <td>@(h.Approved.HasValue ? "Yes" : "No")</td>
+                <td>@(h.Approved.HasValue ? (h.Approved.Value ? "Yes" : "No") : "")</td>
+                <td>@h.UpdatedOn.ToString("G")</td>
+                <td>@h.UpdatedBy</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
 </div>
