@@ -25,9 +25,11 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                             {  pending > 0 &&
                                 <span className="mr-3">{pending} Pending Changes</span>
                             }
-                            <button className="btn btn-danger" onClick={this.props.onReset}>
-                                Reset
-                            </button>
+                            {  pending > 0 &&
+                                <button className="btn btn-danger" onClick={this.props.onReset}>
+                                    Reset
+                                </button>
+                            }
                             <button
                                 className="btn btn-primary"
                                 id="submit-button"
