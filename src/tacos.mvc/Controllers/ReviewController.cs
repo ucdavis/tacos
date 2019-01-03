@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace tacos.mvc.Controllers
             var requests = await _dbContext.Requests
                 .Include(r => r.Course)
                 .Include(r => r.Department)
+                .Where(r => r.IsActive)
                 .AsNoTracking()
                 .ToArrayAsync();
 
