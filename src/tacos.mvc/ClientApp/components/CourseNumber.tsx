@@ -3,8 +3,8 @@ import * as React from "react";
 import { ICourse } from "../models/ICourse";
 
 interface IProps {
-  course: ICourse;
-  onChange: (course: ICourse) => void;
+    course: ICourse;
+    onChange: (course: ICourse) => void;
 }
 
 interface IState {
@@ -21,10 +21,10 @@ const defaultCourse: ICourse = {
 
 // render a textbox for inputing course number, or show course info if already selected
 export default class CourseNumber extends React.PureComponent<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
+    constructor(props: IProps) {
+        super(props);
 
-    this.state = {
+        this.state = {
             querying: false
         };
     }
@@ -52,11 +52,11 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
                         >
                             {this.renderIndicator()}
                         </span>
-          </div>
-        </div>
-        {!!courseName && <small className="form-text text-muted">{courseName}</small>}
-      </div>
-    );
+                    </div>
+                </div>
+                {!!courseName && <small className="form-text text-muted">{courseName}</small>}
+            </div>
+        );
     }
 
     private renderIndicator = () => {
@@ -70,47 +70,45 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
         const isValid = !!course.name;
 
         return <i className={`fa fa-${isValid ? "check" : "times"}`} />;
-  };
+    };
 
-  private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const val = event.target.value;
-    this.props.onChange({ ...defaultCourse, number: val });
+    private onNumberChanged = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        try {
 
-    // only valid if we are at 6+ chars
-    if (val.length < 6) {
-      this.setState({ querying: false });
-      return;
+            const val = event.target.value;
+            this.props.onChange({ ...defaultCourse, number: val });
+
+            // only valid if we are at 6+ chars
+            if (val.length < 6) {
+                this.setState({ querying: false });
+                return;
+            }
+
+            this.setState({ querying: true });
+
+            // TODO: debounce
+
+            const response = await fetch(`/course/${val}`, {
+                headers: [["Accept", "application/json"], ["Content-Type", "application/json"]],
+                method: "GET",
+                credentials: "include"
+            })
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const course: ICourse = await response.json();
+
+            if (course) {
+                this.setState({ querying: false });
+                this.props.onChange(course);
+            }
+        }
+        catch (err) {
+
+            console.error(err);
+            this.setState({ querying: false });
+        }
     }
-
-    this.setState({ querying: true });
-
-    // TODO: debounce
-
-    fetch(`/course/${val}`, {
-      headers: [
-        ["Accept", "application/json"],
-        ["Content-Type", "application/json"]
-      ],
-      method: "GET",
-      credentials: "include"
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-
-        return res.json();
-      })
-      .then((course: ICourse) => {
-        if (course) {
-          this.setState({ querying: false });
-          this.props.onChange({ ...course, valid: true });
-        }
-      })
-      .catch(err => {
-        console.error(err);
-
-        this.setState({ querying: false });
-      });
-  };
 }
