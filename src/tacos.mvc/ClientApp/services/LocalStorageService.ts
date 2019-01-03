@@ -24,8 +24,17 @@ export function getRequests(department: IDepartment): IRequest[] {
 
 export function saveRequests(department: IDepartment, requests: IRequest[]) {
     const key = getStorageKey(department);
+
+    // don't save isFocused: true
+    const data = requests.map((r) => {
+        return { 
+            ...r,
+            isFocused: false,
+        };
+    });
+
     const storage: IStorage = {
-        requests,
+        requests: data,
         updatedOn: new Date(),
     }
 
