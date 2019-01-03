@@ -58,7 +58,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             }
 
             // find matching request
-            const index = requests.findIndex(r => r.id == parsedId);
+            const index = requests.findIndex(r => r.id === parsedId);
             if (index < 0) {
                 return;
             }
