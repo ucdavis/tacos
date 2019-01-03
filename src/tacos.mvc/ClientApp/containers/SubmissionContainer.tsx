@@ -255,7 +255,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { requests } = this.state;
 
         console.log("removing request");
-        let request = this.state.requests[i];
+        let request = requests[i];
 
         // if this is an existing request, mark it as deleted, so that we can delete it on the server
         if (request.id) {
@@ -264,7 +264,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             return;
         }
 
-        // else, remove it from the array
+        // else, remove it from new array
         const newRequests = requests.filter((r, rIndex) => rIndex !== i);
         LocalStorageService.saveRequests(department, newRequests);
         this.setState({ requests: newRequests });
@@ -319,11 +319,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.isDirty = true;
         }
 
-        // replace item in array
-        requests[i] = request;
+        // create new array and replace item
+        const newRequests = [...requests];
+        newRequests[i] = request;
 
-        LocalStorageService.saveRequests(department, requests);
-        this.setState({ requests });
+        LocalStorageService.saveRequests(department, newRequests);
+        this.setState({ requests: newRequests });
 
         // trigger validations
         this.checkIsValid();
@@ -332,7 +333,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     private onAddRequest = () => {
         const { department } = this.props;
 
-        const requests: IRequest[] = [
+        const newRequests: IRequest[] = [
             ...this.state.requests,
             {
                 course: {
@@ -355,7 +356,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             }
         ];
 
-        LocalStorageService.saveRequests(department, requests);
-        this.setState({ requests });
+        LocalStorageService.saveRequests(department, newRequests);
+        this.setState({ requests: newRequests });
     }
 }
