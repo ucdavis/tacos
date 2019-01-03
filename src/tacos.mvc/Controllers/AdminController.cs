@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -13,17 +11,17 @@ namespace tacos.mvc.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ApplicationController
     {
-        private readonly TacoDbContext dbContext;
+        private readonly TacoDbContext _dbContext;
 
         public AdminController(TacoDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
         public async Task<IActionResult> Index()
         {
             // get most all submissions
-            var requests = await dbContext
+            var requests = await _dbContext
                 .Requests
                 .Include(r => r.Course)
                 .Where(r => r.IsActive)
@@ -35,12 +33,15 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, string decision) {
-            var request = await dbContext.Requests.SingleAsync(x=>x.Id == id);
+        public async Task<IActionResult> Edit(int id, string decision)
+        {
+            var request = await _dbContext
+                .Requests
+                .SingleAsync(x => x.Id == id);
             
             request.Approved = string.Equals(decision, "APPROVE", StringComparison.OrdinalIgnoreCase);
 
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
