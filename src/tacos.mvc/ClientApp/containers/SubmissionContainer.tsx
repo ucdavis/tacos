@@ -138,9 +138,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 </tfoot>
             </table>
         );
-    };
+    }
 
     private renderRequest = (request: IRequest, index: number) => {
+        if (request.isDeleted) {
+            return null;
+        }
 
         return (
             <Request
