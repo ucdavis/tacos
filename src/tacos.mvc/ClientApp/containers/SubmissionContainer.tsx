@@ -10,7 +10,7 @@ import * as LocalStorageService from "../services/LocalStorageService";
 
 import { IRequest } from "../models/IRequest";
 import { IDepartment } from "../models/IDepartment";
-import { ISubmission } from "ClientApp/models/ISubmission";
+import { ISubmission } from "../models/ISubmission";
 
 interface IProps {
     department: IDepartment;
@@ -40,7 +40,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     public componentDidMount() {
         const { requests } = this.props;
 
-        const [host, controller, action, id] = location.pathname.split('/');
+        const [__host, __controller, __action, id] = location.pathname.split('/');
         const { jsAction } = QueryParse(location.search);
         if (!jsAction) {
             return;
