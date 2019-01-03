@@ -74,7 +74,7 @@ namespace tacos.mvc.Controllers
             return View(request);
         }
 
-        public async Task<IActionResult> Edit(string code)
+        public async Task<IActionResult> Edit(int id, string code)
         {
             // get user's departments
             var user = await _userManager.GetUserAsync(User);
