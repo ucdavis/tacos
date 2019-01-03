@@ -119,15 +119,40 @@ namespace tacos.mvc.Controllers
                 return BadRequest("Matching department not found among user's permission set.");
             }
 
-            foreach (var m in model.Requests)
+            // process requested deletions first
+            foreach (var m in model.Requests.Where(r => r.IsDeleted))
             {
-                // find course
+                // find request by id
+                var request = await _context.Requests
+                        .FirstOrDefaultAsync(r => r.Id == m.Id);
+
+                // can't find the request being deleted
+                if (request == null)
+                {
+                    return BadRequest("Could not find request to be deleted.");
+                }
+
+                request.IsActive = false;
+            }
+
+            // process updates next
+            foreach (var m in model.Requests.Where(r => !r.IsDeleted))
+            {
                 var course = await _context.Courses.FindAsync(m.CourseNumber);
 
-                // find or create new request
-                var request = await _context.Requests
-                    .FirstOrDefaultAsync(r =>
-                        string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                // find request by id or name, or create a new one
+                Request request = null;
+                if (m.Id > 0)
+                {
+                    request = await _context.Requests
+                        .FirstOrDefaultAsync(r => r.Id == m.Id);
+                }
+                else
+                {
+                    request = await _context.Requests
+                        .FirstOrDefaultAsync(r =>
+                            string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                }
 
                 // create request if necessary
                 if (request == null)
