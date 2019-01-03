@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import { UncontrolledTooltip } from "reactstrap";
+
 import CourseNumber from "./CourseNumber";
 import CourseType from "./CourseType";
 import Exception from "./Exception";
@@ -42,7 +44,7 @@ export default class Request extends React.Component<IProps, {}> {
         }
 
         return (
-            <tbody id={`request-${request.id}`} ref={this._focusRef} className={bodyClass}>
+            <tbody id={`request-${request.id}`} ref={this._focusRef} className={bodyClass.trim()}>
                 <tr>
                     <td>
                         <CourseNumber course={request.course} onChange={this.onCourseChange} />
@@ -86,6 +88,16 @@ export default class Request extends React.Component<IProps, {}> {
                                 title="This class has pending edits."
                             />
                         )}
+                    </td>
+                    <td>
+                        { (request.isDirty && !request.isValid) && (
+                            <div>
+                                <i id={`request-${request.id}-error`} className="fas fa-exclamation-triangle text-danger" />
+                                <UncontrolledTooltip className="" placement="right" target={`request-${request.id}-error`}>
+                                    {request.error}
+                                </UncontrolledTooltip>
+                            </div>
+                        ) }
                     </td>
                 </tr>
                 {this.props.request.exception && (

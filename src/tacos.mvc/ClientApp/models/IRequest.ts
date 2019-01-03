@@ -14,6 +14,10 @@ export interface IRequest {
     exceptionTotal: number;
     exceptionAnnualizedTotal: number;
 
-    isDirty: boolean;
-    isFocused: boolean;
+    isDirty?: boolean;
+    isFocused?: boolean;
+    isDeleted?: boolean;
+
+    error?: string;
+    isValid?: boolean;
   }
