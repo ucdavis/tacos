@@ -123,5 +123,7 @@ export const formulas: IFormulas = {
   AUTO: lectureAutoGradingFormula,
   MAN: lectureManualGradingFormula,
   MODW: lectureModerateWritingFormula,
-  INT: lectureIntensiveFormula
+    INT: lectureIntensiveFormula
 };
+
+export const annualizationRatio = 4.0 / 12.0;

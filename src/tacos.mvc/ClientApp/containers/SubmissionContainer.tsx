@@ -4,7 +4,7 @@ import { parse as QueryParse } from "query-string";
 import Request from "../components/Request";
 import Summary from "../components/Summary";
 
-import { formulas } from "../util/formulas";
+import { annualizationRatio, formulas } from "../util/formulas";
 
 import * as LocalStorageService from "../services/LocalStorageService";
 
@@ -174,6 +174,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         return total;
     }
 
+    
     private onReset = () => {
         const { department } = this.props;
 
@@ -274,15 +275,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { department } = this.props;
         const { requests } = this.state;
 
-        const annualizationRatio = 4.0 / 12.0;
         // if the course info looks good, calculate totals
         request.calculatedTotal = formulas[request.courseType].calculate(request.course);
 
-        request.exceptionAnnualizedTotal =
-            request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
-
-        request.annualizedTotal =
-            request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
+        request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
+        request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
 
         // clear error messages
         request.isValid = true;
