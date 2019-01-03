@@ -11,12 +11,15 @@ namespace tacos.data
     {
         public Request()
         {
+            IsActive = true;
             UpdatedOn = DateTime.UtcNow;
             History = new List<RequestHistory>();
         }
 
         [Key]
         public int Id { get; set; }
+
+        public bool IsActive { get; set; }
 
         public DateTime UpdatedOn { get; set; }
 

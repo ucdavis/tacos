@@ -1,5 +1,6 @@
-CREATE TABLE [dbo].[Requests] (
+﻿CREATE TABLE [dbo].[Requests] (
     [Id]                       INT            IDENTITY (1, 1) NOT NULL,
+    [IsActive]				   BIT			  NOT NULL DEFAULT 1, 
     [Approved]                 BIT            NULL,
     [AnnualizedTotal]          FLOAT (53)     NOT NULL,
     [CalculatedTotal]          FLOAT (53)     NOT NULL,

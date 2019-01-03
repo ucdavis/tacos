@@ -47,6 +47,7 @@ namespace tacos.mvc.Controllers
             // get requests for department
             var requests = await _context.Requests
                 .Include(r => r.Department)
+                .Where(r => r.IsActive)
                 .Where(r => r.Department.Id == department.Id)
                 .AsNoTracking()
                 .ToArrayAsync();
@@ -96,6 +97,7 @@ namespace tacos.mvc.Controllers
             // get requests for department
             var requests = await _context.Requests
                 .Include(r => r.Course)
+                .Where(r => r.IsActive)
                 .Where(r => r.Department.Id == department.Id)
                 .AsNoTracking()
                 .ToArrayAsync();
@@ -139,6 +141,7 @@ namespace tacos.mvc.Controllers
                 }
 
                 // update values
+                request.IsActive                 = true;
                 request.CourseType               = m.CourseType;
                 request.RequestType              = m.RequestType;
                 request.Exception                = m.Exception;
