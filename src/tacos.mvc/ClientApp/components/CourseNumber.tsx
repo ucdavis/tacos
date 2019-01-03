@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 
 import { ICourse } from "../models/ICourse";
 
@@ -12,13 +11,12 @@ interface IState {
   querying: boolean;
 }
 
-const defaultCourse = {
+const defaultCourse: ICourse = {
   name: "",
   number: "",
   timesOfferedPerYear: 0,
   averageEnrollment: 0,
   averageSectionsPerCourse: 0,
-  valid: false
 };
 
 // render a textbox for inputing course number, or show course info if already selected
@@ -27,41 +25,51 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     super(props);
 
     this.state = {
-      querying: false
-    };
-  }
-  public render() {
-    let courseName = this.props.course.name;
-    return (
-      <div>
-        <div className="input-group">
-          <input
-            type="text"
-            className="form-control"
-            value={this.props.course.number}
-            onChange={this.onNumberChanged}
-          />
-          <div className="input-group-append">
-            <span
-              className="input-group-text"
-              id="basic-addon2"
-              style={{ color: this.props.course.valid ? "green" : "red" }}
-            >
-              {this.renderIndicator()}
-            </span>
+            querying: false
+        };
+    }
+
+    public render() {
+        const { course } = this.props;
+
+        let courseName = course.name;
+        const isValid = !!course.name;
+
+        return (
+            <div>
+                <div className="input-group">
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={course.number}
+                        onChange={this.onNumberChanged}
+                    />
+                    <div className="input-group-append">
+                        <span
+                            className="input-group-text"
+                            id="basic-addon2"
+                            style={{ color: isValid ? "green" : "red" }}
+                        >
+                            {this.renderIndicator()}
+                        </span>
           </div>
         </div>
         {!!courseName && <small className="form-text text-muted">{courseName}</small>}
       </div>
     );
-  }
-
-  private renderIndicator = () => {
-    if (this.state.querying) {
-      return <i className="fa fa-spin fa-spinner" />;
-    } else {
-      return <i className={`fa fa-${this.props.course.valid ? "check" : "times"}`} />;
     }
+
+    private renderIndicator = () => {
+        const { course } = this.props;
+        const { querying } = this.state;
+
+        if (querying) {
+            return <i className="fa fa-spin fa-spinner" />;
+        }
+
+        const isValid = !!course.name;
+
+        return <i className={`fa fa-${isValid ? "check" : "times"}`} />;
   };
 
   private onNumberChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
