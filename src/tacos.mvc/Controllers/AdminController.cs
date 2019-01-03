@@ -25,6 +25,7 @@ namespace tacos.mvc.Controllers
             // get most all submissions
             var requests = await dbContext
                 .Requests
+                .Include(r => r.Course)
                 .Where(r => r.IsActive)
                 .OrderByDescending(s => s.UpdatedOn)
                 .AsNoTracking()
