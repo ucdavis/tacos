@@ -63,10 +63,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 return;
             }
 
-            let request = requests[index];
-            request = { ...request, isFocused: true };
-            this.requestUpdated(index, request);
+            const request = requests[index];
 
+            // update isFocused to trigger ui flash
+            this.focusRequest(index);
+
+            // scroll to location
             window.location.hash = `request-${request.id}`;
 
             return;
@@ -78,11 +80,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         const pending = requests.filter(r => r.isDirty).length;
 
+        const isValid = this.checkIsValid();
+
         return (
             <div>
                 {this.renderRequests()}
                 <Summary
-                    canSubmit={this.isValidSubmission()}
+                    canSubmit={isValid}
                     total={this.submissionTotal()}
                     pending={pending}
                     onSubmit={this.submit}
@@ -119,13 +123,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                         <th>Annual TA FTE</th>
                         <th>Exception?</th>
                         <th>Remove</th>
-                        <th></th>
                     </tr>
                 </thead>
                 { requests.map(this.renderRequest) }
                 <tfoot>
                     <tr>
-                        <td colSpan={5}>
+                        <td colSpan={7}>
                             <button
                                 className="btn btn-primary"
                                 id="add-new"
@@ -156,23 +159,20 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         );
     }
 
-
-    private setSubmissionRefs = () => {
-
-    }
-
     private submissionTotal = () => {
         const { requests } = this.state;
 
         // go add up everything they have requested
-        const total = requests.reduce((acc, req) => {
-            // add in exception total if exception, otherwise the annualized total
-            const value = req.exception ? req.exceptionAnnualizedTotal : req.annualizedTotal;
-            return acc + value;
-        }, 0);
+        const total = requests
+            .filter(r => !r.isDeleted)
+            .reduce((acc, req) => {
+                // add in exception total if exception, otherwise the annualized total
+                const value = req.exception ? req.exceptionAnnualizedTotal : req.annualizedTotal;
+                return acc + value;
+            }, 0);
 
         return total;
-    };
+    }
 
     private onReset = () => {
         const { department } = this.props;
@@ -184,22 +184,23 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 requests: this.props.requests || [],
             });
         }
-    };
+    }
 
-    private isValidSubmission = (): boolean => {
+    private checkIsValid = (): boolean => {
+        const { requests } = this.state;
+
         // make sure we have at least one request
-        if (this.state.requests.length === 0) {
+        if (requests.length === 0) {
             return false;
         }
 
-        // submission is valid if every course is valid and every exception has a valid exceptionTotal
-        return this.state.requests.every(
-            r =>
-                !!r.course &&
-                !!r.course.number &&
-                (!r.exception || (r.exception && r.exceptionTotal >= 0))
-        );
-    };
+        // make sure all dirty requests are all valid or are being deleted
+        if (!requests.filter(r => r.isDirty).every(r => r.isValid || r.isDeleted || false)) {
+            return false;
+        }
+
+        return true;
+    }
 
     private submit = async () => {
         try {
@@ -208,6 +209,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
             // filter just dirty submittions
             const dirtyRequests = requests.filter(r => r.isDirty);
+
+            // check validity
+            const isValid = this.checkIsValid();
+            if (!isValid) {
+                return;
+            }
 
             // create the submission
             const submission: ISubmission = {
@@ -234,10 +241,38 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         } catch (err) {
             console.error(err);
         }
-    };
+    }
 
-    private requestUpdated = (i: number, request: IRequest) => {
+    private focusRequest = (i: number) => {
+        let request = this.state.requests[i];
+        request = { ...request, isFocused: true };
+
+        this.requestUpdated(i, request, false);
+    }
+
+    private removeRequest = (i: number) => {
         const { department } = this.props;
+        const { requests } = this.state;
+
+        console.log("removing request");
+        let request = this.state.requests[i];
+
+        // if this is an existing request, mark it as deleted, so that we can delete it on the server
+        if (request.id) {
+            request = { ...request, isDeleted: true };
+            this.requestUpdated(i, request);
+            return;
+        }
+
+        // else, remove it from the array
+        const newRequests = requests.filter((r, rIndex) => rIndex !== i);
+        LocalStorageService.saveRequests(department, newRequests);
+        this.setState({ requests: newRequests });
+    }
+
+    private requestUpdated = (i: number, request: IRequest, dirty: boolean = true) => {
+        const { department } = this.props;
+        const { requests } = this.state;
 
         const annualizationRatio = 4.0 / 12.0;
         // if the course info looks good, calculate totals
@@ -249,28 +284,54 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         request.annualizedTotal =
             request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
 
-        request.isDirty = true;
+        // clear error messages
+        request.isValid = true;
+        request.error = '';
 
-        const requests = this.state.requests;
+        // check validity
+        if (!request.course) {
+            request.isValid = false;
+            request.error = 'Course required';
+        }
+
+        if (!request.courseNumber) {
+            request.isValid = false;
+            request.error = 'Course required';
+        }
+
+        if (request.exception && request.exceptionTotal <= 0) {
+            request.isValid = false;
+            request.error = 'Exception > 0 required';
+        }
+
+        // check for duplicate courses earlier in the array
+        const foundDuplicate = requests
+            .filter((r, rIndex) => rIndex < i)
+            .filter(r => !r.isDeleted)
+            .find(r => r.courseNumber === request.courseNumber);
+
+        if (foundDuplicate) {
+            request.isValid = false;
+            request.error = 'Duplicate course in request above';
+        }
+
+        if (dirty) {
+            request.isDirty = true;
+        }
+
+        // replace item in array
         requests[i] = request;
 
         LocalStorageService.saveRequests(department, requests);
         this.setState({ requests });
-    };
 
-    private removeRequest = (i: number) => {
-        const { department } = this.props;
-        console.log("removing request");
+        // trigger validations
+        this.checkIsValid();
+    }
 
-        const requests = [...this.state.requests];
-        requests.splice(i, 1);
-
-        LocalStorageService.saveRequests(department, requests);
-        this.setState({ requests });
-    };
-
-    
     private onAddRequest = () => {
+        const { department } = this.props;
+
         const requests: IRequest[] = [
             ...this.state.requests,
             {
@@ -290,10 +351,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 exceptionReason: "",
                 exceptionTotal: 0.0,
                 exceptionAnnualizedTotal: 0,
-                isDirty: false,
+                isValid: true,
             }
         ];
 
+        LocalStorageService.saveRequests(department, requests);
         this.setState({ requests });
-    };
+    }
 }
