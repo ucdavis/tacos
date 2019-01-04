@@ -1,13 +1,37 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using tacos.mvc.Data;
+
 namespace tacos.data
 {
     // request for a specific course
     public class Request
     {
+        public Request()
+        {
+            IsActive = true;
+            UpdatedOn = DateTime.UtcNow;
+            History = new List<RequestHistory>();
+        }
+
+        [Key]
         public int Id { get; set; }
 
-        public Submission Submission { get; set; }
+        public bool IsActive { get; set; }
 
-        public int SubmissionId { get; set; }
+        public DateTime UpdatedOn { get; set; }
+
+        public string UpdatedBy { get; set; }
+
+        [Required]
+        public Department Department { get; set; }
+
+        public int DepartmentId { get; set; }
+
+        [Required]
+        public Course Course { get; set; }
 
         public string CourseNumber { get; set; }
 
@@ -23,12 +47,6 @@ namespace tacos.data
 
         public double ExceptionAnnualizedTotal { get; set; }
 
-        public double AverageSectionsPerCourse { get; set; }
-
-        public double AverageEnrollment { get; set; }
-
-        public double TimesOfferedPerYear { get; set; }
-
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
 
@@ -40,33 +58,42 @@ namespace tacos.data
         {
             get
             {
-                if (Approved.HasValue) {
-                    // if we've made a decision
-                    if (Approved.Value) {
-                        return Exception ? ExceptionTotal : CalculatedTotal;
-                    } else {
-                        return CalculatedTotal;
-                    }
-                } else {
-                    return 0;
+                if (!Approved.HasValue) return 0;
+
+                // if we've made a decision
+                if (Approved.Value) {
+                    return Exception ? ExceptionTotal : CalculatedTotal;
                 }
+
+                return CalculatedTotal;
             }
         }
+
         public double ApprovedAnnualizedTotal
         {
             get
             {
-                if (Approved.HasValue) {
-                    // if we've made a decision
-                    if (Approved.Value) {
-                        return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
-                    } else {
-                        return AnnualizedTotal;
-                    }
-                } else {
-                    return 0;
+                if (!Approved.HasValue) return 0;
+
+                // if we've made a decision
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
                 }
+
+                return AnnualizedTotal;
             }
+        }
+
+
+        public IList<RequestHistory> History { get; set; }
+
+        public static void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<Request>()
+                .HasOne(r => r.Course)
+                .WithMany()
+                .HasForeignKey(r => r.CourseNumber);
         }
     }
 }

@@ -65,7 +65,6 @@
     <RefactorLog Include="tacos.sql.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\Submissions.sql" />
     <Build Include="dbo\Tables\Requests.sql" />
     <Build Include="dbo\Tables\AspNetUserTokens.sql" />
     <Build Include="dbo\Tables\AspNetUsers.sql" />
@@ -75,6 +74,9 @@
     <Build Include="dbo\Tables\AspNetRoles.sql" />
     <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
     <Build Include="dbo\Tables\Courses.sql" />
+    <Build Include="dbo\Tables\Departments.sql" />
+    <Build Include="dbo\Tables\DepartmentRoles.sql" />
+    <Build Include="dbo\Tables\RequestHistory.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="comparisons\SqlSchemaCompare_Localhost.scmp" />

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using tacos.data;
 using tacos.mvc.services;
 
@@ -44,7 +46,13 @@ namespace tacos.mvc
                     options.CasServerUrlBase = Configuration["Common:CasBaseUrl"];
                 });
 
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(o =>
+            {
+                o.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                o.SerializerSettings.Formatting = Formatting.Indented;
+                o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
 
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IDirectorySearchService, IetWsSearchService>();
@@ -53,6 +61,8 @@ namespace tacos.mvc
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseMiddleware<StackifyMiddleware.RequestTracerMiddleware>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

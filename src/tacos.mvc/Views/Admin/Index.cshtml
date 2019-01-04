@@ -1,9 +1,5 @@
 @using tacos.mvc.Resources 
-@model Submission[]
-
-@section styles {
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
-}
+@model Request[]
 
 <table class="table" id="requestTable">
     <thead>
@@ -25,32 +21,30 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var submission in Model) {
-            @foreach(var request in submission.Requests) {
-                <tr>
-                    <td>@submission.Id</td>
-                    <td>@submission.Department</td>
-                    <td>@submission.ActorName (@submission.Actor)</td>
-                    <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
-                    <td>@request.CourseNumber</td>
-                    <td>@CourseInfo.Types[request.CourseType]</td>
-                    <td>@request.AverageSectionsPerCourse</td>
-                    <td>@request.AverageEnrollment</td>
-                    <td>@CourseInfo.Requests[request.RequestType]</td>
-                    <td>@request.ExceptionReason</td>
-                    <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
-                    <td>@request.ApprovedTotal.ToString("f3")</td>
-                    <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
-                    <td>
-                        @if (!@request.Approved.HasValue) {
-                            <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
-                                <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
-                                <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
+        @foreach(var request in Model) {
+            <tr>
+                <td>@request.Id</td>
+                <td>@request.Department</td>
+                <td>@request.UpdatedBy</td>
+                <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
+                <td>@request.CourseNumber</td>
+                <td>@CourseInfo.Types[request.CourseType]</td>
+                <td>@request.Course.AverageSectionsPerCourse</td>
+                <td>@request.Course.AverageEnrollment</td>
+                <td>@CourseInfo.Requests[request.RequestType]</td>
+                <td>@request.ExceptionReason</td>
+                <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
+                <td>@request.ApprovedTotal.ToString("f3")</td>
+                <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
+                <td>
+                    @if (!@request.Approved.HasValue) {
+                        <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
+                            <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
+                            <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
+                        </form>
+                    }
+                </td>
+            </tr>
         }
     </tbody>
     <tfoot>
@@ -58,7 +52,7 @@
             <td colspan="11"></td>
             <td>Total:</td>
             <td>
-                @Model.SelectMany(x=>x.Requests).Sum(r=>r.ApprovedAnnualizedTotal).ToString("f3")
+                @Model.Sum(r => r.ApprovedAnnualizedTotal).ToString("f3")
             </td>
             <td>&nbsp;</td>
         </tr>
@@ -66,9 +60,8 @@
 </table>
 
 @section scripts {
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
     <script>
-        $(document).ready( function () {
+        $(function () {
             $('#requestTable').DataTable({
                 "paging": false,
                 "info": false,
@@ -78,6 +71,6 @@
                     'excel'
                 ]
             });
-        } );
+        });
     </script>
 }

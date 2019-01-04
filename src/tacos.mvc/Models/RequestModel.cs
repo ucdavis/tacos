@@ -3,8 +3,11 @@ using tacos.mvc.Models;
 
 namespace tacos.mvc.Models
 {
-    public class RequestModel {
-        public Course Course { get; set; }
+    public class RequestModel
+    {
+        public int Id { get; set; }
+
+        public string CourseNumber { get; set; }
 
         public string CourseType { get; set; }
 
@@ -15,9 +18,14 @@ namespace tacos.mvc.Models
         public string ExceptionReason { get; set; }
 
         public double ExceptionTotal { get; set; }
+
         public double ExceptionAnnualizedTotal { get; set; }
+
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
+
         public double AnnualizedTotal { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

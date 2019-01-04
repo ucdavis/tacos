@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using tacos.mvc.Data;
 
 namespace tacos.data
 {
@@ -10,11 +10,19 @@ namespace tacos.data
             : base(options)
         { }
 
-        public virtual DbSet<Submission> Submissions { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+
+        public virtual DbSet<DepartmentRole> DepartmentRoles { get; set; }
 
         public virtual DbSet<Request> Requests { get; set; }
 
         public virtual DbSet<Course> Courses { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            Request.OnModelCreating(builder);
+        }
     }
-        
 }

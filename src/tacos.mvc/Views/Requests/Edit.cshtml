@@ -1,0 +1,24 @@
+﻿@using Newtonsoft.Json
+@using tacos.mvc.Data
+@using tacos.mvc.Helpers
+@model IList<Request>
+
+@{
+    var department = (Department)ViewBag.Department;
+    var departments = (IList<Department>)ViewBag.Departments;
+}
+
+<div class="container my-4">
+    <div id="react-app">Loading...</div>
+</div>
+
+@section scripts {
+    
+    <script>
+        window.department = @(Html.Raw(JsonConvert.SerializeObject(department, JsonHelpers.GetDefaultJsonSerializerSettings())));
+        window.departments = @(Html.Raw(JsonConvert.SerializeObject(departments, JsonHelpers.GetDefaultJsonSerializerSettings())));
+        window.model = @(Html.Raw(JsonConvert.SerializeObject(Model, JsonHelpers.GetDefaultJsonSerializerSettings())));
+    </script>
+
+    <script src="~/dist/edit.js" asp-append-version="true"></script>
+}

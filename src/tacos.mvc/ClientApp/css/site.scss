@@ -1,4 +1,10 @@
+@import 'animations';
+
 /* site specific sass here */
+
+html {
+  scroll-behavior: smooth;
+}
 
 // // fonts
 @font-face {
@@ -63,6 +69,7 @@ $wintersky-gray: #5b7f95;
 $cenwalk-gray: #b1b3b3;
 $cork-oak: #aca39a;
 $shingle-brown: #4f2c1d;
+
 // mixins
 @mixin breakpoint($point) {
   @if $point==rufus {
@@ -171,10 +178,15 @@ $shingle-brown: #4f2c1d;
 
 */
 
-.table{
+.table {
     margin-top: 3rem;
     margin-bottom: 5rem;
-    td{
+
+    tbody.target {
+      animation: background-flash 1000ms 2 ease 1000ms;
+    }
+
+    td {
         border: none;
         vertical-align: baseline;
     }
@@ -203,4 +215,14 @@ margin-left: 4px;
 
 .exceptionRowComponents {
   margin-top: 2px;
+}
+
+// datatable styles
+.dataTables_wrapper {
+  padding-left: 0;
+  padding-right: 0;
+
+  table {
+    
+  }
 }

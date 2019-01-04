@@ -1,60 +1,135 @@
-﻿@using tacos.mvc.Resources
-@model IList<tacos.mvc.Models.SystemViewModels.UserRoleViewModel>
+﻿@using tacos.mvc.Data
+@using tacos.mvc.Resources
+@model tacos.mvc.Models.SystemViewModels.UserRolesViewModel
 
 @{
     ViewBag.Title = "Manage User Roles";
+
+    var departments = (IList<Department>)ViewBag.Departments;
+    var departmentSelectItems = departments.Select(d => new SelectListItem() {Text = d.Name, Value = d.Id.ToString()});
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
 
-<table id="table" class="table table-striped">
-    <thead>
+
+    <h2>Manage System Roles</h2>
+
+    <table id="table" class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Is Admin</th>
+                <th>Is Reviewer</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.SystemRoles)
+            {
+                <tr>
+                    <td>
+
+                        @if (row.IsAdmin)
+                        {
+                            <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="false" asp-antiforgery="true">
+                                <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i> Admin</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="true" asp-antiforgery="true">
+                                <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i> Admin</button>
+                            </form>
+                        }
+                        <hr />
+                        @if (row.IsReviewer)
+                        {
+                            <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="false" asp-antiforgery="true">
+                                <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i> Reviewer</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="true" asp-antiforgery="true">
+                                <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i> Reviewer</button>
+                            </form>
+                        }
+
+                    </td>
+                    <td>@row.User.Name</td>
+                    <td>@row.User.Email</td>
+                    <td>@row.IsAdmin</td>
+                    <td>@row.IsReviewer</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>Manage Department Roles</h2>
+
+    <table id="table" class="table table-striped">
+        <thead>
         <tr>
             <th></th>
+            <th>Code</th>
+            <th>Department</th>
             <th>Name</th>
             <th>Email</th>
-            <th>Is Admin</th>
-            <th>Is Reviwer</th>
+            <th>Role</th>
         </tr>
-    </thead>
-    <tbody>
-        @foreach (var row in Model)
+        </thead>
+        <tbody>
+        @foreach (var row in Model.DepartmentRoles)
         {
             <tr>
                 <td>
-                        
-                    @if (row.IsAdmin)
-                    {
-                        <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="false" asp-antiforgery="true">
-                            <button class="btn btn-danger" type="submit"><i class="fa fa-trash"></i> Admin</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="true" asp-antiforgery="true">
-                            <button class="btn btn-primary" type="submit"><i class="fa fa-plus"></i> Admin</button>
-                        </form>
-                    }
-                    <hr/>
-                    @if (row.IsReviewer)
-                    {
-                        <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="false" asp-antiforgery="true">
-                            <button class="btn btn-danger" type="submit"><i class="fa fa-trash"></i> Reviewer</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="true" asp-antiforgery="true">
-                            <button class="btn btn-primary" type="submit"><i class="fa fa-plus"></i> Reviewer</button>
-                        </form>
-                    }
-
+                    <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
+                        <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i></button>
+                    </form>
                 </td>
+                <td>@row.Department.Code</td>
+                <td>@row.Department.Name</td>
                 <td>@row.User.Name</td>
                 <td>@row.User.Email</td>
-                <td>@row.IsAdmin</td>
-                <td>@row.IsReviewer</td>
+                <td>@row.Role</td>
             </tr>
         }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+    
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserToDepartmentRoleModal">
+        Add User to Department
+    </button>
+
+    <form method="post" asp-action="AddUserToDepartmentRole">
+        <div id="addUserToDepartmentRoleModal" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="control-label">Department</label>
+                            <select name="departmentId" class="form-control" asp-items="departmentSelectItems"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">User</label>
+                            <input name="userId" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add User</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -13,22 +11,24 @@ namespace tacos.mvc.Controllers
     [Authorize(Roles = "Reviewer")]
     public class ReviewController : ApplicationController
     {
-        private readonly TacoDbContext dbContext;
+        private readonly TacoDbContext _dbContext;
 
         public ReviewController(TacoDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            this._dbContext = dbContext;
         }
 
         public async Task<IActionResult> Index()
         {
             // get most all submissions
-            var submissions = await dbContext
-                .Submissions.OrderByDescending(s => s.Created)
-                .Include(s => s.Requests)
-                .AsNoTracking().ToArrayAsync();
+            var requests = await _dbContext.Requests
+                .Include(r => r.Course)
+                .Include(r => r.Department)
+                .Where(r => r.IsActive)
+                .AsNoTracking()
+                .ToArrayAsync();
 
-            return View(submissions);
+            return View(requests);
         }
     }
 }

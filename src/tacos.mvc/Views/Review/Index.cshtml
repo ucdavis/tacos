@@ -1,5 +1,5 @@
 @using tacos.mvc.Resources 
-@model Submission[]
+@model Request[]
 
 @section styles {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
@@ -16,30 +16,29 @@
             <th>Average Sections</th>
             <th>Average Enrollment</th>
             <th>Request Type</th>
-            <th>ExceptionReason</th>
+            <th>Exception Reason</th>
             <th>Exception TAs per course</th>
             <th>Approved TAs per course</th>
             <th>Approved Annualized Total</th>
         </tr>
     </thead>
     <tbody>
-        @foreach(var submission in Model) {
-            @foreach(var request in submission.Requests) {
-                <tr>
-                    <td>@submission.Department</td>
-                    <td>@submission.ActorName (@submission.Actor)</td>
-                    <td>@submission.Created.ToLocalTime().ToShortDateString()</td>
-                    <td>@request.CourseNumber</td>
-                    <td>@CourseInfo.Types[request.CourseType]</td>
-                    <td>@request.AverageSectionsPerCourse</td>
-                    <td>@request.AverageEnrollment</td>
-                    <td>@CourseInfo.Requests[request.RequestType]</td>
-                    <td>@request.ExceptionReason</td>
-                    <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
-                    <td>@request.ApprovedTotal.ToString("f3")</td>
-                    <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
-                </tr>
-            }
+        @foreach(var request in Model)
+        {
+            <tr>
+                <td>@request.Department.Code</td>
+                <td>@request.UpdatedBy</td>
+                <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
+                <td>@request.CourseNumber</td>
+                <td>@CourseInfo.Types[request.CourseType]</td>
+                <td>@request.Course.AverageSectionsPerCourse</td>
+                <td>@request.Course.AverageEnrollment</td>
+                <td>@CourseInfo.Requests[request.RequestType]</td>
+                <td>@request.ExceptionReason</td>
+                <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
+                <td>@request.ApprovedTotal.ToString("f3")</td>
+                <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
+            </tr>
         }
     </tbody>
     <tfoot>
@@ -47,7 +46,7 @@
             <td colspan="10"></td>
             <td>Total:</td>
             <td>
-                @Model.SelectMany(x=>x.Requests).Sum(r=>r.ApprovedAnnualizedTotal).ToString("f3")
+                @Model.Sum(r => r.ApprovedAnnualizedTotal).ToString("f3")
             </td>
         </tr>
     </tfoot>

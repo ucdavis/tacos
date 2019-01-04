@@ -14,7 +14,6 @@ namespace tacos.mvc
         {
             var host = BuildWebHost(args);
 
-#if DEBUG
             // automatically create and seed database
             using (var scope = host.Services.CreateScope())
             {
@@ -23,10 +22,8 @@ namespace tacos.mvc
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
                 var dbInitializer = new DbInitializer(context, userManager, roleManager);
-
-                Task.Run(() => dbInitializer.RecreateAndInitialize()).Wait();
+                dbInitializer.Initialize().GetAwaiter().GetResult();
             }
-#endif
 
             host.Run();
         }

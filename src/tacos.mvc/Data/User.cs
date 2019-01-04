@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
+using tacos.mvc.Data;
 
 namespace tacos.data
 {
@@ -17,5 +19,7 @@ namespace tacos.data
         [StringLength(256)]
         [Display(Name = "Name")]
         public string Name { get; set; }
+
+        public IList<DepartmentRole> DepartmentRoles { get; set; }
     }
 }
