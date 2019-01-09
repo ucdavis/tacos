@@ -1,12 +1,9 @@
 @using tacos.mvc.Resources 
 @model Request[]
 
-@section styles {
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
-}
-
-<table class="table" id="requestTable">
-    <thead>
+<div class="container-fluid my-4">
+    <table class="table table-bordered" id="requestTable">
+        <thead>
         <tr>
             <th>Department</th>
             <th>Submitter</th>
@@ -21,8 +18,8 @@
             <th>Approved TAs per course</th>
             <th>Approved Annualized Total</th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody>
         @foreach(var request in Model)
         {
             <tr>
@@ -40,8 +37,8 @@
                 <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
             </tr>
         }
-    </tbody>
-    <tfoot>
+        </tbody>
+        <tfoot>
         <tr class="table-info">
             <td colspan="10"></td>
             <td>Total:</td>
@@ -49,22 +46,26 @@
                 @Model.Sum(r => r.ApprovedAnnualizedTotal).ToString("f3")
             </td>
         </tr>
-    </tfoot>
-</table>
+        </tfoot>
+    </table>
+</div>
 
 @section scripts {
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.js"></script>
     <script>
-        $(document).ready( function () {
+        $(function () {
             $('#requestTable').DataTable({
                 "paging": false,
                 "info": false,
                 "order": [[2, "desc"]],
-                dom: 'Bfrtip',
-                buttons: [
-                    'excel'
+                "fixedHeader": true,
+                "dom": 
+                    "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex justify-content-end align-items-baseline'fB>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                "buttons": [
+                    "excel"
                 ]
             });
-        } );
+        });
     </script>
 }
