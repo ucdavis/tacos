@@ -5,15 +5,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tacos.data;
+using tacos.mvc.Models.ApprovalViewModels;
 
 namespace tacos.mvc.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class AdminController : ApplicationController
+    public class ApprovalController : ApplicationController
     {
         private readonly TacoDbContext _dbContext;
 
-        public AdminController(TacoDbContext dbContext)
+        public ApprovalController(TacoDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -33,13 +34,14 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, string decision)
+        public async Task<IActionResult> Edit(int id, ApprovalDecisionViewModel model)
         {
             var request = await _dbContext
                 .Requests
                 .SingleAsync(x => x.Id == id);
-            
-            request.Approved = string.Equals(decision, "APPROVE", StringComparison.OrdinalIgnoreCase);
+
+            request.Approved = model.Approved;
+            request.ApprovedComment = model.Comment;
 
             await _dbContext.SaveChangesAsync();
 

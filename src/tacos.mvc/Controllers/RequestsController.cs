@@ -19,8 +19,8 @@ namespace tacos.mvc.Controllers
 
         public RequestsController(TacoDbContext context, UserManager<User> userManager)
         {
-            this._context = context;
-            this._userManager = userManager;
+            _context = context;
+            _userManager = userManager;
         }
 
         // list submissions
@@ -180,6 +180,7 @@ namespace tacos.mvc.Controllers
 
                 // clear approval
                 request.Approved = null;
+                request.ApprovedComment = null;
 
                 // auto approve any un-exception requests
                 if (!request.Exception)
@@ -203,6 +204,7 @@ namespace tacos.mvc.Controllers
                     CalculatedTotal          = request.CalculatedTotal,
                     AnnualizedTotal          = request.AnnualizedTotal,
                     Approved                 = request.Approved,
+                    ApprovedComment          = request.ApprovedComment,
                     CourseNumber             = course.Number,
                     AverageSectionsPerCourse = course.AverageSectionsPerCourse,
                     AverageEnrollment        = course.AverageEnrollment,

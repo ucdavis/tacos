@@ -24,7 +24,7 @@
         <tbody>
             @foreach (var request in Model)
             {
-                <tr>
+                <tr data-id="@request.Id">
                     <td>@request.Id</td>
                     <td>@request.Department</td>
                     <td>@request.UpdatedBy</td>
@@ -39,12 +39,13 @@
                     <td>@request.ApprovedTotal.ToString("f3")</td>
                     <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
                     <td>
-                        @if (!@request.Approved.HasValue)
+                        @if (!request.Approved.HasValue)
                         {
                             <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
-                                <button type="submit" name="decision" value="APPROVE" class="btn btn-primary mb-2">Approve</button>
-                                <button type="submit" name="decision" value="DENY" class="btn btn-primary mb-2">DENY</button>
+                                <input type="hidden" name="approved" value="true" />
+                                <button type="submit" class="btn btn-primary mb-2">Approve</button>
                             </form>
+                            <button class="btn btn-primary mb-2" data-toggle="modal" data-target="#denialModal">Deny</button>
                         }
                     </td>
                 </tr>
@@ -63,27 +64,68 @@
     </table>
 </div>
 
+<form id="denialForm" asp-action="Edit" asp-route-id="0" method="post">
+    <input type="hidden" name="approved" value="false" />
+
+    <div class="modal fade" id="denialModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Deny Exception?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="denialFormComment" class="form-control" name="comment" placeholder="Comment on denial..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Deny Exception</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
 @section scripts {
     <script>
-        $(function () {
-            $('#requestTable').DataTable({
-                "paging": false,
-                "info": false,
+        $(function() {
+            var table = $('#requestTable').DataTable({
+                //"paging": false,
+                //"info": false,
                 "order": [[11, "desc"], [4, "asc"]],
                 "columnDefs": [
                     {
                         "targets": [-1],
-                        "sortable": false
-                    }],
+                        //"sortable": false
+                    }
+                ],
                 "fixedHeader": true,
-                "dom": 
+                "dom":
                     "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex justify-content-end align-items-baseline'fB>>" +
-                    "<'row'<'col-sm-12'tr>>" +
-                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                 "buttons": [
-                   "excel"
+                    "excel"
                 ]
             });
         });
+
+        var editUrl = '@Url.Action("Edit", new {id = "00000"})';
+
+        $('#denialModal').on('show.bs.modal',
+            function(e) {
+                var trigger = $(e.relatedTarget);
+                var id = trigger.parents('tr').data('id');
+                var url = editUrl.replace('00000', id);
+
+                // reset form
+                $('#denialFormComment').val('');
+
+                // update url with id
+                $('#denialForm').attr('action', url);
+            });
     </script>
 }

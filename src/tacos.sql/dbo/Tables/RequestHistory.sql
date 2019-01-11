@@ -10,6 +10,7 @@ CREATE TABLE [dbo].[RequestHistory] (
     [ExceptionAnnualizedTotal] FLOAT (53)     NOT NULL,
     [ExceptionReason]          NVARCHAR (MAX) NULL,
     [ExceptionTotal]           FLOAT (53)     NOT NULL,
+    [ApprovedComment]          NVARCHAR (MAX) NULL, 
 	[AnnualizedTotal]          FLOAT (53)     NOT NULL,
     [CalculatedTotal]          FLOAT (53)     NOT NULL,
 	[AverageEnrollment]        FLOAT (53)     NOT NULL,

@@ -85,6 +85,8 @@ namespace tacos.data
             }
         }
 
+        public string ApprovedComment { get; set; }
+
 
         public IList<RequestHistory> History { get; set; }
 

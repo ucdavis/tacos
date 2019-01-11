@@ -39,6 +39,8 @@ namespace tacos.mvc.Data
 
         public double ExceptionAnnualizedTotal { get; set; }
 
+        public string ApprovedComment { get; set; }
+
         // calculated total of TAs, regardless of what is requested
         public double CalculatedTotal { get; set; }
 

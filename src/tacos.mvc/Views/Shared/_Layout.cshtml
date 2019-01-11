@@ -49,7 +49,7 @@
                 @if (User.IsInRole("Admin"))
                 {
                     <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "admin" ? "active" : "")">
-                        <a class="nav-link" asp-controller="admin" asp-action="index">Admin</a>
+                        <a class="nav-link" asp-controller="Approval" asp-action="index">Approvals</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "system" ? "active" : "")">
                         <a class="nav-link" asp-controller="system" asp-action="users">Users</a>
