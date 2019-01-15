@@ -102,7 +102,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { requests } = this.state;
 
         return (
-            <table className="table">
+            <table className="table requests">
                 <thead>
                     <tr>
                         <th>Course Number</th>
