@@ -257,7 +257,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { department } = this.props;
         const { requests } = this.state;
 
-        LogService.log("removing request");
+        LogService.info("removing request");
         let request = requests[i];
 
         // if this is an existing request, mark it as deleted, so that we can delete it on the server
