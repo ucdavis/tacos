@@ -39,7 +39,8 @@ namespace tacos.mvc.Controllers
             if (department == null)
             {
                 // could not find a valid department
-                return Forbid();
+                // return empty model
+                return View(new List<Request>());
             }
 
             ViewBag.Department = department;
@@ -50,7 +51,7 @@ namespace tacos.mvc.Controllers
                 .Where(r => r.IsActive)
                 .Where(r => r.Department.Id == department.Id)
                 .AsNoTracking()
-                .ToArrayAsync();
+                .ToListAsync();
 
             return View(requests);
         }
