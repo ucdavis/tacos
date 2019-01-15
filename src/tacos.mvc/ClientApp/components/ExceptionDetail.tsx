@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import NumberInput from "./NumberInput";
+
 interface IProps {
     exception: boolean;
     exceptionReason: string;
@@ -11,7 +13,7 @@ interface IProps {
 // render a textbox for inputing course number, or show course info if already selected
 export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
     public render() {
-        if (!this.props.exception) return null;
+        if (!this.props.exception) { return null; }
 
         return (
             <div className="exceptionRow">
@@ -32,17 +34,25 @@ export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
 
     private renderExceptionTotal = () => {
         return (
-            <input
+            <NumberInput
                 className="form-control"
-                type="number"
                 min={0}
                 step={0.25}
                 placeholder="Total FTE requested"
                 value={this.props.exceptionTotal}
                 onChange={this.onChangeTotal}
+                format={this.formatExceptionTotal}
             />
         );
-    };
+    }
+
+    private formatExceptionTotal = (value: number) => {
+        if (value === 0) {
+            return "";
+        }
+
+        return value.toFixed(2);
+    }
 
     private renderExceptionReason = () => {
         return (
@@ -56,8 +66,8 @@ export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
         );
     };
 
-    private onChangeTotal = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.onExceptionTotalChange(e.target.valueAsNumber);
+    private onChangeTotal = (value: number) => {
+        this.props.onExceptionTotalChange(value);
     };
 
     private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
