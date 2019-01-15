@@ -28,7 +28,7 @@ export default class Request extends React.Component<IProps, {}> {
         this._focusRef = React.createRef<HTMLTableSectionElement>();
     }
 
-    componentDidUpdate() {
+    public componentDidUpdate() {
         const { request } = this.props;
         if (request.isFocused) {
             this.onFocused();
@@ -101,8 +101,8 @@ export default class Request extends React.Component<IProps, {}> {
                     </td>
                 </tr>
                 {this.props.request.exception && (
-                    <tr key={`exception-${this.props.index}`}>
-                        <td colSpan={7}>
+                    <tr className="exceptionDetailRow" key={`exception-${this.props.index}`}>
+                        <td colSpan={9}>
                             <ExceptionDetail
                                 exception={this.props.request.exception}
                                 exceptionReason={this.props.request.exceptionReason}
@@ -140,12 +140,12 @@ export default class Request extends React.Component<IProps, {}> {
     private onCourseChange = (course: ICourse) => {
         this.requestChanged("courseNumber", course.number);
         this.requestChanged("course", course);
-    };
+    }
 
     private requestChanged = (prop: string, val: any) => {
         const request = { ...this.props.request, [prop]: val };
 
         // new request passed up
         this.props.onEdit(this.props.index, request);
-    };
+    }
 }

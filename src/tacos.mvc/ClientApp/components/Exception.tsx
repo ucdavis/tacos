@@ -16,9 +16,8 @@ export default class Exception extends React.PureComponent<IProps, {}> {
                         type="checkbox"
                         checked={this.props.exception}
                         onChange={this.onChange}
-                        id="defaultCheck1"
                     />
-                    <label className="form-check-label" htmlFor="defaultCheck1">
+                    <label className="form-check-label">
                         Exception
                     </label>
                 </div>

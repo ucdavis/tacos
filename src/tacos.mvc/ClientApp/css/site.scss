@@ -1,4 +1,5 @@
 @import 'animations';
+@import 'vendor';
 
 /* site specific sass here */
 
@@ -216,16 +217,16 @@ margin-left: 4px;
   margin-top: 2px;
 }
 
-// datatable styles
-.dataTables_wrapper {
-  padding-left: 0;
-  padding-right: 0;
 
-  table {
-    
+table.requests {
+
+  border: none;
+
+  th, td {
+    border: none;
   }
 
-  .dt-buttons:last-child {
-    padding-left: 2rem;
+  tbody {
+    border-top: 1px solid $borders;
   }
 }
