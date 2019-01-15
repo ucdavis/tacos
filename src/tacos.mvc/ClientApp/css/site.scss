@@ -187,7 +187,6 @@ $shingle-brown: #4f2c1d;
     }
 
     td {
-        border: none;
         vertical-align: baseline;
     }
 }
@@ -224,5 +223,9 @@ margin-left: 4px;
 
   table {
     
+  }
+
+  .dt-buttons:last-child {
+    padding-left: 2rem;
   }
 }

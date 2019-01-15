@@ -1,0 +1,50 @@
+@model IList<Course>
+
+<div class="container py-4">
+    <table id="coursesTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Average Enrollment</th>
+                <th>Average Sections</th>
+                <th>Times Offered / Year</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var course in Model)
+        {
+            <tr>
+                <td>@course.Number</td>
+                <td>@course.Name</td>
+                <td>@course.AverageEnrollment</td>
+                <td>@course.AverageSectionsPerCourse</td>
+                <td>@course.TimesOfferedPerYear</td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Number">
+                        <i class="fas fa-info mr-2"></i> Details
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+</div>
+
+@section scripts
+{
+    <script>
+        $(function () {
+            $('#coursesTable').DataTable({
+                "columnDefs": [
+                    {
+                        "targets": [-1],
+                        "sortable": false
+                    }],
+                "order": [[1, "desc"]]
+            });
+        });
+    </script>
+}

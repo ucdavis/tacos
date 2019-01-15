@@ -1,0 +1,64 @@
+@model tacos.mvc.Models.CourseViewModels.CourseDetailsViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<div class="container">
+    <h3>Course Description Information: @Model.Course.Number</h3>
+
+    <dl>
+        <dt>Course Number</dt>
+        <dd>@Model.Course.Number</dd>
+
+        <dt>Name</dt>
+        <dd>@Model.Course.Name</dd>
+
+        <dt>Average Enrollment</dt>
+        <dd>@Model.Course.AverageEnrollment</dd>
+
+        <dt>Average Sections per Course</dt>
+        <dd>@Model.Course.AverageSectionsPerCourse</dd>
+
+        <dt>Times Offered per Year</dt>
+        <dd>@Model.Course.TimesOfferedPerYear</dd>
+    </dl>
+
+    @if (Model.Description != null)
+    {
+
+        <h4>Additional Information</h4>
+
+        <dl>
+            <dt>College</dt>
+            <dd>@Model.Description.College</dd>
+
+            <dt>Department</dt>
+            <dd>@Model.Description.Department</dd>
+
+            <dt>Abbreviated Title</dt>
+            <dd>@Model.Description.AbbreviatedTitle</dd>
+
+            <dt>Description</dt>
+            <dd>@Model.Description.Description</dd>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description.Quarters))
+            {
+                <dt>Quarter Offerings</dt>
+                <dd>@Model.Description.Quarters</dd>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description.QuartersOffered))
+            {
+                <dt>Yearly Offerings</dt>
+                <dd>@Model.Description.QuartersOffered</dd>
+            }
+        </dl>
+    }
+    else
+    {
+        <p>No additional information found.</p>
+    }
+</div>

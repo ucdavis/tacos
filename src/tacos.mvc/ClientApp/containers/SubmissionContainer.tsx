@@ -7,6 +7,7 @@ import Summary from "../components/Summary";
 import { annualizationRatio, formulas } from "../util/formulas";
 
 import * as LocalStorageService from "../services/LocalStorageService";
+import * as LogService from "../services/LogService";
 
 import { IRequest } from "../models/IRequest";
 import { IDepartment } from "../models/IDepartment";
@@ -33,13 +34,14 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         }
 
         this.state = {
-            requests: requests,
+            requests,
         };
     }
 
     public componentDidMount() {
         const { requests } = this.props;
 
+        // tslint:disable-next-line:variable-name
         const [__host, __controller, __action, id] = location.pathname.split('/');
         const { jsAction } = QueryParse(location.search);
         if (!jsAction) {
@@ -240,7 +242,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             LocalStorageService.clearRequests(department);
             window.location.replace("/requests");
         } catch (err) {
-            console.error(err);
+            LogService.error(err);
         }
     }
 
@@ -255,7 +257,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { department } = this.props;
         const { requests } = this.state;
 
-        console.log("removing request");
+        LogService.info("removing request");
         let request = requests[i];
 
         // if this is an existing request, mark it as deleted, so that we can delete it on the server

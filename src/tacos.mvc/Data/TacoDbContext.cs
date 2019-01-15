@@ -10,17 +10,21 @@ namespace tacos.data
             : base(options)
         { }
 
+        public virtual DbSet<Course> Courses { get; set; }
+
+        public virtual  DbSet<CourseDescription> CourseDescriptions { get; set; }
+
         public virtual DbSet<Department> Departments { get; set; }
 
         public virtual DbSet<DepartmentRole> DepartmentRoles { get; set; }
 
         public virtual DbSet<Request> Requests { get; set; }
 
-        public virtual DbSet<Course> Courses { get; set; }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            CourseDescription.OnModelCreating(builder);
 
             Request.OnModelCreating(builder);
         }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as LogService from "../services/LogService";
 
 import { ICourse } from "../models/ICourse";
 
@@ -107,7 +108,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
         }
         catch (err) {
 
-            console.error(err);
+            LogService.error(err);
             this.setState({ querying: false });
         }
     }

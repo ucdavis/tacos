@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Requests] (
+CREATE TABLE [dbo].[Requests] (
     [Id]                       INT            IDENTITY (1, 1) NOT NULL,
     [IsActive]				   BIT			  NOT NULL DEFAULT 1, 
     [Approved]                 BIT            NULL,
@@ -11,6 +11,7 @@
     [ExceptionAnnualizedTotal] FLOAT (53)     NOT NULL,
     [ExceptionReason]          NVARCHAR (MAX) NULL,
     [ExceptionTotal]           FLOAT (53)     NOT NULL,
+    [ApprovedComment]          NVARCHAR (MAX) NULL, 
     [RequestType]              NVARCHAR (50)  NULL,
     [UpdatedBy]                NVARCHAR (450) NULL,
     [UpdatedOn]                DATETIME2 (7)  NOT NULL,

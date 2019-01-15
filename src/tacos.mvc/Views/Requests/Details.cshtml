@@ -59,6 +59,12 @@
             {
                 <dt>Approved?</dt>
                 <dd>@(Model.Approved.Value ? "Yes" : "No")</dd>
+
+                if (!string.IsNullOrWhiteSpace(Model.ApprovedComment))
+                {
+                    <dt>Comment</dt>
+                    <dd>@Model.ApprovedComment</dd>
+                }
             }
         }
 
