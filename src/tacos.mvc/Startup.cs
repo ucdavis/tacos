@@ -7,21 +7,38 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Serilog;
 using tacos.data;
+using tacos.mvc.Helpers;
 using tacos.mvc.services;
 
 namespace tacos.mvc
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
+            Environment = env;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfigurationRoot Configuration { get; }
+
+        public IHostingEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -29,13 +46,8 @@ namespace tacos.mvc
             services.Configure<CommonSettings>(Configuration.GetSection("Common"));
 
             // setup entity framework
-#if DEBUG
-            services.AddDbContextPool<TacoDbContext>(o => 
-                o.UseSqlite("Data Source=tacos.db"));
-#else
             services.AddDbContextPool<TacoDbContext>(o => 
                 o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-#endif
 
             services.AddIdentity<User, IdentityRole>()
                             .AddEntityFrameworkStores<TacoDbContext>()
@@ -59,9 +71,12 @@ namespace tacos.mvc
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // setup logging
+            LogHelper.Setup(Configuration);
             app.UseMiddleware<StackifyMiddleware.RequestTracerMiddleware>();
+            loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {
