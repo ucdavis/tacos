@@ -12,7 +12,6 @@ module.exports = env => {
       stats: { modules: false },
       entry: {
         app: "./ClientApp/app.tsx",
-        create: "./ClientApp/pages/CreateSubmission.tsx",
         edit: "./ClientApp/pages/EditSubmission.tsx",
         vendor: [
           "event-source-polyfill",
