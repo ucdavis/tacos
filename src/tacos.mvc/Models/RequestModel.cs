@@ -27,5 +27,7 @@ namespace tacos.mvc.Models
         public double AnnualizedTotal { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public bool IsDirty { get; set; }
     }
 }

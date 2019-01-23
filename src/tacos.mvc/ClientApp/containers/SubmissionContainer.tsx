@@ -49,7 +49,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         }
 
         if (jsAction === 'create') {
+            // TODO: check if last request is already empty
+
             this.onAddRequest();
+
+            // TODO: focus new request
             return;
         }
 
@@ -82,15 +86,18 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         const pending = requests.filter(r => r.isDirty).length;
 
+        const canSave = pending > 0;
         const isValid = this.checkIsValid();
 
         return (
             <div>
                 {this.renderRequests()}
                 <Summary
+                    canSave={canSave}
                     canSubmit={isValid}
                     total={this.submissionTotal()}
                     pending={pending}
+                    onSave={this.save}
                     onSubmit={this.submit}
                     onReset={this.onReset}
                 />
@@ -205,7 +212,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         return true;
     }
 
-    private submit = async () => {
+    private save = async() => {
         try {
             const { department } = this.props;
             const { requests } = this.state;
@@ -223,6 +230,44 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             const submission: ISubmission = {
                 departmentId: department.id,
                 requests: dirtyRequests
+            };
+
+            const response = await fetch("/requests/save", {
+                body: JSON.stringify(submission),
+                headers: [["Accept", "application/json"], ["Content-Type", "application/json"]],
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const result = await response.json();
+
+            // TODO: make sure we have success
+            LocalStorageService.clearRequests(department);
+            window.location.replace("/requests");
+        } catch (err) {
+            LogService.error(err);
+        }
+    }
+
+    private submit = async () => {
+        try {
+            const { department } = this.props;
+            const { requests } = this.state;
+
+            // check validity
+            const isValid = this.checkIsValid();
+            if (!isValid) {
+                return;
+            }
+
+            // create the submission, ship all requests
+            const submission: ISubmission = {
+                departmentId: department.id,
+                requests
             };
 
             const response = await fetch("/requests/submit", {

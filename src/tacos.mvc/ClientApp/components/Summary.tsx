@@ -1,9 +1,13 @@
 import * as React from "react";
 
 interface IProps {
+    onSave: () => void;
     onSubmit: () => void;
     onReset: () => void;
+
+    canSave: boolean;
     canSubmit: boolean;
+
     total: number;
     pending: number;
 }
@@ -30,13 +34,25 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                                     Reset
                                 </button>
                             }
+
+                            <button
+                                className="btn btn-primary"
+                                id="submit-button"
+                                disabled={!this.props.canSave}
+                                onClick={this.props.onSave}
+                            >
+                                Save Changes
+                                <i className="far fa-save ml-2" /> 
+                            </button>
+
                             <button
                                 className="btn btn-primary"
                                 id="submit-button"
                                 disabled={!this.props.canSubmit}
                                 onClick={this.props.onSubmit}
                             >
-                                Submit
+                                Submit for Approval
+                                <i className="far fa-thumbs-up ml-2" />
                             </button>
                         </div>
                     </div>
