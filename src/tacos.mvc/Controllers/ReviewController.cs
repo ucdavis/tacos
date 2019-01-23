@@ -25,6 +25,7 @@ namespace tacos.mvc.Controllers
                 .Include(r => r.Course)
                 .Include(r => r.Department)
                 .Where(r => r.IsActive)
+                .Where(r => r.Submitted)
                 .AsNoTracking()
                 .ToArrayAsync();
 
