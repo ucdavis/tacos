@@ -18,7 +18,7 @@
         <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />
     </environment>
     
-    @Html.Partial("_DatatablesStylesPartial")
+    <partial name="_DatatablesStylesPartial" />
 
     @RenderSection("styles", required: false)
 </head>
@@ -79,7 +79,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
     </environment>
     
-    @Html.Partial("_DatatablesScriptsPartial")
+    <partial name="_DatatablesScriptsPartial" />
 
     <script>
         $(function() {
