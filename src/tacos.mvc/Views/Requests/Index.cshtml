@@ -5,14 +5,21 @@
 @{
     var department = ViewBag.Department as Department;
     var departments = ViewBag.Departments as IList<Department>;
-
-    
 }
-
 
 <div class="container my-4">
 
-    <h3>Your submissions</h3>
+    <div class="row">
+        <div class="col">
+            <h3>Your submissions</h3>
+        </div>
+        @if (department != null)
+        {
+            <div class="col d-flex justify-content-end align-items-center">
+                <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Create New Submission</a>
+            </div>
+        }
+    </div>
 
     @if (departments != null)
     {
@@ -33,7 +40,7 @@
         <tr>
             <th>Course Number</th>
             <th>Course Type</th>
-            <th>Updated On</th>
+            <th>Submitted On</th>
             <th></th>
         </tr>
         </thead>
@@ -50,7 +57,7 @@
                     @CourseInfo.Types[request.CourseType]
                 </td>
                 <td data-order="@request.UpdatedOn.Ticks">
-                    @request.UpdatedOn.ToString("d")
+                    @request.SubmittedOn?.ToString("d")
                 </td>
                 <td class="text-center">
                     <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="btn btn-primary">
@@ -61,11 +68,6 @@
         }
         </tbody>
     </table>
-    
-    @if (department != null)
-    {
-        <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Edit Submissions</a>
-    }
 </div>
 
 @section scripts
@@ -77,6 +79,10 @@
         });
 
         $('#requestTable').DataTable({
+            "lengthMenu": [
+                [ 10, 25, 50, -1 ],
+                [ 10, 25, 50, "All" ],
+            ],
             "columnDefs": [
                 {
                     "targets": [-1],
