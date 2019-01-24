@@ -33,7 +33,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
     public render() {
         const { course } = this.props;
 
-        let courseName = course.name;
+        const courseName = course.name;
         const isValid = !!course.name;
 
         return (
@@ -55,7 +55,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
                         </span>
                     </div>
                 </div>
-                {isValid && <small className="form-text text-muted">{courseName}</small>}
+                {isValid && <small className="form-text text-muted pl-2">{courseName}</small>}
             </div>
         );
     }
