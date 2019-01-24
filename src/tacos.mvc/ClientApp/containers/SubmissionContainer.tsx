@@ -1,8 +1,8 @@
 import * as React from "react";
 import { parse as QueryParse } from "query-string";
 
-import Request from "../components/Request";
 import Summary from "../components/Summary";
+import RequestsTable from "../components/RequestsTable";
 
 import { annualizationRatio, formulas } from "../util/formulas";
 
@@ -86,12 +86,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         const pending = requests.filter(r => r.isDirty).length;
 
-        const canSave = pending > 0;
         const isValid = this.checkIsValid();
+        const canSave = pending > 0 && isValid;
 
         return (
-            <div>
-                {this.renderRequests()}
+            <div className="pb-4">
+                <RequestsTable
+                    className="mb-4"
+                    requests={requests}
+                    onEdit={this.requestUpdated}
+                    onRemove={this.removeRequest}
+                />
                 <Summary
                     canSave={canSave}
                     canSubmit={isValid}
@@ -102,69 +107,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     onReset={this.onReset}
                 />
             </div>
-        );
-    }
-
-    private renderRequests = () => {
-        const { requests } = this.state;
-
-        return (
-            <table className="table requests">
-                <thead>
-                    <tr>
-                        <th>Course Number</th>
-                        <th>
-                            Course Type &nbsp;&nbsp;
-                            <a target="_blank" href="/CAES-TA-Guidelines 2018-21.pdf">
-                                Criteria Info <i className="fas fa-external-link-alt" />
-                            </a>
-                        </th>
-                        <th>
-                            <span
-                                data-toggle="tooltip"
-                                data-placement="top"
-                                title="For courses that require both TAs and Readers, select the majority position type."
-                            >
-                                Request Type <i className="fas fa-question-circle" />
-                            </span>
-                        </th>
-                        <th>TAs per course</th>
-                        <th>Annual TA FTE</th>
-                        <th>Exception?</th>
-                        <th>Remove</th>
-                    </tr>
-                </thead>
-                { requests.map(this.renderRequest) }
-                <tfoot>
-                    <tr>
-                        <td colSpan={7}>
-                            <button
-                                className="btn btn-primary"
-                                id="add-new"
-                                onClick={this.onAddRequest}
-                            >
-                                Add New
-                            </button>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        );
-    }
-
-    private renderRequest = (request: IRequest, index: number) => {
-        if (request.isDeleted) {
-            return null;
-        }
-
-        return (
-            <Request
-                key={`course-${index}`}
-                request={request}
-                index={index}
-                onEdit={this.requestUpdated}
-                onRemove={this.removeRequest}
-            />
         );
     }
 

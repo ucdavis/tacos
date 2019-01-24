@@ -15,7 +15,9 @@
     "query-string": "^6.2.0",
     "react": "~16.3.0",
     "react-dom": "~16.3.0",
-    "reactstrap": "^7.0.2"
+    "react-table": "^6.8.6",
+    "reactstrap": "^7.1.0",
+    "recompose": "^0.30.0"
   },
   "devDependencies": {
     "@types/history": "4.6.2",
@@ -25,7 +27,9 @@
     "@types/react-hot-loader": "3.0.5",
     "@types/react-router": "4.0.21",
     "@types/react-router-dom": "4.2.3",
-    "@types/reactstrap": "^6.4.3",
+    "@types/react-table": "^6.7.21",
+    "@types/reactstrap": "^7.1.0",
+    "@types/recompose": "^0.30.2",
     "@types/webpack-env": "1.13.3",
     "aspnet-webpack": "^2.0.3",
     "aspnet-webpack-react": "^3.0.0",
