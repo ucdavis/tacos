@@ -238,6 +238,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         request = { ...request, isFocused: true };
 
         this.requestUpdated(i, request, false);
+
+        // remove focus after 5s
+        setTimeout(() => {
+            let unfocusRequest = this.state.requests[i];
+            unfocusRequest = { ...unfocusRequest, isFocused: false };
+            this.requestUpdated(i, unfocusRequest, false);
+        }, 3 * 1000);
     }
 
     private removeRequest = (i: number) => {

@@ -186,15 +186,14 @@ $shingle-brown: #4f2c1d;
     margin-top: 3rem;
     margin-bottom: 5rem;
 
-    tbody.target {
-      animation: background-flash 1000ms 2 ease 1000ms;
-    }
-
     td {
         vertical-align: baseline;
     }
 }
 
+.target-flash {
+  animation: background-flash 1000ms 2 ease 1000ms;
+}
 
 .input-group-text{
 background-color: $accent;
