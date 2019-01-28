@@ -182,6 +182,8 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 SubComponent={this.renderExceptionDetail}
                 showPagination={false}
                 minRows={1}
+                pageSizeOptions={[requests.length]}
+                defaultPageSize={requests.length}
                 expanded={expanded}
                 // filtered={this.state.filtered}
                 // onFilteredChange={this.onFilterChanged}
