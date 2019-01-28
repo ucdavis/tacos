@@ -78,6 +78,10 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 Filter: this.renderCourseFilter,
                 accessor: "course",
                 sortable: true,
+                sortMethod: (a: ICourse, b: ICourse, direction: boolean) => {
+                    const sign = direction ? -1 : 1;
+                    return sign * a.number.localeCompare(b.number);
+                },
                 filterable: true,
                 filterMethod: (filter: any, request: IRequest) => {
                     const value = filter.value.toLowerCase();
@@ -185,8 +189,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 pageSizeOptions={[requests.length]}
                 defaultPageSize={requests.length}
                 expanded={expanded}
-                // filtered={this.state.filtered}
-                // onFilteredChange={this.onFilterChanged}
+                defaultSorted={[{id: 'course', desc: true}]}
                 getTrProps={this.decorateTr}
             />
         );
