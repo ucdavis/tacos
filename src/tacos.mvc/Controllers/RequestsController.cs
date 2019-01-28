@@ -38,9 +38,8 @@ namespace tacos.mvc.Controllers
 
             if (department == null)
             {
-                // could not find a valid department
-                // return empty model
-                return View(new List<Request>());
+                // could not find a valid department(s)
+                return RedirectToAction(nameof(Empty));
             }
 
             ViewBag.Department = department;
@@ -54,6 +53,11 @@ namespace tacos.mvc.Controllers
                 .ToListAsync();
 
             return View(requests);
+        }
+
+        public IActionResult Empty()
+        {
+            return View();
         }
 
         public async Task<IActionResult> Details(int id)
