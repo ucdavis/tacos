@@ -221,7 +221,7 @@ namespace tacos.mvc.Controllers
             // save everything
             await Save(model);
 
-            // process submission next
+            // process submissions next
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
                 // find request by id or name, or create a new one
@@ -236,6 +236,12 @@ namespace tacos.mvc.Controllers
                     request = await _context.Requests
                         .FirstOrDefaultAsync(r =>
                             string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                }
+
+                // don't overwrite existing data
+                if (request.Submitted)
+                {
+                    continue;
                 }
 
                 // submit request
