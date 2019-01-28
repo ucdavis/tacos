@@ -9,63 +9,66 @@
 
 <div class="container my-4">
 
-    <div class="row">
-        <div class="col">
-            <h3>Your submissions</h3>
-        </div>
-        @if (department != null)
-        {
-            <div class="col d-flex justify-content-end align-items-center">
-                <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Create New Submission</a>
-            </div>
-        }
-    </div>
-
-    @if (departments != null)
-    {
+    @{
         var departmentSelectItems = departments.Select(d => new SelectListItem()
         {
             Value = d.Code,
             Text = d.Name,
             Selected = (d.Id == department?.Id),
         });
-        <div class="form-group">
-            <label>Department:</label>
-            <select class="form-control" id="departmentSelect" asp-items="departmentSelectItems"></select>
-        </div>
     }
+
+    <div class="form-group mb-4">
+        <label>Selected department:</label>
+        <select class="form-control" id="departmentSelect" asp-items="departmentSelectItems"></select>
+    </div>
+    
+    <hr />
+
+    <div class="mb-4">
+        <div class="row">
+            <div class="col">
+                <h4>@department.Name</h4>
+            </div>
+            <div class="col d-flex justify-content-end align-items-center">
+                <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Create New Submission</a>
+            </div>
+        </div>
+        
+        <span>@Model.Count total requests. (@Model.Count(r => !r.Submitted) unsubmitted requests)</span>
+    </div>
 
     <table id="requestTable" class="table table-bordered">
         <thead>
-        <tr>
-            <th>Course Number</th>
-            <th>Course Type</th>
-            <th>Submitted On</th>
-            <th></th>
-        </tr>
+            <tr>
+                <th>Course Number</th>
+                <th>Course Type</th>
+                <th>Submitted On</th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
-        @foreach (var request in Model)
-        {
-            <tr>
-                <td>
-                    <a asp-action="Details" asp-route-id="@request.Id">
-                        @request.CourseNumber
-                    </a>
-                </td>
-                <td>
-                    @CourseInfo.Types[request.CourseType]
-                </td>
-                <td data-order="@request.UpdatedOn.Ticks">
-                    @request.SubmittedOn?.ToString("d")
-                </td>
-                <td class="text-center">
-                    <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                </td>
-            </tr>
-        }
+            @foreach (var request in Model)
+            {
+                <tr>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@request.Id">
+                            @request.CourseNumber
+                        </a>
+                    </td>
+                    <td>
+                        @CourseInfo.Types[request.CourseType]
+                    </td>
+                    <td data-order="@request.UpdatedOn.Ticks">
+                        @request.SubmittedOn?.ToString("d")
+                    </td>
+                    <td class="text-center">
+                        <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
