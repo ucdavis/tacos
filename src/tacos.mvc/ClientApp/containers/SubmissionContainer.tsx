@@ -48,7 +48,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     }
 
     public componentDidMount() {
-        const { requests } = this.props;
+        const { requests } = this.state;
 
         // tslint:disable-next-line:variable-name
         const [__host, __controller, __action, id] = location.pathname.split('/');
