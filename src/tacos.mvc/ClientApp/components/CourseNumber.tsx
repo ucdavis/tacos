@@ -114,8 +114,8 @@ export default class CourseNumber extends React.Component<IProps, IState> {
                 courseNumber,
             });
 
-            // changing the number clears the assigned course object
-            this.props.onChange(undefined);
+            // clear out course when changing this value
+            this.onCourseClear();
 
             // only trigger search when length > 6
             if (courseNumber.length < 6) {
@@ -127,6 +127,11 @@ export default class CourseNumber extends React.Component<IProps, IState> {
 
             this.searchCourse(courseNumber)
     }
+
+    // tslint:disable-next-line:member-ordering
+    private onCourseClear = debounce(() => {
+        this.props.onChange(undefined);
+    }, 100);
 
     // tslint:disable-next-line:member-ordering
     private searchCourse = debounce(async (courseNumber: string) => {
@@ -170,7 +175,7 @@ export default class CourseNumber extends React.Component<IProps, IState> {
         finally {
             this.setState({ querying: false });
         }
-    }, 100);
+    }, 250);
     
     private onCourseCreate = () => {
         const { courseNumber } = this.state;
