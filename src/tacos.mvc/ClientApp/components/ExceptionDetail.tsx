@@ -10,8 +10,31 @@ interface IProps {
     onReasonChange: (exceptionReason: string) => void;
 }
 
+interface IState {
+    exceptionReason: string;
+}
+
 // render a textbox for inputing course number, or show course info if already selected
-export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
+export default class ExceptionDetail extends React.PureComponent<IProps, IState> {
+
+    public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
+        if (nextProps.exceptionReason !== prevState.exceptionReason) {
+            return {
+                exceptionReason: nextProps.exceptionReason,
+            };
+        }
+
+        return null;
+    }
+
+    constructor(props: IProps) {
+        super(props); 
+
+        this.state = {
+            exceptionReason: "",
+        };
+    }
+
     public render() {
         if (!this.props.exception) { return null; }
 
@@ -55,12 +78,14 @@ export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
     }
 
     private renderExceptionReason = () => {
+        const { exceptionReason } = this.state;
         return (
             <textarea
                 className="form-control"
                 placeholder="Reason for exceptioning the course request"
                 rows={3}
-                value={this.props.exceptionReason}
+                value={exceptionReason}
+                onBlur={this.onBlurReason}
                 onChange={this.onChangeReason}
             />
         );
@@ -70,7 +95,13 @@ export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
         this.props.onExceptionTotalChange(value);
     };
 
-    private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    private onBlurReason = (e: React.FocusEvent<HTMLTextAreaElement>) => {
         this.props.onReasonChange(e.target.value);
+    };
+    
+    private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        this.setState({
+            exceptionReason: e.target.value,
+        });
     };
 }
