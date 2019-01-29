@@ -271,6 +271,9 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         this.requestUpdated(i, request, false);
 
+        // scroll to location
+        window.location.hash = `request-${request.id}`;
+
         // remove focus after 5s
         setTimeout(() => {
             let unfocusRequest = this.state.requests[i];
