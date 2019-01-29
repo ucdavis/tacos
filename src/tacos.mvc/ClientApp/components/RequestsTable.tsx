@@ -38,11 +38,11 @@ interface ITypedRowInfo extends RowInfo {
 }
 
 interface IFilterParam {
-    value: any;
+    value: string;
 }
 
 interface IExpandedState {
-    [index: number]: {};
+    [index: number]: true;
 }
 
 export default class RequestsTable extends React.Component<IProps, IState> {
@@ -66,13 +66,14 @@ export default class RequestsTable extends React.Component<IProps, IState> {
 
         this.columns = [
             {
+                // to show the filter icon in a 0-index column
                 Filter: this.renderNewIndicatorFilter,
                 className: "d-flex justify-content-center align-items-center",
                 headerClassName: "d-flex justify-content-center align-items-center",
                 Cell: this.renderNewIndicator,
                 width: 45,
                 sortable: false,
-                filterable: true, // to show the filter icon
+                filterable: true, 
             },
             {
                 Header: "Course",
@@ -118,25 +119,28 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 sortable: true,
                 filterable: true,
             },
-            // {
-            //     Header: "TAs per course",
-            //     Cell: null
-            // },
-            // {
-            //     Header: "Annual TA FTE",
-            //     Cell: null
-            // },
+            {
+                Header: "TAs per course",
+                accessor: "calculatedTotal",
+                className: "text-center",
+                Cell: (row: ITypedRowInfo) => row.original.calculatedTotal.toFixed(3),
+            },
+            {
+                Header: "Annual TA FTE",
+                accessor: "annualizedTotal",
+                className: "text-center",
+                Cell: (row: ITypedRowInfo) => row.original.annualizedTotal.toFixed(3),
+            },
             {
                 id: "exception",
                 Header: "Exception ?",
-                expander: true,
                 className: "d-flex justify-content-center pt-3",
-                Expander: this.renderException,
+                Cell: this.renderException,
                 Filter: this.renderExceptionFilter,
                 width: 150,
                 sortable: true,
                 filterable: true,
-                filterMethod: (filter: any, request: IRequest) => {
+                filterMethod: (filter: IFilterParam, request: IRequest) => {
                     const value = filter.value.toLowerCase();
                     if (value === "") {
                         return true;
@@ -165,8 +169,15 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 sortable: false,
             },
             {
-                // hidden columns for data
+                // hidden columns for data mapping
+                // because react-table doesn't explicitly show the entire original data
+                // unless it has an accessor
                 accessor: "exception",
+                show: false,
+            },
+            {
+                // hide expander
+                expander: true,
                 show: false,
             },
         ];
