@@ -12,7 +12,7 @@ export default class Exception extends React.PureComponent<IProps, {}> {
             <div className="pretty p-switch p-fill">
                 <input type="checkbox" checked={this.props.exception} onChange={this.onChange} />
                 <div className="state p-primary">
-                    <label></label>
+                    <label />
                 </div>
             </div>
         );
