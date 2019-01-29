@@ -132,11 +132,18 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 },
             },
             {
+                id: 'isDeleted',
                 Header: "Remove",
                 className: "d-flex justify-content-center align-items-center",
+                accessor: "isDeleted",
                 Cell: this.renderRemoveButton,
                 width: 100,
                 sortable: false,
+                filterAll: true,
+                filterMethod: (filter: IFilterParam, rows: IRequest[]) => {
+                    // sneaky filter to remove deleted rows
+                    return rows.filter(r => !r.isDeleted);
+                },
             },
             {
                 className: "d-flex justify-content-center align-items-center",
@@ -170,10 +177,13 @@ export default class RequestsTable extends React.Component<IProps, IState> {
     public render() {
         const { requests } = this.props;
 
+        // expand all rows by default
+        // unfortunately we can't just expand the rows we care about
+        // ie, .exception?, because the table control treats the expanded
+        // object by it's viewIndex, which is sorted/filtered,
+        // and we have no access to that value
         const expanded = requests.reduce((e, r, index) => {
-            if (r.exception) {
-                e[index] = {};
-            }
+            e[index] = true;
             return e;
         }, {} as IExpandedState);
 
@@ -181,14 +191,14 @@ export default class RequestsTable extends React.Component<IProps, IState> {
             <TypedReactTable
                 className={this.props.className}
                 data={requests}
-                resolveData={this.resolveData}
                 columns={this.columns}
+                expanded={expanded}
                 SubComponent={this.renderExceptionDetail}
                 showPagination={false}
                 minRows={1}
                 pageSizeOptions={[requests.length]}
                 defaultPageSize={requests.length}
-                expanded={expanded}
+                defaultFiltered={[{id: 'isDeleted', value: false }]}
                 defaultSorted={[{id: 'course', desc: true}]}
                 getTrProps={this.decorateTr}
             />
@@ -434,12 +444,6 @@ export default class RequestsTable extends React.Component<IProps, IState> {
 
         // new request passed up
         this.props.onEdit(index, newRequest);
-    }
-
-    private resolveData = (data: IRequest[]) => data.filter(r => !r.isDeleted);
-
-    private onFilterChanged = (filtered: Filter[]) => {
-        this.setState({ filtered });
     }
 
     private decorateTr = (state: any, row: ITypedRowInfo | undefined) => {
