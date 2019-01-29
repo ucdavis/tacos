@@ -66,6 +66,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
 
         this.columns = [
             {
+                id: 'new-indicator',
                 // to show the filter icon in a 0-index column
                 Filter: this.renderNewIndicatorFilter,
                 className: "d-flex justify-content-center align-items-center",
@@ -163,6 +164,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 },
             },
             {
+                id: "warning-indicator",
                 className: "d-flex justify-content-center align-items-center",
                 Cell: this.renderWarnings,
                 width: 45,
@@ -260,7 +262,9 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         const index = row.index;
         const request = row.original;
 
+        // we're adding a key to force a redraw when you add a new request
         return <CourseNumber
+            key={`request-course-input-${index}`}
             course={request.course}
             onChange={course => this.onCourseChange(index, course)}
             onCourseCreate={(c) => this.props.onCourseCreate(index, c)}
