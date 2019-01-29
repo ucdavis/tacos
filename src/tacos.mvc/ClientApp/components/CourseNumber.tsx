@@ -53,7 +53,7 @@ export default class CourseNumber extends React.Component<IProps, IState> {
         const courseName = course ? course.name : "";
 
         const isValid = !!course;
-        const isNew = course && course.isNew
+        const isNew = course && course.isNew;
 
         return (
             <div>
@@ -84,12 +84,7 @@ export default class CourseNumber extends React.Component<IProps, IState> {
                 )}
                 { isValid && (
                     <small className="form-text text-muted pl-2">
-                        <span>{ courseName } </span>
-                        { isNew && (
-                            <button className="btn-link p-0 border-0" style={{ cursor: "pointer" }} onClick={this.onCourseCreate}>
-                                Edit new course details?
-                            </button>
-                        )}
+                        <span className="d-block text-truncate" title={courseName}>{ courseName }</span>
                     </small>
                 )}
             </div>
@@ -101,18 +96,30 @@ export default class CourseNumber extends React.Component<IProps, IState> {
         const { querying } = this.state;
 
         if (querying) {
-            return <i className="fa fa-spin fa-spinner" />;
+            return <i className="fas fa-fw fa-spin fa-spinner" />;
         }
 
         const isValid = !!course;
+        const isNew = course && course.isNew;
 
-        return <i className={`fa fa-${isValid ? "check" : "times"}`} />;
+        if (isValid && isNew) {
+            return (
+                <button className="btn-link p-0 border-0" style={{ cursor: "pointer" }} onClick={this.onCourseCreate}>
+                    <i className="far fa-fw fa-edit" />
+                </button>
+            );
+        }
+
+        return <i className={`fas fa-fw fa-${isValid ? "check" : "times"}`} />;
     };
+
+    
 
     private onCourseNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             const courseNumber = event.target.value;
             this.setState({
-                courseNumber,
+                courseNumber,       // save controlled input
+                notFound: false,    // remove "add new course" message
             });
 
             // clear out course when changing this value
