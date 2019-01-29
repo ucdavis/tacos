@@ -43,7 +43,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
                         type="text"
                         className="form-control"
                         value={course.number}
-                        onChange={this.onNumberChanged}
+                        onChange={this.onCourseNumberChange}
                     />
                     <div className="input-group-append">
                         <span
@@ -73,43 +73,68 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
         return <i className={`fa fa-${isValid ? "check" : "times"}`} />;
     };
 
-    private onNumberChanged = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        try {
+    private onCourseNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+            const courseNumber = event.target.value;
+            this.setState({
+                courseNumber,
+            });
 
-            const val = event.target.value;
-            this.props.onChange({ ...defaultCourse, number: val });
+            // changing the number clears the assigned course object
+            this.props.onChange(undefined);
 
-            // only valid if we are at 6+ chars
-            if (val.length < 6) {
-                this.setState({ querying: false });
+            // only trigger search when length > 6
+            if (courseNumber.length < 6) {
+                this.setState({
+                    querying: false,
+                });
                 return;
             }
 
+            this.searchCourse(courseNumber)
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private searchCourse = debounce(async (courseNumber: string) => {
+        try {
             this.setState({ querying: true });
 
-            // TODO: debounce
-
-            const response = await fetch(`/course/${val}`, {
+            const response = await fetch(`/course/${courseNumber}`, {
                 headers: [["Accept", "application/json"], ["Content-Type", "application/json"]],
                 method: "GET",
                 credentials: "include"
-            })
+            });
+
+            // handle explictly
+            if (response.status === 404) {
+                this.setState({
+                    notFound: true,
+                });
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error(response.statusText);
             }
 
-            const course: ICourse = await response.json();
+            const result: ICourse = await response.json();
 
-            if (course) {
-                this.setState({ querying: false });
-                this.props.onChange(course);
-            }
+            // pass up found course
+            this.props.onChange({
+                ...result,
+                isNew: false,
+            });
+
+            this.setState({
+                notFound: false,
+            });
         }
         catch (err) {
-
             LogService.error(err);
             this.setState({ querying: false });
         }
+        finally {
+            this.setState({ querying: false });
+        }
+    }, 100);
     }
 }
