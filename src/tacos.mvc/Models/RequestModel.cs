@@ -7,6 +7,8 @@ namespace tacos.mvc.Models
     {
         public int Id { get; set; }
 
+        public string CourseName { get; set; }
+
         public string CourseNumber { get; set; }
 
         public string CourseType { get; set; }

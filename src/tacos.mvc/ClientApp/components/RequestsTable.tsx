@@ -21,6 +21,8 @@ interface IProps {
     onRemove: (i: number) => void;
 
     courseNumberFilter?: string;
+
+    onCourseCreate: (i: number, defaultValues?: ICourse) => void;
 }
 
 interface IState {
@@ -78,13 +80,24 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 Filter: this.renderCourseFilter,
                 accessor: "course",
                 sortable: true,
-                sortMethod: (a: ICourse, b: ICourse, direction: boolean) => {
+                sortMethod: (a: ICourse | undefined, b: ICourse | undefined, direction: boolean) => {
+                    const aNumber = a ? a.number : "";
+                    const bNumber = b ? b.number : "";
+
+                    // sort by course number
                     const sign = direction ? -1 : 1;
-                    return sign * a.number.localeCompare(b.number);
+                    return sign * aNumber.localeCompare(bNumber);
                 },
                 filterable: true,
-                filterMethod: (filter: any, request: IRequest) => {
+                filterMethod: (filter: IFilterParam, request: IRequest) => {
                     const value = filter.value.toLowerCase();
+
+                    if (!request.course) {
+                        if (value) { return false; }
+                        return true;
+                    }
+
+                    // search the entire number/name for the filter value
                     return request.course.number.toLowerCase().indexOf(value) >= 0
                         || request.course.name.toLowerCase().indexOf(value) >= 0;
                 },
@@ -206,7 +219,24 @@ export default class RequestsTable extends React.Component<IProps, IState> {
     }
 
     private renderNewIndicator = (row: ITypedCellInfo) => {
-        return null;
+        const index = row.index;
+        const request = row.original;
+
+        if (!request.course || !request.course.isNew) {
+            return null
+        }
+
+        return (
+            <span>
+                <i className="fas fa-plus-circle" id={`request-new-indicator-${index}`} />
+                <UncontrolledTooltip
+                    target={`request-new-indicator-${index}`}
+                    placement="left"
+                >
+                    New course will be created
+                </UncontrolledTooltip>
+            </span>
+        );
     }
 
     private renderNewIndicatorFilter = (params: any) => {
@@ -219,7 +249,11 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         const index = row.index;
         const request = row.original;
 
-        return <CourseNumber course={request.course} onChange={course => this.onCourseChange(index, course)} />;
+        return <CourseNumber
+            course={request.course}
+            onChange={course => this.onCourseChange(index, course)}
+            onCourseCreate={(c) => this.props.onCourseCreate(index, c)}
+        />;
     }
 
     private renderCourseFilter = (params: any) => {
@@ -429,8 +463,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         );
     }
 
-    private onCourseChange = (index: number, course: ICourse) => {
-        this.requestChanged(index, "courseNumber", course.number);
+    private onCourseChange = (index: number, course: ICourse | undefined) => {
         this.requestChanged(index, "course", course);
     }
 

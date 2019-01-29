@@ -1,40 +1,58 @@
 import * as React from "react";
 import * as LogService from "../services/LogService";
 
+import debounce from "../util/debounce";
+
 import { ICourse } from "../models/ICourse";
 
 interface IProps {
-    course: ICourse;
-    onChange: (course: ICourse) => void;
+    course: ICourse | undefined;
+    onChange: (course: ICourse | undefined) => void;
+
+    onCourseCreate: (defaultValues: ICourse) => void;
 }
 
 interface IState {
-  querying: boolean;
+    courseNumber: string;
+
+    querying: boolean;
+    notFound: boolean;
 }
 
-const defaultCourse: ICourse = {
-  name: "",
-  number: "",
-  timesOfferedPerYear: 0,
-  averageEnrollment: 0,
-  averageSectionsPerCourse: 0,
-};
-
 // render a textbox for inputing course number, or show course info if already selected
-export default class CourseNumber extends React.PureComponent<IProps, IState> {
+export default class CourseNumber extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
 
         this.state = {
-            querying: false
+            courseNumber: props.course ? props.course.number : "",
+            querying: false,
+            notFound: false,
         };
+    }
+
+    public componentWillReceiveProps(nextProps: IProps) {
+        if (this.props.course !== nextProps.course) {
+            this.setState({
+                courseNumber: nextProps.course ? nextProps.course.number : "",
+            });
+        }
+
+        if (nextProps.course) {
+            this.setState({
+                notFound: false,
+            });
+        }
     }
 
     public render() {
         const { course } = this.props;
+        const { courseNumber, notFound } = this.state;
 
-        const courseName = course.name;
-        const isValid = !!course.name;
+        const courseName = course ? course.name : "";
+
+        const isValid = !!course;
+        const isNew = course && course.isNew
 
         return (
             <div>
@@ -42,7 +60,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
                     <input
                         type="text"
                         className="form-control"
-                        value={course.number}
+                        value={courseNumber}
                         onChange={this.onCourseNumberChange}
                     />
                     <div className="input-group-append">
@@ -55,7 +73,24 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
                         </span>
                     </div>
                 </div>
-                {isValid && <small className="form-text text-muted pl-2">{courseName}</small>}
+                { notFound && (
+                    <small className="form-text pl-2">
+                        <span className="mr-3">Course Not Found!</span>
+                        <button className="btn-link p-0 border-0" style={{ cursor: "pointer" }} onClick={this.onCourseCreate}>
+                            Add new course?
+                        </button>
+                    </small>
+                )}
+                { isValid && (
+                    <small className="form-text text-muted pl-2">
+                        <span>{ courseName } </span>
+                        { isNew && (
+                            <button className="btn-link p-0 border-0" style={{ cursor: "pointer" }} onClick={this.onCourseCreate}>
+                                Edit new course details?
+                            </button>
+                        )}
+                    </small>
+                )}
             </div>
         );
     }
@@ -68,7 +103,7 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             return <i className="fa fa-spin fa-spinner" />;
         }
 
-        const isValid = !!course.name;
+        const isValid = !!course;
 
         return <i className={`fa fa-${isValid ? "check" : "times"}`} />;
     };
@@ -136,5 +171,16 @@ export default class CourseNumber extends React.PureComponent<IProps, IState> {
             this.setState({ querying: false });
         }
     }, 100);
+    
+    private onCourseCreate = () => {
+        const { courseNumber } = this.state;
+        this.props.onCourseCreate({
+            name: "",
+            number: courseNumber,
+            averageEnrollment: 0,
+            averageSectionsPerCourse: 0,
+            timesOfferedPerYear: 0,
+            isNew: true,
+        })
     }
 }

@@ -4,4 +4,6 @@ export interface ICourse {
     timesOfferedPerYear: number;
     averageSectionsPerCourse: number;
     averageEnrollment: number;
+
+    isNew: boolean;
   }

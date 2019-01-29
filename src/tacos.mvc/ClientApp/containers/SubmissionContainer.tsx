@@ -2,6 +2,7 @@ import * as React from "react";
 import { parse as QueryParse } from "query-string";
 
 import Summary from "../components/Summary";
+import CreateCourseModal from "../components/CreateCourseModal";
 import RequestsTable from "../components/RequestsTable";
 
 import { annualizationRatio, formulas } from "../util/formulas";
@@ -9,6 +10,7 @@ import { annualizationRatio, formulas } from "../util/formulas";
 import * as LocalStorageService from "../services/LocalStorageService";
 import * as LogService from "../services/LogService";
 
+import { ICourse } from "../models/ICourse";
 import { IRequest } from "../models/IRequest";
 import { IDepartment } from "../models/IDepartment";
 import { ISubmission } from "../models/ISubmission";
@@ -20,6 +22,10 @@ interface IProps {
 
 interface IState {
     requests: IRequest[];
+
+    isCourseCreateOpen: boolean;
+    createCourseIndex: number | undefined;
+    createCourseModel: ICourse | undefined;
 }
 
 export default class SubmissionContainer extends React.Component<IProps, IState> {
@@ -35,6 +41,9 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         this.state = {
             requests,
+            isCourseCreateOpen: false,
+            createCourseIndex: undefined,
+            createCourseModel: undefined,
         };
     }
 
@@ -82,7 +91,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     }
 
     public render() {
-        const { requests } = this.state;
+        const { requests, isCourseCreateOpen, createCourseModel } = this.state;
 
         const pending = requests.filter(r => r.isDirty).length;
 
@@ -96,6 +105,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     requests={requests}
                     onEdit={this.requestUpdated}
                     onRemove={this.removeRequest}
+                    onCourseCreate={(i, c) => this.onOpenCourseCreate(i, c)}
+                />
+                <CreateCourseModal
+                    isOpen={isCourseCreateOpen}
+                    onClose={this.onCloseCourseCreate}
+                    course={createCourseModel}
+                    onCourseCreate={this.onCourseCreate}
                 />
                 <Summary
                     canSave={canSave}
@@ -271,11 +287,27 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { department } = this.props;
         const { requests } = this.state;
 
-        // if the course info looks good, calculate totals
-        request.calculatedTotal = formulas[request.courseType].calculate(request.course);
+        // flatten model
+        if (request.course) {
+            request.courseName = request.course.name;
+            request.courseNumber = request.course.number;
+        } else {
+            request.courseName = "";
+            request.courseNumber = "";
+        }
 
-        request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
-        request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
+        // if the course info looks good, calculate totals
+        const formula = formulas[request.courseType];
+        if (formula && request.course) {
+            request.calculatedTotal = formula.calculate(request.course);
+            request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
+            request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
+        }
+        else {
+            request.calculatedTotal = 0;
+            request.annualizedTotal = 0;
+            request.exceptionAnnualizedTotal = 0;
+        }
 
         // clear error messages
         request.isValid = true;
@@ -290,6 +322,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (!request.courseNumber) {
             request.isValid = false;
             request.error = 'Course required';
+        }
+
+        if (request.course && request.course.isNew && !request.exception) {
+            request.isValid = false;
+            request.error = 'Exception required with new courses';
         }
 
         if (request.exception && request.exceptionTotal <= 0) {
@@ -329,13 +366,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const newRequests: IRequest[] = [
             ...this.state.requests,
             {
-                course: {
-                    name: "",
-                    number: "",
-                    timesOfferedPerYear: 0,
-                    averageEnrollment: 0,
-                    averageSectionsPerCourse: 0
-                },
+                course: undefined,
+                courseName: "",
                 courseNumber: "",
                 courseType: "STD",
                 requestType: "TA",
@@ -350,6 +382,54 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         ];
 
         LocalStorageService.saveRequests(department, newRequests);
-        this.setState({ requests: newRequests });
+        this.setState({ requests: newRequests }, () => {
+            // update isFocused to trigger ui flash
+            const index = newRequests.length - 1;
+            this.focusRequest(index);
+        });
+    }
+
+    private onOpenCourseCreate = (index: number, defaultValues?: ICourse) => {
+        const { requests } = this.state;
+        const request = requests[index];
+
+        this.setState({
+            isCourseCreateOpen: true,
+            createCourseIndex: index,
+            createCourseModel: request.course || defaultValues,
+        });
+    }
+
+    private onCloseCourseCreate = () => {
+        this.setState({
+            isCourseCreateOpen: false,
+            createCourseIndex: undefined,
+            createCourseModel: undefined,
+        });
+    }
+
+    private onCourseCreate = (course: ICourse)  => {
+        const { requests, createCourseIndex } = this.state;
+
+        if (!createCourseIndex) {
+            return;
+        }
+
+        const request = requests[createCourseIndex];
+
+        // clear modal data
+        this.setState({
+            isCourseCreateOpen: false,
+            createCourseIndex: undefined,
+            createCourseModel: undefined,
+        });
+
+        // update request, add course details, default with exception
+        const newRequest = {
+            ...request,
+            course,
+            exception: true,
+        };
+        this.requestUpdated(createCourseIndex, newRequest);
     }
 }

@@ -3,8 +3,15 @@ import { ICourse } from './ICourse';
 export interface IRequest {
     id?: number;
 
-    course: ICourse;
+
+    course: ICourse | undefined;
+    
+    // flattened course value
+    courseName: string;
+
+    // flattened course value
     courseNumber: string;
+
     courseType: string;
     requestType: string;
     calculatedTotal: number;

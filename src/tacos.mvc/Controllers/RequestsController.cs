@@ -143,7 +143,23 @@ namespace tacos.mvc.Controllers
             // process updates next
             foreach (var m in model.Requests.Where(r => !r.IsDeleted && r.IsDirty))
             {
-                var course = await _context.Courses.FindAsync(m.CourseNumber);
+                var course = await _context.Courses
+                    .FirstOrDefaultAsync(c => 
+                        string.Equals(c.Number, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+
+                // possible create new course
+                if (course == null)
+                {
+                    course = new Course()
+                    {
+                        Number = m.CourseNumber,
+                        Name = m.CourseName,
+                        AverageEnrollment = 0,
+                        AverageSectionsPerCourse = 0,
+                        TimesOfferedPerYear = 0,
+                    };
+                    await _context.Courses.AddAsync(course);
+                }
 
                 // find request by id or name, or create a new one
                 Request request;
