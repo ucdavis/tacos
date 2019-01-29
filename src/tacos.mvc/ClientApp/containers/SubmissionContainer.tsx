@@ -104,6 +104,18 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         return (
             <div className="pb-4">
+                <div className="row mb-4">
+                    <div className="col d-flex justify-content-end">
+                            <button
+                                className="btn btn-primary"
+                                id="submit-button"
+                                onClick={this.onAddRequest}
+                            >
+                                Create New Request
+                                <i className="fas fa-plus-circle ml-2" /> 
+                            </button>
+                    </div>
+                </div>
                 <RequestsTable
                     className="mb-4"
                     requests={requests}
