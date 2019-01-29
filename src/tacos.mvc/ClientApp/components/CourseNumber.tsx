@@ -21,6 +21,21 @@ interface IState {
 
 // render a textbox for inputing course number, or show course info if already selected
 export default class CourseNumber extends React.Component<IProps, IState> {
+
+    public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
+        const nextState: Partial<IState> = {};
+        
+        if (nextProps.course) {
+            nextState.notFound = false;
+        }
+
+        if (nextProps.course && prevState.courseNumber !== nextProps.course.number) {
+            nextState.courseNumber = nextProps.course.number;
+        }
+
+        return nextState;
+    }
+
     constructor(props: IProps) {
         super(props);
 
@@ -29,20 +44,6 @@ export default class CourseNumber extends React.Component<IProps, IState> {
             querying: false,
             notFound: false,
         };
-    }
-
-    public componentWillReceiveProps(nextProps: IProps) {
-        if (this.props.course !== nextProps.course) {
-            this.setState({
-                courseNumber: nextProps.course ? nextProps.course.number : "",
-            });
-        }
-
-        if (nextProps.course) {
-            this.setState({
-                notFound: false,
-            });
-        }
     }
 
     public render() {
