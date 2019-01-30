@@ -14,8 +14,10 @@ variables:
 
 steps:
   - script: dotnet restore
+    displayName: dotnet restore
 
   - script: dotnet build .\src\tacos.mvc\ --configuration $(buildConfiguration)
     displayName: 'dotnet build $(buildConfiguration)'
 
-  - script: dotnet publish .\src\tacos.mvc\ --output $(Build.ArtifactStagingDirectory)
+  - script: dotnet publish .\src\tacos.mvc\ --output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration)
+    displayName: 'dotnet publish $(buildConfiguration)'
