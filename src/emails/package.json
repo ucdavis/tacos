@@ -1,0 +1,16 @@
+{
+  "name": "tacos-emails",
+  "version": "1.0.0",
+  "description": "Tacos Emails Build Pipeline",
+  "main": "index.ts",
+  "scripts": {
+    "build": "node ./tools/build.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jpknoll@ucdavis.edu",
+  "license": "MIT",
+  "devDependencies": {
+    "mjml": "^4.3.1",
+    "rimraf": "^2.6.3"
+  }
+}
