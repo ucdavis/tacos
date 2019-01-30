@@ -21,3 +21,9 @@ steps:
 
   - script: dotnet publish .\src\tacos.mvc\ --output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration)
     displayName: 'dotnet publish $(buildConfiguration)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'publish artifact'
+    inputs:
+      ArtifactName: tacos.mvc
+      PathtoPublish: $(Build.ArtifactStagingDirectory)
