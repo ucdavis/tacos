@@ -1,0 +1,9 @@
+.edit-requests {
+    &.container {
+        max-width: 80%;
+
+        @include breakpoint(tablet) {
+            max-width: 100%;
+        }
+    }
+}

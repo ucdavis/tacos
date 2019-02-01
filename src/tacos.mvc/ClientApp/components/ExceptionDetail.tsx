@@ -1,5 +1,7 @@
 import * as React from "react";
 
+import NumberInput from "./NumberInput";
+
 interface IProps {
     exception: boolean;
     exceptionReason: string;
@@ -8,10 +10,33 @@ interface IProps {
     onReasonChange: (exceptionReason: string) => void;
 }
 
+interface IState {
+    exceptionReason: string;
+}
+
 // render a textbox for inputing course number, or show course info if already selected
-export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
+export default class ExceptionDetail extends React.PureComponent<IProps, IState> {
+
+    public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
+        if (nextProps.exceptionReason !== prevState.exceptionReason) {
+            return {
+                exceptionReason: nextProps.exceptionReason,
+            };
+        }
+
+        return null;
+    }
+
+    constructor(props: IProps) {
+        super(props); 
+
+        this.state = {
+            exceptionReason: "",
+        };
+    }
+
     public render() {
-        if (!this.props.exception) return null;
+        if (!this.props.exception) { return null; }
 
         return (
             <div className="exceptionRow">
@@ -32,35 +57,51 @@ export default class ExceptionDetail extends React.PureComponent<IProps, {}> {
 
     private renderExceptionTotal = () => {
         return (
-            <input
+            <NumberInput
                 className="form-control"
-                type="number"
                 min={0}
                 step={0.25}
                 placeholder="Total FTE requested"
                 value={this.props.exceptionTotal}
                 onChange={this.onChangeTotal}
+                format={this.formatExceptionTotal}
             />
         );
-    };
+    }
+
+    private formatExceptionTotal = (value: number) => {
+        if (value === 0) {
+            return "";
+        }
+
+        return value.toFixed(2);
+    }
 
     private renderExceptionReason = () => {
+        const { exceptionReason } = this.state;
         return (
             <textarea
                 className="form-control"
                 placeholder="Reason for exceptioning the course request"
                 rows={3}
-                value={this.props.exceptionReason}
+                value={exceptionReason}
+                onBlur={this.onBlurReason}
                 onChange={this.onChangeReason}
             />
         );
     };
 
-    private onChangeTotal = (e: React.ChangeEvent<HTMLInputElement>) => {
-        this.props.onExceptionTotalChange(e.target.valueAsNumber);
+    private onChangeTotal = (value: number) => {
+        this.props.onExceptionTotalChange(value);
     };
 
-    private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    private onBlurReason = (e: React.FocusEvent<HTMLTextAreaElement>) => {
         this.props.onReasonChange(e.target.value);
+    };
+    
+    private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        this.setState({
+            exceptionReason: e.target.value,
+        });
     };
 }

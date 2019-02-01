@@ -9,18 +9,10 @@ interface IProps {
 export default class Exception extends React.PureComponent<IProps, {}> {
     public render() {
         return (
-            <div>
-                <div className="form-check">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        checked={this.props.exception}
-                        onChange={this.onChange}
-                        id="defaultCheck1"
-                    />
-                    <label className="form-check-label" htmlFor="defaultCheck1">
-                        Exception
-                    </label>
+            <div className="pretty p-switch p-fill">
+                <input type="checkbox" checked={this.props.exception} onChange={this.onChange} />
+                <div className="state p-primary">
+                    <label />
                 </div>
             </div>
         );

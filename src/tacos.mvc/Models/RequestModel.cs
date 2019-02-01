@@ -7,6 +7,8 @@ namespace tacos.mvc.Models
     {
         public int Id { get; set; }
 
+        public string CourseName { get; set; }
+
         public string CourseNumber { get; set; }
 
         public string CourseType { get; set; }
@@ -27,5 +29,7 @@ namespace tacos.mvc.Models
         public double AnnualizedTotal { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public bool IsDirty { get; set; }
     }
 }
