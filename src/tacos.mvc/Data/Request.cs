@@ -87,6 +87,11 @@ namespace tacos.data
 
         public string ApprovedComment { get; set; }
 
+        public bool Submitted { get; set; }
+
+        public DateTime? SubmittedOn { get; set; }
+
+        public string SubmittedBy { get; set; }
 
         public IList<RequestHistory> History { get; set; }
 

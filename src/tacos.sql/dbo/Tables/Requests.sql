@@ -15,6 +15,9 @@ CREATE TABLE [dbo].[Requests] (
     [RequestType]              NVARCHAR (50)  NULL,
     [UpdatedBy]                NVARCHAR (450) NULL,
     [UpdatedOn]                DATETIME2 (7)  NOT NULL,
+    [Submitted]				   BIT			  NOT NULL DEFAULT 0, 
+    [SubmittedOn]			   DATETIME2	  NULL, 
+    [SubmittedBy]			   NVARCHAR(450)  NULL, 
     CONSTRAINT [PK_Requests] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Requests_Courses_CourseNumber] FOREIGN KEY ([CourseNumber]) REFERENCES [dbo].[Courses] ([Number]) ON DELETE CASCADE,
     CONSTRAINT [FK_Requests_Departments_DepartmentId] FOREIGN KEY ([DepartmentId]) REFERENCES [dbo].[Departments] ([Id]) ON DELETE CASCADE

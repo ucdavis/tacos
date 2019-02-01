@@ -26,6 +26,7 @@ namespace tacos.mvc.Controllers
                 .Requests
                 .Include(r => r.Course)
                 .Where(r => r.IsActive)
+                .Where(r => r.Submitted)
                 .Where(r => r.Approved == null)
                 .OrderByDescending(s => s.UpdatedOn)
                 .AsNoTracking()

@@ -38,8 +38,8 @@ namespace tacos.mvc.Controllers
 
             if (department == null)
             {
-                // could not find a valid department
-                return Forbid();
+                // could not find a valid department(s)
+                return RedirectToAction(nameof(Empty));
             }
 
             ViewBag.Department = department;
@@ -50,9 +50,14 @@ namespace tacos.mvc.Controllers
                 .Where(r => r.IsActive)
                 .Where(r => r.Department.Id == department.Id)
                 .AsNoTracking()
-                .ToArrayAsync();
+                .ToListAsync();
 
             return View(requests);
+        }
+
+        public IActionResult Empty()
+        {
+            return View();
         }
 
         public async Task<IActionResult> Details(int id)
@@ -106,7 +111,7 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Submit([FromBody]SubmissionModel model)
+        public async Task<IActionResult> Save([FromBody]SubmissionModel model)
         {
             // get user's departments
             var user = await _userManager.GetUserAsync(User);
@@ -136,12 +141,28 @@ namespace tacos.mvc.Controllers
             }
 
             // process updates next
-            foreach (var m in model.Requests.Where(r => !r.IsDeleted))
+            foreach (var m in model.Requests.Where(r => !r.IsDeleted && r.IsDirty))
             {
-                var course = await _context.Courses.FindAsync(m.CourseNumber);
+                var course = await _context.Courses
+                    .FirstOrDefaultAsync(c => 
+                        string.Equals(c.Number, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+
+                // possible create new course
+                if (course == null)
+                {
+                    course = new Course()
+                    {
+                        Number = m.CourseNumber,
+                        Name = m.CourseName,
+                        AverageEnrollment = 0,
+                        AverageSectionsPerCourse = 0,
+                        TimesOfferedPerYear = 0,
+                    };
+                    await _context.Courses.AddAsync(course);
+                }
 
                 // find request by id or name, or create a new one
-                Request request = null;
+                Request request;
                 if (m.Id > 0)
                 {
                     request = await _context.Requests
@@ -159,8 +180,8 @@ namespace tacos.mvc.Controllers
                 {
                     request = new Request()
                     {
-                        DepartmentId             = department.Id,
-                        CourseNumber             = course.Number,
+                        DepartmentId = department.Id,
+                        CourseNumber = course.Number,
                     };
                     _context.Requests.Add(request);
                 }
@@ -188,34 +209,92 @@ namespace tacos.mvc.Controllers
                     request.Approved = true;
                 }
 
-                // always create a history entry, with this new data even on new entries, include course snapshot
-                var history = new RequestHistory()
-                {
-                    RequestId                = request.Id,
-                    DepartmentId             = department.Id,
-                    UpdatedOn                = request.UpdatedOn,
-                    UpdatedBy                = request.UpdatedBy,
-                    CourseType               = request.CourseType,
-                    RequestType              = request.RequestType,
-                    Exception                = request.Exception,
-                    ExceptionReason          = request.ExceptionReason,
-                    ExceptionTotal           = request.ExceptionTotal,
-                    ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
-                    CalculatedTotal          = request.CalculatedTotal,
-                    AnnualizedTotal          = request.AnnualizedTotal,
-                    Approved                 = request.Approved,
-                    ApprovedComment          = request.ApprovedComment,
-                    CourseNumber             = course.Number,
-                    AverageSectionsPerCourse = course.AverageSectionsPerCourse,
-                    AverageEnrollment        = course.AverageEnrollment,
-                    TimesOfferedPerYear      = course.TimesOfferedPerYear,
-                };
-                request.History.Add(history);
+                // always create a history entry on save
+                CreateRequestHistory(request, course);
             }
 
             await _context.SaveChangesAsync();
 
             return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Submit([FromBody]SubmissionModel model)
+        {
+            // get user's departments
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
+
+            // find matching department
+            var department = departments.SingleOrDefault(d => d.Id == model.DepartmentId);
+            if (department == null)
+            {
+                return BadRequest("Matching department not found among user's permission set.");
+            }
+
+            var now = DateTime.UtcNow;
+
+            // save everything
+            await Save(model);
+
+            // process submissions next
+            foreach (var m in model.Requests.Where(r => !r.IsDeleted))
+            {
+                // find request by id or name, or create a new one
+                Request request;
+                if (m.Id > 0)
+                {
+                    request = await _context.Requests
+                        .FirstOrDefaultAsync(r => r.Id == m.Id);
+                }
+                else
+                {
+                    request = await _context.Requests
+                        .FirstOrDefaultAsync(r =>
+                            string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                }
+
+                // don't overwrite existing data
+                if (request.Submitted)
+                {
+                    continue;
+                }
+
+                // submit request
+                request.Submitted = true;
+                request.SubmittedOn = now;
+                request.SubmittedBy = user.Name;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+        private static void CreateRequestHistory(Request request, Course course)
+        {
+            var history = new RequestHistory()
+            {
+                RequestId                = request.Id,
+                DepartmentId             = request.DepartmentId,
+                UpdatedOn                = request.UpdatedOn,
+                UpdatedBy                = request.UpdatedBy,
+                CourseType               = request.CourseType,
+                RequestType              = request.RequestType,
+                Exception                = request.Exception,
+                ExceptionReason          = request.ExceptionReason,
+                ExceptionTotal           = request.ExceptionTotal,
+                ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
+                CalculatedTotal          = request.CalculatedTotal,
+                AnnualizedTotal          = request.AnnualizedTotal,
+                Approved                 = request.Approved,
+                ApprovedComment          = request.ApprovedComment,
+                CourseNumber             = course.Number,
+                AverageSectionsPerCourse = course.AverageSectionsPerCourse,
+                AverageEnrollment        = course.AverageEnrollment,
+                TimesOfferedPerYear      = course.TimesOfferedPerYear,
+            };
+            request.History.Add(history);
         }
     }
 }
