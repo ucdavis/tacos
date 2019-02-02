@@ -1,8 +1,6 @@
-﻿using System;
 using System.ComponentModel.DataAnnotations;
-using tacos.data;
 
-namespace tacos.mvc.Data
+namespace tacos.core.Data
 {
     public class DepartmentRole
     {

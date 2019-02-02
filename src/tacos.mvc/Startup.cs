@@ -11,7 +11,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
-using tacos.data;
+using tacos.core;
+using tacos.core.Data;
 using tacos.mvc.Helpers;
 using tacos.mvc.services;
 

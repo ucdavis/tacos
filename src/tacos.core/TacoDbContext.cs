@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using tacos.mvc.Data;
+using tacos.core.Data;
 
-namespace tacos.data
+namespace tacos.core
 {
     public class TacoDbContext : IdentityDbContext<User>
     {

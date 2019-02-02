@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace tacos.data
+namespace tacos.core.Data
 {
     public class Course {
         // course number, ex: MAT110

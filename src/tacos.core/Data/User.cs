@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
-using tacos.mvc.Data;
 
-namespace tacos.data
+namespace tacos.core.Data
 {
     public class User : IdentityUser
     {

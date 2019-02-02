@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tacos.data;
-using tacos.mvc.Data;
+using tacos.core;
+using tacos.core.Data;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models;
 

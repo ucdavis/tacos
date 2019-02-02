@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using tacos.data;
+using tacos.core.Data;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models.AccountViewModels;
 using tacos.mvc.services;

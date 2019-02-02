@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tacos.data;
+using tacos.core;
 using tacos.mvc.Models.CourseViewModels;
 
 namespace tacos.mvc.Controllers

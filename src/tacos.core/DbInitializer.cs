@@ -3,10 +3,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using tacos.mvc.Data;
-using tacos.mvc.Resources;
+using tacos.core.Data;
+using tacos.core.Resources;
 
-namespace tacos.data
+namespace tacos.core
 {
     public class DbInitializer
     {
@@ -172,7 +172,7 @@ namespace tacos.data
                 new Claim(ClaimTypes.Name, user.Name)
             }));
 
-            var info = new ExternalLoginInfo(principal, AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme, user.Id, null);
+            var info = new ExternalLoginInfo(principal, "CAS", user.Id, null);
 
             await _userManager.CreateAsync(user);
             await _userManager.AddLoginAsync(user, info);

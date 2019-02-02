@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace tacos.mvc.Resources
+namespace tacos.core.Resources
 {
     public static class CourseInfo
     {
