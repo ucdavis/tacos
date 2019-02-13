@@ -112,6 +112,12 @@ namespace tacos.mvc.Controllers
             // check for existing user first
             var user = await _userManager.FindByIdAsync(userId);
 
+            // check email too
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(userId);
+            }
+
             // check for user on directory
             if (user == null)
             {
