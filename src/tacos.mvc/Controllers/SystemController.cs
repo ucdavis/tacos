@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ using tacos.data;
 using tacos.mvc.Data;
 using tacos.mvc.Models.SystemViewModels;
 using tacos.mvc.Resources;
+using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers
 {
@@ -17,15 +19,23 @@ namespace tacos.mvc.Controllers
     {
         private readonly TacoDbContext _dbContext;
         private readonly UserManager<User> _userManager;
+        private readonly IDirectorySearchService _directorySearchService;
 
-        public SystemController(TacoDbContext dbContext, UserManager<User> userManager)
+        public SystemController(TacoDbContext dbContext, UserManager<User> userManager, IDirectorySearchService directorySearchService)
         {
             _dbContext = dbContext;
             _userManager = userManager;
+            _directorySearchService = directorySearchService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users()
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SystemUsers()
         {
             var users = _dbContext.Users.ToList();
 
@@ -46,15 +56,25 @@ namespace tacos.mvc.Controllers
                                   IsReviewer = (match2 != null),
                               };
 
+            var model = new UserRolesViewModel()
+            {
+                SystemRoles = systemRoles.ToList(),
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DepartmentUsers()
+        {
             var departmentRoles = await _dbContext.DepartmentRoles
                 .Include(r => r.Department)
                 .Include(r => r.User)
                 .AsNoTracking()
                 .ToListAsync();
 
-            var model = new UserRolesViewModel()
+            var model = new DepartmentRolesViewModel()
             {
-                SystemRoles = systemRoles.ToList(),
                 DepartmentRoles = departmentRoles,
             };
 
@@ -73,7 +93,7 @@ namespace tacos.mvc.Controllers
 
             await _userManager.AddToRoleAsync(user, role);
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(SystemUsers));
         }
 
         [HttpPost]
@@ -83,13 +103,56 @@ namespace tacos.mvc.Controllers
 
             await _userManager.RemoveFromRoleAsync(user, role);
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(SystemUsers));
         }
 
         [HttpPost]
         public async Task<IActionResult> AddUserToDepartmentRole(string userId, int departmentId)
         {
+            // check for existing user first
             var user = await _userManager.FindByIdAsync(userId);
+
+            // check email too
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(userId);
+            }
+
+            // check for user on directory
+            if (user == null)
+            {
+                var person = await _directorySearchService.GetByKerberos(userId);
+                if (person == null)
+                {
+                    person = await _directorySearchService.GetByEmail(userId);
+                }
+
+                if (person == null)
+                {
+                    ErrorMessage = "User not found.";
+                    return RedirectToAction(nameof(DepartmentUsers));
+                }
+
+                // create user and login
+                var principal = new ClaimsPrincipal();
+                var login = new ExternalLoginInfo(
+                    principal,
+                    AspNetCore.Security.CAS.CasDefaults.AuthenticationScheme,
+                    person.Kerberos,
+                    AspNetCore.Security.CAS.CasDefaults.DisplayName);
+                    
+                user = new User
+                {
+                    Id        = person.Kerberos,
+                    Email     = person.Mail,
+                    UserName  = person.Kerberos,
+                    FirstName = person.GivenName,
+                    LastName  = person.Surname,
+                    Name      = person.FullName,
+                };
+                await _userManager.CreateAsync(user);
+                await _userManager.AddLoginAsync(user, login);
+            }
 
             var department = await _dbContext.Departments
                 .Include(d => d.MemberRoles)
@@ -104,7 +167,7 @@ namespace tacos.mvc.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(DepartmentUsers));
         }
 
         [HttpPost]
@@ -122,7 +185,7 @@ namespace tacos.mvc.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(DepartmentUsers));
         }
     }
 }
