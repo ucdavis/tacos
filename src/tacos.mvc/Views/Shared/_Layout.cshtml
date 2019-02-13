@@ -52,7 +52,7 @@
                         <a class="nav-link" asp-controller="Approval" asp-action="index">Approvals</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "system" ? "active" : "")">
-                        <a class="nav-link" asp-controller="system" asp-action="users">Users</a>
+                        <a class="nav-link" asp-controller="system" asp-action="Index">Users</a>
                     </li>
                 }
             </ul>
@@ -61,11 +61,26 @@
             </form>
         </div>
     </nav>
+        
+    @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
+    {
+        <div class="alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
     {
-        <div>Alert</div>
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            @TempData["Message"]
+        </div>
     }
-    @RenderBody()
+
+    <div class="py-4">
+        @RenderBody()
+    </div>
     
     <environment names="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.js"></script>

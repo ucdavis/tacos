@@ -1,0 +1,63 @@
+@using tacos.mvc.Data
+@using tacos.mvc.Resources
+@model tacos.mvc.Models.SystemViewModels.UserRolesViewModel
+
+@{
+    ViewBag.Title = "Manage User Roles";
+}
+
+<div class="container">
+    <h2>Manage System Roles</h2>
+
+    <table id="table" class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Is Admin</th>
+                <th>Is Reviewer</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.SystemRoles)
+            {
+                <tr>
+                    <td>
+
+                        @if (row.IsAdmin)
+                        {
+                            <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="false" asp-antiforgery="true">
+                                <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i> Admin</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="true" asp-antiforgery="true">
+                                <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i> Admin</button>
+                            </form>
+                        }
+                        <hr />
+                        @if (row.IsReviewer)
+                        {
+                            <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="false" asp-antiforgery="true">
+                                <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i> Reviewer</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-action="AddUserToRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="true" asp-antiforgery="true">
+                                <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i> Reviewer</button>
+                            </form>
+                        }
+
+                    </td>
+                    <td>@row.User.Name</td>
+                    <td>@row.User.Email</td>
+                    <td>@row.IsAdmin</td>
+                    <td>@row.IsReviewer</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

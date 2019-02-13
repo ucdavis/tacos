@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ietws;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Serilog;
 using tacos.mvc.Models;
 
 namespace tacos.mvc.services {
@@ -28,12 +29,29 @@ namespace tacos.mvc.services {
         {
             // find the contact via their email
             var ucdContactResult = await ietClient.Contacts.Search(ContactSearchField.email, email);
-            EnsureResponseSuccess(ucdContactResult);
+            if (ucdContactResult.ResponseStatus != 0 || !ucdContactResult.ResponseData.Results.Any())
+            {
+                Log.ForContext("email", email)
+                    .ForContext("response", ucdContactResult, true)
+                    .Warning("User not found");
+
+                return null;
+            }
+
             var ucdContact = ucdContactResult.ResponseData.Results.First();
 
             // now look up the whole person's record by ID including kerb
             var ucdKerbResult = await ietClient.Kerberos.Search(KerberosSearchField.iamId, ucdContact.IamId);
-            EnsureResponseSuccess(ucdKerbResult);
+
+            if (ucdKerbResult.ResponseStatus != 0 || !ucdKerbResult.ResponseData.Results.Any())
+            {
+                Log.ForContext("email", email)
+                   .ForContext("response", ucdKerbResult, true)
+                   .Warning("User not found");
+
+                return null;
+            }
+
             var ucdKerbPerson = ucdKerbResult.ResponseData.Results.Single();
             return new Person
             {
@@ -48,12 +66,28 @@ namespace tacos.mvc.services {
         public async Task<Person> GetByKerberos(string kerb)
         {
             var ucdKerbResult = await ietClient.Kerberos.Search(KerberosSearchField.userId, kerb);
-            EnsureResponseSuccess(ucdKerbResult);
+            if (ucdKerbResult.ResponseStatus != 0 || !ucdKerbResult.ResponseData.Results.Any())
+            {
+                Log.ForContext("kerb", kerb)
+                    .ForContext("response", ucdKerbResult, true)
+                    .Warning("User not found");
+
+                return null;
+            }
+
             var ucdKerbPerson = ucdKerbResult.ResponseData.Results.Single();
 
             // find their email
             var ucdContactResult = await ietClient.Contacts.Get(ucdKerbPerson.IamId);
-            EnsureResponseSuccess(ucdContactResult);
+            if (ucdContactResult.ResponseStatus != 0 || !ucdContactResult.ResponseData.Results.Any())
+            {
+                Log.ForContext("kerb", kerb)
+                    .ForContext("response", ucdContactResult, true)
+                    .Warning("User not found");
+
+                return null;
+            }
+
             var ucdContact = ucdContactResult.ResponseData.Results.First();
 
             return new Person
@@ -64,13 +98,6 @@ namespace tacos.mvc.services {
                 Kerberos = ucdKerbPerson.UserId,
                 Mail = ucdContact.Email
             };
-        }
-
-        private void EnsureResponseSuccess<T>(IetResult<T> result) {
-            if (result.ResponseStatus != 0)
-            {
-                throw new ApplicationException(result.ResponseDetails);
-            }
         }
     }
 }
