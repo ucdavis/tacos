@@ -52,7 +52,7 @@
                         <a class="nav-link" asp-controller="Approval" asp-action="index">Approvals</a>
                     </li>
                     <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "system" ? "active" : "")">
-                        <a class="nav-link" asp-controller="system" asp-action="users">Users</a>
+                        <a class="nav-link" asp-controller="system" asp-action="Index">Users</a>
                     </li>
                 }
             </ul>
@@ -78,7 +78,9 @@
         </div>
     }
 
-    @RenderBody()
+    <div class="py-4">
+        @RenderBody()
+    </div>
     
     <environment names="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.js"></script>

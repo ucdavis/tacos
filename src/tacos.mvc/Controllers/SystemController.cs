@@ -29,7 +29,13 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users()
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SystemUsers()
         {
             var users = _dbContext.Users.ToList();
 
@@ -50,15 +56,25 @@ namespace tacos.mvc.Controllers
                                   IsReviewer = (match2 != null),
                               };
 
+            var model = new UserRolesViewModel()
+            {
+                SystemRoles = systemRoles.ToList(),
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DepartmentUsers()
+        {
             var departmentRoles = await _dbContext.DepartmentRoles
                 .Include(r => r.Department)
                 .Include(r => r.User)
                 .AsNoTracking()
                 .ToListAsync();
 
-            var model = new UserRolesViewModel()
+            var model = new DepartmentRolesViewModel()
             {
-                SystemRoles = systemRoles.ToList(),
                 DepartmentRoles = departmentRoles,
             };
 
@@ -77,7 +93,7 @@ namespace tacos.mvc.Controllers
 
             await _userManager.AddToRoleAsync(user, role);
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(SystemUsers));
         }
 
         [HttpPost]
@@ -87,7 +103,7 @@ namespace tacos.mvc.Controllers
 
             await _userManager.RemoveFromRoleAsync(user, role);
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(SystemUsers));
         }
 
         [HttpPost]
@@ -108,7 +124,7 @@ namespace tacos.mvc.Controllers
                 if (person == null)
                 {
                     ErrorMessage = "User not found.";
-                    return RedirectToAction(nameof(Users));
+                    return RedirectToAction(nameof(DepartmentUsers));
                 }
 
                 // create user and login
@@ -145,7 +161,7 @@ namespace tacos.mvc.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(DepartmentUsers));
         }
 
         [HttpPost]
@@ -163,7 +179,7 @@ namespace tacos.mvc.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(nameof(DepartmentUsers));
         }
     }
 }
