@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using tacos.core;
 using tacos.core.Data;
 using tacos.mvc.Extensions;
@@ -276,7 +277,14 @@ namespace tacos.mvc.Controllers
             await _context.SaveChangesAsync();
 
             // send emails
-            await _emailService.SendSubmissionNotification(requestsFound);
+            try
+            {
+                await _emailService.SendSubmissionNotification(requestsFound);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception throw while sending notification email.");
+            }
 
             return Json(new { success = true });
         }
