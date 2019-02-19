@@ -9,6 +9,6 @@ namespace tacos.emails.models
     {
         public string RecipientName { get; set; }
 
-        public IList<Request> Requests { get; set; }
+        public Request Request { get; set; }
     }
 }
