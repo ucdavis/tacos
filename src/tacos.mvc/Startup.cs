@@ -45,7 +45,9 @@ namespace tacos.mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // add settings
             services.Configure<CommonSettings>(Configuration.GetSection("Common"));
+            services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
 
             // setup entity framework
             services.AddDbContextPool<TacoDbContext>(o => 
@@ -74,6 +76,7 @@ namespace tacos.mvc
                 o.DefaultBeautify = true;
             });
 
+            services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IDirectorySearchService, IetWsSearchService>();
         }
 

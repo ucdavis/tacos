@@ -9,6 +9,7 @@ using tacos.core;
 using tacos.core.Data;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models;
+using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers
 {
@@ -16,11 +17,13 @@ namespace tacos.mvc.Controllers
     {
         private readonly TacoDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
 
-        public RequestsController(TacoDbContext context, UserManager<User> userManager)
+        public RequestsController(TacoDbContext context, UserManager<User> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // list submissions
@@ -238,6 +241,7 @@ namespace tacos.mvc.Controllers
             await Save(model);
 
             // process submissions next
+            var requestsFound = new List<Request>();
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
                 // find request by id or name, or create a new one
@@ -264,9 +268,15 @@ namespace tacos.mvc.Controllers
                 request.Submitted = true;
                 request.SubmittedOn = now;
                 request.SubmittedBy = user.Name;
+
+                // add request to list
+                requestsFound.Add(request);
             }
 
             await _context.SaveChangesAsync();
+
+            // send emails
+            await _emailService.SendSubmissionNotification(requestsFound);
 
             return Json(new { success = true });
         }

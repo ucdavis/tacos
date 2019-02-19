@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -13,10 +13,12 @@
     <PackageReference Include="ietws" Version="0.1.19" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.7" />
     <PackageReference Include="Mjml.AspNetCore" Version="1.0.13" />
+    <PackageReference Include="RazorLight" Version="2.0.0-beta1" />
     <PackageReference Include="Serilog" Version="2.7.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Serilog.Exceptions" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.Stackify" Version="2.0.2" />
+    <PackageReference Include="SparkPost" Version="1.14.0" />
     <PackageReference Include="StackifyMiddleware" Version="3.0.2" />
   </ItemGroup>
 
@@ -33,6 +35,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\tacos.core\tacos.core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Emails\*.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
