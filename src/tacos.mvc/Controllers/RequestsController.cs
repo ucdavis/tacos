@@ -203,15 +203,12 @@ namespace tacos.mvc.Controllers
                 request.UpdatedOn                = DateTime.UtcNow;
                 request.UpdatedBy                = user.UserName;
 
-                // clear approval
-                request.Approved = null;
+                // clear approval and submission
+                request.Approved        = null;
                 request.ApprovedComment = null;
-
-                // auto approve any un-exception requests
-                if (!request.Exception)
-                {
-                    request.Approved = true;
-                }
+                request.Submitted       = false;
+                request.SubmittedBy     = null;
+                request.SubmittedOn     = null;
 
                 // always create a history entry on save
                 CreateRequestHistory(request, course);
@@ -242,7 +239,7 @@ namespace tacos.mvc.Controllers
             await Save(model);
 
             // process submissions next
-            var requestsFound = new List<Request>();
+            var requestsNeedingApproval = new List<Request>();
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
                 // find request by id or name, or create a new one
@@ -270,8 +267,17 @@ namespace tacos.mvc.Controllers
                 request.SubmittedOn = now;
                 request.SubmittedBy = user.UserName;
 
-                // add request to list
-                requestsFound.Add(request);
+                // auto approve any un-exception requests
+                if (!request.Exception)
+                {
+                    request.Approved = true;
+                }
+
+                // add request to list if it needs approval
+                if (!request.Approved.HasValue)
+                {
+                    requestsNeedingApproval.Add(request);
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -279,7 +285,10 @@ namespace tacos.mvc.Controllers
             // send emails
             try
             {
-                await _emailService.SendSubmissionNotification(requestsFound);
+                if (requestsNeedingApproval.Any())
+                {
+                    await _emailService.SendSubmissionNotification(requestsNeedingApproval);
+                }
             }
             catch (Exception ex)
             {
