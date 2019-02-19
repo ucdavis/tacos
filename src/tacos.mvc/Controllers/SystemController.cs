@@ -10,7 +10,6 @@ using tacos.core;
 using tacos.core.Data;
 using tacos.core.Resources;
 using tacos.mvc.Models.SystemViewModels;
-using tacos.mvc.Resources;
 using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers

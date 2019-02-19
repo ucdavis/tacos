@@ -67,7 +67,7 @@ namespace tacos.mvc
                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
 
-            services.AddTransient<IEmailSender, EmailSender>();
+            // add render services
             services.AddTransient<IDirectorySearchService, IetWsSearchService>();
         }
 
