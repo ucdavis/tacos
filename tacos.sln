@@ -8,9 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "tacos.sql", "src\tacos.sql\tacos.sql.sqlproj", "{DB48B5AA-E1A9-43E1-B9FE-10058C2F6A0D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tacos.emails", "src\tacos.emails\tacos.emails.csproj", "{5B4C4F25-B68B-438D-A353-22F23D6F54F1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tacos.core", "src\tacos.core\tacos.core.csproj", "{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tacos.core", "src\tacos.core\tacos.core.csproj", "{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,10 +30,6 @@ Global
 		{DB48B5AA-E1A9-43E1-B9FE-10058C2F6A0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB48B5AA-E1A9-43E1-B9FE-10058C2F6A0D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DB48B5AA-E1A9-43E1-B9FE-10058C2F6A0D}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{5B4C4F25-B68B-438D-A353-22F23D6F54F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B4C4F25-B68B-438D-A353-22F23D6F54F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B4C4F25-B68B-438D-A353-22F23D6F54F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5B4C4F25-B68B-438D-A353-22F23D6F54F1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
