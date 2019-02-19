@@ -23,6 +23,8 @@ namespace tacos.mvc.services
         private readonly IMjmlServices _mjmlServices;
         private readonly TacoDbContext _dbContext;
 
+        private readonly Address _replyAddress = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
+
         public EmailService(IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext)
         {
             _emailSettings = emailSettings.Value;
@@ -31,8 +33,13 @@ namespace tacos.mvc.services
             _dbContext = dbContext;
         }
 
-        public async Task SendSubmissionNotification(IEnumerable<Request> requests)
+        public async Task SendSubmissionNotification(IReadOnlyList<Request> requests)
         {
+            if (!requests.Any())
+            {
+                return;
+            }
+
             // get approvers, specifically, penny
             var pennyUser = await _dbContext.Users.FindAsync("ph8335");
 
@@ -44,23 +51,24 @@ namespace tacos.mvc.services
 
             // add model data to email
             var engine = GetRazorEngine();
-            var prehtml = await engine.CompileRenderAsync("./Emails/SubmissionNotification.cshtml", model);
+            var prehtml = await engine.CompileRenderAsync("SubmissionNotification.cshtml", model);
 
             // convert email to real html
             var result = await _mjmlServices.Render(prehtml);
 
             // create transmission
+            
             var transmission = new Transmission()
             {
                 Content = new Content()
                 {
                     Subject = "New Pending Approvals on TACOS",
                     Html = result.Html,
-                    From = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification"),
+                    From = _replyAddress,
                 },
                 Recipients = new List<Recipient>()
                 {
-                    new Recipient() {Address = new Address("jpknoll@ucdavis.edu")},
+                    new Recipient() {Address = GetAddressFromUser(pennyUser)},
                 },
             };
 
@@ -86,7 +94,7 @@ namespace tacos.mvc.services
 
             // add model data to email
             var engine = GetRazorEngine();
-            var prehtml = await engine.CompileRenderAsync("./Emails/ApprovalNotification.cshtml", model);
+            var prehtml = await engine.CompileRenderAsync("ApprovalNotification.cshtml", model);
 
             // convert email to real html
             var result = await _mjmlServices.Render(prehtml);
@@ -103,11 +111,11 @@ namespace tacos.mvc.services
                 {
                     Subject = subject,
                     Html = result.Html,
-                    From = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification"),
+                    From = _replyAddress,
                 },
                 Recipients = new List<Recipient>()
                 {
-                    new Recipient() {Address = new Address("jpknoll@ucdavis.edu")},
+                    new Recipient() {Address = GetAddressFromUser(recipient)},
                 },
             };
 
@@ -117,7 +125,7 @@ namespace tacos.mvc.services
 
         private static RazorLightEngine GetRazorEngine()
         {
-            var path = Path.GetFullPath(".");
+            var path = Path.GetFullPath("./Emails");
 
             var engine = new RazorLightEngineBuilder()
                 .UseFilesystemProject(path)
@@ -132,11 +140,17 @@ namespace tacos.mvc.services
             var client = new Client(_emailSettings.ApiKey);
             return client;
         }
+
+        private Address GetAddressFromUser(User user)
+        {
+            //return new Address(user.Email, user.Name);
+            return new Address("jpknoll@ucdavis.edu");
+        }
     }
 
     public interface IEmailService
     {
-        Task SendSubmissionNotification(IEnumerable<Request> requests);
+        Task SendSubmissionNotification(IReadOnlyList<Request> requests);
 
         Task SendApprovalNotification(Request request);
     }
