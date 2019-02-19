@@ -1,5 +1,6 @@
 using System;
 using AspNetCore.Security.CAS;
+using Mjml.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -68,6 +69,11 @@ namespace tacos.mvc
             });
 
             // add render services
+            services.AddMjmlServices(o =>
+            {
+                o.DefaultBeautify = true;
+            });
+
             services.AddTransient<IDirectorySearchService, IetWsSearchService>();
         }
 
