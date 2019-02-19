@@ -201,7 +201,7 @@ namespace tacos.mvc.Controllers
                 request.CalculatedTotal          = m.CalculatedTotal;
                 request.AnnualizedTotal          = m.AnnualizedTotal;
                 request.UpdatedOn                = DateTime.UtcNow;
-                request.UpdatedBy                = user.Name;
+                request.UpdatedBy                = user.UserName;
 
                 // clear approval
                 request.Approved = null;
@@ -268,7 +268,7 @@ namespace tacos.mvc.Controllers
                 // submit request
                 request.Submitted = true;
                 request.SubmittedOn = now;
-                request.SubmittedBy = user.Name;
+                request.SubmittedBy = user.UserName;
 
                 // add request to list
                 requestsFound.Add(request);
