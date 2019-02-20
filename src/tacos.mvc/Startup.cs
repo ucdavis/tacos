@@ -73,7 +73,15 @@ namespace tacos.mvc
             // add render services
             services.AddMjmlServices(o =>
             {
-                o.DefaultBeautify = true;
+                if (Environment.IsDevelopment())
+                {
+                    o.DefaultBeautify = true;
+                }
+                else
+                {
+                    o.DefaultMinify = true;
+                    o.RunNpmInstall = true;
+                }
             });
 
             services.AddTransient<IEmailService, EmailService>();
