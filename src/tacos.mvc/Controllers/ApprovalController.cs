@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tacos.data;
+using Serilog;
+using tacos.core;
 using tacos.mvc.Models.ApprovalViewModels;
+using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers
 {
@@ -13,10 +15,12 @@ namespace tacos.mvc.Controllers
     public class ApprovalController : ApplicationController
     {
         private readonly TacoDbContext _dbContext;
+        private readonly IEmailService _emailService;
 
-        public ApprovalController(TacoDbContext dbContext)
+        public ApprovalController(TacoDbContext dbContext, IEmailService emailService)
         {
             _dbContext = dbContext;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Index()
@@ -46,6 +50,16 @@ namespace tacos.mvc.Controllers
             request.ApprovedComment = model.Comment;
 
             await _dbContext.SaveChangesAsync();
+
+            // send emails
+            try
+            {
+                await _emailService.SendApprovalNotification(request);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception throw while sending notification email.");
+            }
 
             return RedirectToAction("Index");
         }

@@ -1,5 +1,3 @@
-using tacos.data;
-using tacos.mvc.Models;
 
 namespace tacos.mvc.Models
 {

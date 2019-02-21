@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using tacos.mvc.Data;
+using tacos.core.Data;
 
 namespace tacos.mvc.Models.SystemViewModels
 {

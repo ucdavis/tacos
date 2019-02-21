@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using tacos.mvc.Data;
 
-namespace tacos.data
+namespace tacos.core.Data
 {
     // request for a specific course
     public class Request

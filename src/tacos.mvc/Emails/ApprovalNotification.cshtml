@@ -1,0 +1,60 @@
+@using RazorLight
+@inherits TemplatePage<tacos.emails.models.ApprovalNotificationViewModel>
+
+@{
+    Layout = "_EmailLayout";
+    var decision = Model.Request.Approved.Value ? "Approved" : "Denied";
+}
+
+
+<mj-section background-color="#356cc7" padding-bottom="0px" padding-top="0">
+    <mj-column width="100%">
+        <mj-text align="center" font-size="13px" color="#ABCDEA" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="18px" padding-top="28px">
+            HELLO
+            <p style="font-size:16px; color:white">@Model.RecipientName</p>
+        </mj-text>
+    </mj-column>
+</mj-section>
+<mj-section background-color="#356cc7" padding-bottom="5px" padding-top="0">
+    <mj-column width="100%">
+        <mj-divider border-color="#ffffff" border-width="2px" border-style="solid" padding-left="20px" padding-right="20px" padding-bottom="0px" padding-top="0"></mj-divider>
+        <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="28px" padding-top="28px">
+            <span style="font-size:20px; font-weight:bold">Your request for @Model.Request.CourseNumber has been @decision.</span>
+            <br />
+            <span style="font-size:15px">Please find details below.</span>
+        </mj-text>
+    </mj-column>
+</mj-section>
+<mj-section background-color="#568feb" padding-bottom="15px">
+    <mj-column>
+        <mj-text align="center" color="#FFF" font-size="15px" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="0px"><strong>Course Number</strong></mj-text>
+        <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="20px" padding-top="10px">@Model.Request.CourseNumber</mj-text>
+    </mj-column>
+    <mj-column>
+        <mj-text align="center" color="#FFF" font-size="15px" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="0px"><strong>Course Type</strong></mj-text>
+        <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="20px" padding-top="10px">@Model.Request.CourseType</mj-text>
+    </mj-column>
+    <mj-column>
+        <mj-text align="center" color="#FFF" font-size="15px" font-family="Ubuntu, Helvetica, Arial, sans-serif" padding-left="25px" padding-right="25px" padding-bottom="0px"><strong>Approved Amount</strong></mj-text>
+        <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="20px" padding-top="10px">@Model.Request.ApprovedTotal</mj-text>
+    </mj-column>
+</mj-section>
+@if (!Model.Request.Approved.Value)
+{
+    <mj-section background-color="#356cc7" padding-bottom="5px" padding-top="0">
+        <mj-column width="100%">
+            <mj-divider border-color="#ffffff" border-width="2px" border-style="solid" padding-left="20px" padding-right="20px" padding-bottom="0px" padding-top="0"></mj-divider>
+            <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="28px" padding-top="28px">
+                <span style="font-size:20px; font-weight:bold">Comment:</span>
+                <br />
+                <span style="font-size:15px">@Model.Request.ApprovedComment</span>
+            </mj-text>
+        </mj-column>
+    </mj-section>
+}
+<mj-section background-color="#356CC7" padding-bottom="20px" padding-top="20px">
+    <mj-column>
+        <mj-button background-color="#ffae00" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="https://tacos.ucdavis.edu/requests/@Model.Request.Id" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">View My Request</mj-button>
+    </mj-column>
+</mj-section>
+        

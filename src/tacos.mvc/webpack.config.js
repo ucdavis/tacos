@@ -4,7 +4,7 @@ const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const bundleOutputDir = './wwwroot/dist';
@@ -87,7 +87,7 @@ module.exports = env => {
         },
         optimization: {
             minimizer: isDevBuild ? [] : [
-                new UglifyJsPlugin({
+                new TerserPlugin({
                     cache: true,
                     parallel: true,
                     sourceMap: true,

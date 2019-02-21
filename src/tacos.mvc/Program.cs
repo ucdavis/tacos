@@ -4,7 +4,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using tacos.data;
+using tacos.core;
+using tacos.core.Data;
 
 namespace tacos.mvc
 {

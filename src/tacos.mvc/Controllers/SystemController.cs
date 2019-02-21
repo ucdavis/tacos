@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tacos.data;
-using tacos.mvc.Data;
+using tacos.core;
+using tacos.core.Data;
+using tacos.core.Resources;
 using tacos.mvc.Models.SystemViewModels;
-using tacos.mvc.Resources;
 using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers

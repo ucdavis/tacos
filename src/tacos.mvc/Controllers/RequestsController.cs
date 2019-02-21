@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tacos.data;
-using tacos.mvc.Data;
+using Serilog;
+using tacos.core;
+using tacos.core.Data;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models;
+using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers
 {
@@ -16,11 +18,13 @@ namespace tacos.mvc.Controllers
     {
         private readonly TacoDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailService _emailService;
 
-        public RequestsController(TacoDbContext context, UserManager<User> userManager)
+        public RequestsController(TacoDbContext context, UserManager<User> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // list submissions
@@ -197,17 +201,14 @@ namespace tacos.mvc.Controllers
                 request.CalculatedTotal          = m.CalculatedTotal;
                 request.AnnualizedTotal          = m.AnnualizedTotal;
                 request.UpdatedOn                = DateTime.UtcNow;
-                request.UpdatedBy                = user.Name;
+                request.UpdatedBy                = user.UserName;
 
-                // clear approval
-                request.Approved = null;
+                // clear approval and submission
+                request.Approved        = null;
                 request.ApprovedComment = null;
-
-                // auto approve any un-exception requests
-                if (!request.Exception)
-                {
-                    request.Approved = true;
-                }
+                request.Submitted       = false;
+                request.SubmittedBy     = null;
+                request.SubmittedOn     = null;
 
                 // always create a history entry on save
                 CreateRequestHistory(request, course);
@@ -238,6 +239,7 @@ namespace tacos.mvc.Controllers
             await Save(model);
 
             // process submissions next
+            var requestsNeedingApproval = new List<Request>();
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
                 // find request by id or name, or create a new one
@@ -263,10 +265,35 @@ namespace tacos.mvc.Controllers
                 // submit request
                 request.Submitted = true;
                 request.SubmittedOn = now;
-                request.SubmittedBy = user.Name;
+                request.SubmittedBy = user.UserName;
+
+                // auto approve any un-exception requests
+                if (!request.Exception)
+                {
+                    request.Approved = true;
+                }
+
+                // add request to list if it needs approval
+                if (!request.Approved.HasValue)
+                {
+                    requestsNeedingApproval.Add(request);
+                }
             }
 
             await _context.SaveChangesAsync();
+
+            // send emails
+            try
+            {
+                if (requestsNeedingApproval.Any())
+                {
+                    await _emailService.SendSubmissionNotification(requestsNeedingApproval);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception throw while sending notification email.");
+            }
 
             return Json(new { success = true });
         }

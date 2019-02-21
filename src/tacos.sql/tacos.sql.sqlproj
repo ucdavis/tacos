@@ -80,5 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="comparisons\SqlSchemaCompare_Localhost.scmp" />
+    <None Include="comparisons\SqlSchemaCompare_Production.scmp" />
   </ItemGroup>
 </Project>
