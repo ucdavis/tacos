@@ -143,8 +143,11 @@ namespace tacos.mvc.services
 
         private Address GetAddressFromUser(User user)
         {
-            //return new Address(user.Email, user.Name);
+#if DEBUG
             return new Address("jpknoll@ucdavis.edu");
+#else
+            return new Address(user.Email, user.Name);
+#endif
         }
     }
 
