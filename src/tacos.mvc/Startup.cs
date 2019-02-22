@@ -75,12 +75,13 @@ namespace tacos.mvc
             {
                 if (Environment.IsDevelopment())
                 {
+                    o.DefaultKeepComments = true;
                     o.DefaultBeautify = true;
                 }
                 else
                 {
+                    o.DefaultKeepComments = false;
                     o.DefaultMinify = true;
-                    o.RunNpmInstall = true;
                 }
             });
 

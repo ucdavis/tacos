@@ -12,7 +12,6 @@
     "test": "karma start"
   },
   "dependencies": {
-    "mjml": "^4.3.1",
     "pretty-checkbox": "^3.0.3",
     "query-string": "^6.2.0",
     "react": "^16.3.0",
