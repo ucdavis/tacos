@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using tacos.data;
+using tacos.core.Data;
 
 namespace Test.Helpers
 {

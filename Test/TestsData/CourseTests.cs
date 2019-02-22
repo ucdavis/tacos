@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using tacos.data;
+using System.Collections.Generic;
+using tacos.core.Data;
 using TestHelpers.Helpers;
 using Xunit;
 
