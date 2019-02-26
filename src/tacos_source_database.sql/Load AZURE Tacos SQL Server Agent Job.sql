@@ -270,7 +270,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
       ,[Effective]
 	)
   SELECT 
-       [Course]
+       REPLACE([Course],'' '','''')
       ,[SubjectCode]
       ,[CourseNumber]
       ,[CrossListing]
