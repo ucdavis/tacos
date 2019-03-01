@@ -113,7 +113,7 @@ module.exports = env => {
             ] : [
                 // Plugins that apply in production builds only
                 new MiniCssExtractPlugin({
-                    filename: 'site.min.css',
+                    filename: '[name].min.css',
                 }),
             ],
             // Webpack Bundle Analyzer
