@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.Identity;
 using Mjml.AspNetCore;
 using Microsoft.Extensions.Options;
 using RazorLight;
 using SparkPost;
 using tacos.core;
 using tacos.core.Data;
+using tacos.core.Resources;
 using tacos.emails.models;
 
 using Request = tacos.core.Data.Request;
@@ -22,15 +23,17 @@ namespace tacos.mvc.services
 
         private readonly IMjmlServices _mjmlServices;
         private readonly TacoDbContext _dbContext;
+        private readonly UserManager<User> _userManager;
 
         private readonly Address _replyAddress = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
 
-        public EmailService(IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext)
+        public EmailService(IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
         {
             _emailSettings = emailSettings.Value;
 
             _mjmlServices = mjmlServices;
             _dbContext = dbContext;
+            _userManager = userManager;
         }
 
         public async Task SendSubmissionNotification(IReadOnlyList<Request> requests)
@@ -40,12 +43,12 @@ namespace tacos.mvc.services
                 return;
             }
 
-            // get approvers, specifically, penny
-            var pennyUser = await _dbContext.Users.FindAsync("ph8335");
+            // get approvers
+            var admins = await _userManager.GetUsersInRoleAsync(RoleCodes.Admin);
 
             var model = new SubmissionNotificationViewModel()
             {
-                RecipientName = pennyUser.Name,
+                RecipientName = "Penny",
                 Requests = requests.ToList(),
             };
 
@@ -66,10 +69,7 @@ namespace tacos.mvc.services
                     Html = result.Html,
                     From = _replyAddress,
                 },
-                Recipients = new List<Recipient>()
-                {
-                    new Recipient() {Address = GetAddressFromUser(pennyUser)},
-                },
+                Recipients = new List<Recipient>(admins.Select(a => new Recipient() { Address = GetAddressFromUser(a) })),
             };
 
             var client = GetSparkpostClient();
