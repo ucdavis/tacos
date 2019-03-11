@@ -43,7 +43,10 @@
                         {
                             <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
                                 <input type="hidden" name="approved" value="true" />
-                                <button type="submit" class="btn btn-primary mb-2">Approve</button>
+                                <button type="submit" class="btn btn-primary mb-2 approval-form-submit">
+                                    <span class="approval-form-submit-text">Approve</span>
+                                    <span class="approval-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
+                                </button>
                             </form>
                             <button class="btn btn-primary mb-2" data-toggle="modal" data-target="#denialModal">Deny</button>
                         }
@@ -81,7 +84,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Deny Exception</button>
+                    <button type="submit" class="btn btn-primary deny-form-submit">
+                        <span class="deny-form-submit-text">Deny Exception</span>
+                        <span class="deny-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -127,5 +133,21 @@
                 // update url with id
                 $('#denialForm').attr('action', url);
             });
+
+        $('.approval-form-submit').click(function () {
+            // disable all buttons at the same level
+            $(this).parents('#requestTable tr td').find('button').attr('disabled', true);
+
+            $(this).find('.approval-form-submit-text').hide();
+            $(this).find('.approval-form-submit-loading-icon').show();
+        });
+
+        $('.deny-form-submit').click(function () {
+            // disable all buttons at the same level
+            $(this).parent().find('button').attr('disabled', true);
+
+            $(this).find('.deny-form-submit-text').hide();
+            $(this).find('.deny-form-submit-loading-icon').show();
+        });
     </script>
 }
