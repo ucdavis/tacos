@@ -10,12 +10,14 @@ interface IProps {
 
     total: number;
     pending: number;
+
+    isProcessing: boolean;
 }
 
 // the overall summary of totals, plus action/submit button
 export default class Summary extends React.PureComponent<IProps, {}> {
     public render() {
-        const { total, pending } = this.props;
+        const { total, pending, isProcessing } = this.props;
 
         return (
             <div className="navbar navbar-default navbar-expand-xs fixed-bottom" role="navigation">
@@ -30,7 +32,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                                 <span className="mr-3">{pending} Pending Changes</span>
                             }
                             {  pending > 0 &&
-                                <button className="btn btn-danger" onClick={this.props.onReset}>
+                                <button disabled={isProcessing} className="btn btn-danger" onClick={this.props.onReset}>
                                     Reset
                                 </button>
                             }
@@ -38,7 +40,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                             <button
                                 className="btn btn-primary"
                                 id="submit-button"
-                                disabled={!this.props.canSave}
+                                disabled={!this.props.canSave || isProcessing}
                                 onClick={this.props.onSave}
                             >
                                 Save Changes
@@ -48,7 +50,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                             <button
                                 className="btn btn-primary"
                                 id="submit-button"
-                                disabled={!this.props.canSubmit}
+                                disabled={!this.props.canSubmit || isProcessing}
                                 onClick={this.props.onSubmit}
                             >
                                 Submit for Approval
