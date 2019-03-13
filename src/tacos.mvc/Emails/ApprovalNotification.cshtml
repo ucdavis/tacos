@@ -47,7 +47,17 @@
             <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="28px" padding-top="28px">
                 <span style="font-size:20px; font-weight:bold">Comment:</span>
                 <br />
-                <span style="font-size:15px">@Model.Request.ApprovedComment</span>
+                <span style="font-size: 15px">
+                
+                    @if (!string.IsNullOrWhiteSpace(Model.Request.ApprovedComment))
+                    {
+                        <text>@Model.Request.ApprovedComment</text>
+                    }
+                    else
+                    {
+                        <text>No comment provided.</text>
+                    }
+                </span>
             </mj-text>
         </mj-column>
     </mj-section>
