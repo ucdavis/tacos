@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Mjml.AspNetCore;
 using Microsoft.Extensions.Options;
@@ -19,6 +20,8 @@ namespace tacos.mvc.services
 {
     public class EmailService : IEmailService
     {
+        private readonly bool _isDevelopment;
+
         private readonly SparkpostSettings _emailSettings;
 
         private readonly IMjmlServices _mjmlServices;
@@ -27,8 +30,10 @@ namespace tacos.mvc.services
 
         private readonly Address _replyAddress = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
 
-        public EmailService(IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
+        public EmailService(IHostingEnvironment environment, IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
         {
+            _isDevelopment = environment.IsDevelopment();
+
             _emailSettings = emailSettings.Value;
 
             _mjmlServices = mjmlServices;
@@ -143,11 +148,12 @@ namespace tacos.mvc.services
 
         private Address GetAddressFromUser(User user)
         {
-#if DEBUG
-            return new Address("jpknoll@ucdavis.edu");
-#else
+            if (_isDevelopment)
+            {
+                return new Address("jpknoll@ucdavis.edu");
+            }
+
             return new Address(user.Email, user.Name);
-#endif
         }
     }
 

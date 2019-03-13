@@ -47,14 +47,24 @@
             <mj-text align="center" color="#FFF" font-size="13px" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="28px" padding-top="28px">
                 <span style="font-size:20px; font-weight:bold">Comment:</span>
                 <br />
-                <span style="font-size:15px">@Model.Request.ApprovedComment</span>
+                <span style="font-size: 15px">
+                
+                    @if (!string.IsNullOrWhiteSpace(Model.Request.ApprovedComment))
+                    {
+                        <text>@Model.Request.ApprovedComment</text>
+                    }
+                    else
+                    {
+                        <text>No comment provided.</text>
+                    }
+                </span>
             </mj-text>
         </mj-column>
     </mj-section>
 }
 <mj-section background-color="#356CC7" padding-bottom="20px" padding-top="20px">
     <mj-column>
-        <mj-button background-color="#ffae00" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="https://tacos.ucdavis.edu/requests/@Model.Request.Id" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">View My Request</mj-button>
+        <mj-button background-color="#ffae00" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="https://tacos.ucdavis.edu/requests/details/@Model.Request.Id" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">View My Request</mj-button>
     </mj-column>
 </mj-section>
         

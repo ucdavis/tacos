@@ -4,29 +4,29 @@
 <div class="container-fluid my-4">
     <table class="table table-bordered" id="requestTable">
         <thead>
-        <tr>
-            <th>Department</th>
-            <th>Submitter</th>
-            <th>Date</th>
-            <th>Course</th>
-            <th>Course Type</th>
-            <th>Average Sections</th>
-            <th>Average Enrollment</th>
-            <th>Request Type</th>
-            <th>Exception Reason</th>
-            <th>Exception TAs per course</th>
-            <th>Approved TAs per course</th>
-            <th>Approved Annualized Total</th>
-        </tr>
+            <tr>
+                <th>Department</th>
+                <th>Course</th>
+                <th>Submitter</th>
+                <th>Date</th>
+                <th>Course Type</th>
+                <th>Average Sections</th>
+                <th>Average Enrollment</th>
+                <th>Request Type</th>
+                <th>Exception Reason</th>
+                <th>Exception TAs per course</th>
+                <th>Approved TAs per course</th>
+                <th>Approved Annualized Total</th>
+            </tr>
         </thead>
         <tbody>
         @foreach(var request in Model)
         {
             <tr>
                 <td>@request.Department.Code</td>
+                <td><a asp-controller="Requests" asp-action="Details" asp-route-id="@request.Id">@request.CourseNumber</a></td>
                 <td>@request.UpdatedBy</td>
                 <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
-                <td>@request.CourseNumber</td>
                 <td>@CourseInfo.Types[request.CourseType]</td>
                 <td>@request.Course.AverageSectionsPerCourse</td>
                 <td>@request.Course.AverageEnrollment</td>

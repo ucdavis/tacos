@@ -26,6 +26,8 @@ interface IState {
     isCourseCreateOpen: boolean;
     createCourseIndex: number | undefined;
     createCourseModel: ICourse | undefined;
+
+    isProcessing: boolean;
 }
 
 export default class SubmissionContainer extends React.Component<IProps, IState> {
@@ -44,6 +46,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             isCourseCreateOpen: false,
             createCourseIndex: undefined,
             createCourseModel: undefined,
+            isProcessing: false,
         };
     }
 
@@ -100,7 +103,9 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const pending = requests.filter(r => r.isDirty).length;
 
         const isValid = this.checkIsValid();
+
         const canSave = pending > 0 && isValid;
+        const canSubmit = isValid;
 
         return (
             <div className="pb-4">
@@ -131,12 +136,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 />
                 <Summary
                     canSave={canSave}
-                    canSubmit={isValid}
+                    canSubmit={canSubmit}
                     total={this.submissionTotal()}
                     pending={pending}
                     onSave={this.save}
                     onSubmit={this.submit}
                     onReset={this.onReset}
+                    isProcessing={this.state.isProcessing}
                 />
             </div>
         );
@@ -199,6 +205,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             if (!isValid) {
                 return;
             }
+
+            // lock down the submission button
+            this.setState({
+                isProcessing: true,
+            });
 
             // create the submission
             const submission: ISubmission = {
