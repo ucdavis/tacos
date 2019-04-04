@@ -1,11 +1,11 @@
 USE [msdb]
 GO
 
-/****** Object:  Job [Load AZURE Tacos]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Job [Load AZURE Tacos]    Script Date: 4/4/2019 4:08:46 PM ******/
 BEGIN TRANSACTION
 DECLARE @ReturnCode INT
 SELECT @ReturnCode = 0
-/****** Object:  JobCategory [[Uncategorized (Local)]]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  JobCategory [[Uncategorized (Local)]]    Script Date: 4/4/2019 4:08:46 PM ******/
 IF NOT EXISTS (SELECT name FROM msdb.dbo.syscategories WHERE name=N'[Uncategorized (Local)]' AND category_class=1)
 BEGIN
 EXEC @ReturnCode = msdb.dbo.sp_add_category @class=N'JOB', @type=N'LOCAL', @name=N'[Uncategorized (Local)]'
@@ -26,7 +26,7 @@ EXEC @ReturnCode =  msdb.dbo.sp_add_job @job_name=N'Load AZURE Tacos',
 		@owner_login_name=N'sa', 
 		@notify_email_operator_name=N'apprequests', @job_id = @jobId OUTPUT
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Make a local copy of BIA DESII_Courses table]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Make a local copy of BIA DESII_Courses table]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Make a local copy of BIA DESII_Courses table', 
 		@step_id=1, 
 		@cmdexec_success_code=0, 
@@ -50,7 +50,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Make a l
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Make a local copy of CourseDescription table]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Make a local copy of CourseDescription table]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Make a local copy of CourseDescription table', 
 		@step_id=2, 
 		@cmdexec_success_code=0, 
@@ -99,7 +99,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Make a l
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Copy DESII Course data for the last two full academic years.]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Copy DESII Course data for the last two full academic years.]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Copy DESII Course data for the last two full academic years.', 
 		@step_id=3, 
 		@cmdexec_success_code=0, 
@@ -124,8 +124,8 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Copy DES
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Truncate and repopulate the AggregatedCourses table non-cross-listed courses]    Script Date: 10/19/2018 3:15:37 PM ******/
-EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and repopulate the AggregatedCourses table non-cross-listed courses', 
+/****** Object:  Step [Truncate and repopulate the AggregatedCourses table courses]    Script Date: 4/4/2019 4:08:46 PM ******/
+EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and repopulate the AggregatedCourses table courses', 
 		@step_id=4, 
 		@cmdexec_success_code=0, 
 		@on_success_action=3, 
@@ -143,35 +143,13 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 -- the non-cross-listed courses:
 
 	INSERT INTO [dbo].[AggregatedCourses] (SubjectCode, CourseNumber, DeptName, Number, Name, AverageEnrollment, AverageSectionsPerCourse, TimesOfferedPerYear, IsCrossListed)
-	SELECT * FROM [dbo].[udf_GetCombinedDataForNonCrossListedCourses]()', 
+	SELECT * FROM [dbo].[udf_GetCombinedDataForAllCourses]()', 
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Delete Cross-listed courses from the AggregatedCourses table and repopulate with cross-listed courses]    Script Date: 10/19/2018 3:15:37 PM ******/
-EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Delete Cross-listed courses from the AggregatedCourses table and repopulate with cross-listed courses', 
-		@step_id=5, 
-		@cmdexec_success_code=0, 
-		@on_success_action=3, 
-		@on_success_step_id=0, 
-		@on_fail_action=2, 
-		@on_fail_step_id=0, 
-		@retry_attempts=0, 
-		@retry_interval=0, 
-		@os_run_priority=0, @subsystem=N'TSQL', 
-		@command=N'-- Delete Cross-listed courses from the AggregatedCourses table:
-
-	DELETE FROM [dbo].[AggregatedCourses] WHERE IsCrossListed = 1
-
--- Repopulate with aggregated data for the cross-listed courses:
-
-	INSERT INTO [dbo].[AggregatedCourses] (SubjectCode, CourseNumber, DeptName, Number, Name, AverageEnrollment, AverageSectionsPerCourse, TimesOfferedPerYear, IsCrossListed)
-	SELECT * FROM [dbo].[udf_GetCombinedDataForCrossListedCourses]()', 
-		@database_name=N'Tacos', 
-		@flags=0
-IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Truncate and reload Courses table with aggregated data, plus other active courses from course catalog:]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Truncate and reload Courses table with aggregated data, plus other active courses from course catalog:]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and reload Courses table with aggregated data, plus other active courses from course catalog:', 
-		@step_id=6, 
+		@step_id=5, 
 		@cmdexec_success_code=0, 
 		@on_success_action=3, 
 		@on_success_step_id=0, 
@@ -194,9 +172,9 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Truncate and Reload AZURE Tacos Courses]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Truncate and Reload AZURE Tacos Courses]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE Tacos Courses', 
-		@step_id=7, 
+		@step_id=6, 
 		@cmdexec_success_code=0, 
 		@on_success_action=3, 
 		@on_success_step_id=0, 
@@ -232,9 +210,9 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Truncate and Reload AZURE CourseDescription table]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Truncate and Reload AZURE CourseDescription table]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE CourseDescription table', 
-		@step_id=8, 
+		@step_id=7, 
 		@cmdexec_success_code=0, 
 		@on_success_action=3, 
 		@on_success_step_id=0, 
@@ -295,9 +273,9 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Truncate and Reload AZURE DESII_Courses table with data for all terms within the past four academic years]    Script Date: 10/19/2018 3:15:37 PM ******/
+/****** Object:  Step [Truncate and Reload AZURE DESII_Courses table with data for all terms within the past four academic years]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE DESII_Courses table with data for all terms within the past four academic years', 
-		@step_id=9, 
+		@step_id=8, 
 		@cmdexec_success_code=0, 
 		@on_success_action=1, 
 		@on_success_step_id=0, 
@@ -371,4 +349,5 @@ QuitWithRollback:
     IF (@@TRANCOUNT > 0) ROLLBACK TRANSACTION
 EndSave:
 GO
+
 
