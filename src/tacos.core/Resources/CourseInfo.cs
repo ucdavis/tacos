@@ -6,8 +6,8 @@ namespace tacos.core.Resources
     {
         public static readonly Dictionary<string, string> Types =
             new Dictionary<string, string> {
-                { "STD", "Standard lecture" },
-                { "WRT", "Writing intensive lecture" },
+                { "STD", "Standard lecture with sections" },
+                { "WRT", "Writing intensive lecture with sections" },
                 { "LAB", "Lab or Studio classes" },
                 { "FLD", "Field classes" },
                 { "AUTO", "Lecture only, automated grading" },

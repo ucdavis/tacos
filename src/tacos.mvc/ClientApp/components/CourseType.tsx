@@ -15,16 +15,9 @@ export default class CourseType extends React.PureComponent<IProps, {}> {
                     value={this.props.courseType}
                     onChange={this.onChange}
                 >
-                    <option value="STD">Standard lecture</option>
-                    <option value="WRT">Writing intensive lecture</option>
-                    <option value="LAB">Lab or Studio classes</option>
-                    <option value="FLD">Field classes</option>
-                    <option value="AUTO">Lecture only, automated grading</option>
-                    <option value="MAN">Lecture only, manual grading</option>
-                    <option value="MODW">Lecture only, moderate writing</option>
-                    <option value="INT">
-                        Lecture only, writing intensive or substantial project
-                    </option>
+                    {CourseTypeOptions.map(c => (
+                        <option key={c[0]} value={c[0]}>{c[1]}</option>
+                    ))}
                 </select>
             </div>
         );
@@ -34,3 +27,14 @@ export default class CourseType extends React.PureComponent<IProps, {}> {
         this.props.onChange(e.target.value);
     };
 }
+
+export const CourseTypeOptions = [
+    [ "STD", "Standard lecture with sections" ],
+    [ "WRT", "Writing intensive lecture with sections" ],
+    [ "LAB", "Lab or Studio classes" ],
+    [ "FLD", "Field classes" ],
+    [ "AUTO", "Lecture only, automated grading" ],
+    [ "MAN", "Lecture only, manual grading" ],
+    [ "MODW", "Lecture only, moderate writing" ],
+    [ "INT", "Lecture only, writing intensive or substantial project" ]
+];
