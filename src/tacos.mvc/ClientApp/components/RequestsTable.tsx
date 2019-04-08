@@ -121,13 +121,13 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 filterable: true,
             },
             {
-                Header: "TAs per course",
+                Header: "TA % per course offering",
                 accessor: "calculatedTotal",
                 className: "text-center",
                 Cell: (row: ITypedRowInfo) => row.original.calculatedTotal.toFixed(3),
             },
             {
-                Header: "Annual TA FTE",
+                Header: "Annualized TA FTE",
                 accessor: "annualizedTotal",
                 className: "text-center",
                 Cell: (row: ITypedRowInfo) => row.original.annualizedTotal.toFixed(3),
