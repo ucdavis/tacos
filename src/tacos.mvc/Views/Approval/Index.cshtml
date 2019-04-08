@@ -32,7 +32,7 @@
                     <td>@request.CourseNumber</td>
                     <td>@CourseInfo.Types[request.CourseType]</td>
                     <td>@request.Course.AverageSectionsPerCourse</td>
-                    <td>@request.Course.AverageEnrollment</td>
+                    <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
                     <td>@request.ExceptionReason</td>
                     <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
