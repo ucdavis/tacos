@@ -15,9 +15,9 @@
                 <th>Average Enrollment</th>
                 <th>Request Type</th>
                 <th>Exception Reason</th>
-                <th>Exception TAs per course</th>
-                <th>Approved TAs per course</th>
-                <th>Approved Annualized Total</th>
+                <th>Exception TA % per course</th>
+                <th>Approved TA % per course</th>
+                <th>Approved Annualized TA FTE</th>
                 <th></th>
             </tr>
         </thead>
@@ -32,7 +32,7 @@
                     <td>@request.CourseNumber</td>
                     <td>@CourseInfo.Types[request.CourseType]</td>
                     <td>@request.Course.AverageSectionsPerCourse</td>
-                    <td>@request.Course.AverageEnrollment</td>
+                    <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
                     <td>@CourseInfo.Requests[request.RequestType]</td>
                     <td>@request.ExceptionReason</td>
                     <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>

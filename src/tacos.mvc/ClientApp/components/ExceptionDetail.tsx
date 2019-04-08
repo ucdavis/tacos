@@ -41,7 +41,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         return (
             <div className="exceptionRow">
                 <p>
-                    <b>Proposed number of TAs per course</b>
+                    <b>Proposed TA % per course offering</b>
                 </p>
                 <div className="exceptionRowComponents">{this.renderExceptionTotal()}</div>
                 <p>

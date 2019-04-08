@@ -3,7 +3,7 @@ import * as React from "react";
 import ReactTable, { Column, CellInfo, RowInfo, Filter } from "react-table";
 
 import CourseNumber from "./CourseNumber";
-import CourseType from "./CourseType";
+import CourseType, { CourseTypeOptions } from "./CourseType";
 import Exception from "./Exception";
 import ExceptionDetail from "./ExceptionDetail";
 import RequestType from "./RequestType";
@@ -121,13 +121,13 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 filterable: true,
             },
             {
-                Header: "TAs per course",
+                Header: "TA % per course offering",
                 accessor: "calculatedTotal",
                 className: "text-center",
                 Cell: (row: ITypedRowInfo) => row.original.calculatedTotal.toFixed(3),
             },
             {
-                Header: "Annual TA FTE",
+                Header: "Annualized TA FTE",
                 accessor: "annualizedTotal",
                 className: "text-center",
                 Cell: (row: ITypedRowInfo) => row.original.annualizedTotal.toFixed(3),
@@ -321,14 +321,9 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                     value={value}
                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
                 >
-                    <option value="STD">Standard lecture</option>
-                    <option value="WRT">Writing intensive lecture</option>
-                    <option value="LAB">Lab or Studio classes</option>
-                    <option value="FLD">Field classes</option>
-                    <option value="AUTO">Lecture only, automated grading</option>
-                    <option value="MAN">Lecture only, manual grading</option>
-                    <option value="MODW">Lecture only, moderate writing</option>
-                    <option value="INT">Lecture only, writing intensive or substantial project</option>
+                    {CourseTypeOptions.map(c => (
+                        <option key={c[0]} value={c[0]}>{c[1]}</option>
+                    ))}
                     <option value="">Show All</option>
                 </select>
             </div>
