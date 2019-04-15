@@ -24,7 +24,7 @@ interface IState {
     requests: IRequest[];
 
     isCourseCreateOpen: boolean;
-    createCourseIndex: number | undefined;
+    createCourseIndex: number;
     createCourseModel: ICourse | undefined;
 
     isProcessing: boolean;
@@ -44,7 +44,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.state = {
             requests,
             isCourseCreateOpen: false,
-            createCourseIndex: undefined,
+            createCourseIndex: -1,
             createCourseModel: undefined,
             isProcessing: false,
         };
@@ -433,7 +433,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     private onCloseCourseCreate = () => {
         this.setState({
             isCourseCreateOpen: false,
-            createCourseIndex: undefined,
+            createCourseIndex: -1,
             createCourseModel: undefined,
         });
     }
@@ -441,7 +441,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     private onCourseCreate = (course: ICourse)  => {
         const { requests, createCourseIndex } = this.state;
 
-        if (!createCourseIndex) {
+        if (createCourseIndex < 0) {
             return;
         }
 
@@ -450,7 +450,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         // clear modal data
         this.setState({
             isCourseCreateOpen: false,
-            createCourseIndex: undefined,
+            createCourseIndex: -1,
             createCourseModel: undefined,
         });
 
