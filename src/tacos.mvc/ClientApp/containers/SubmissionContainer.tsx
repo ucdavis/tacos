@@ -63,7 +63,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (jsAction === 'create') {
             // check if last request is already empty
             const lastRequest = requests[requests.length - 1];
-            if (!lastRequest.course || !lastRequest.course.number) {
+            if (!lastRequest || !lastRequest.course || !lastRequest.course.number) {
                 // focus request
                 this.focusRequest(requests.length - 1);
                 return;
