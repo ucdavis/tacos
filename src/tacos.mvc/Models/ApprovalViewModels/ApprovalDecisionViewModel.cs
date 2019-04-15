@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace tacos.mvc.Models.ApprovalViewModels
 {
@@ -10,5 +7,7 @@ namespace tacos.mvc.Models.ApprovalViewModels
         public bool Approved { get; set; }
 
         public string Comment { get; set; }
+
+        public string CommentOther { get; set; }
     }
 }

@@ -80,7 +80,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <textarea id="denialFormComment" class="form-control" name="comment" placeholder="Comment on denial..."></textarea>
+                    <div class="form-group">
+                        <select id="denialFormSelect" class="form-control" name="comment">
+                            <option value="">Please indicate reason for denial...</option>
+                            <option value="Exception doesn’t meet criteria">Exception doesn’t meet criteria.</option>
+                            <option value="Please review/reclassify course type.">Please review/reclassify course type.</option>
+                            <option value="Other">Other:</option>
+                        </select>
+                    </div>
+                    <div id="denialFormCommentContainer" class="form-group" style="display:none;">
+                        <textarea id="denialFormComment" class="form-control" name="commentOther" placeholder="Comment on denial..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -149,5 +159,15 @@
             $(this).find('.deny-form-submit-text').hide();
             $(this).find('.deny-form-submit-loading-icon').show();
         });
+
+        // manage dropdown with extra comments
+        $('#denialFormSelect').change(function () {
+            var val = $(this).val();
+            if (val === 'Other') {
+                $('#denialFormCommentContainer').show();
+            } else {
+                $('#denialFormCommentContainer').hide();
+            }
+        })
     </script>
 }
