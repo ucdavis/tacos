@@ -47,7 +47,13 @@ namespace tacos.mvc.Controllers
                 .SingleAsync(x => x.Id == id);
 
             request.Approved = model.Approved;
-            request.ApprovedComment = model.Comment;
+
+            // build comment
+            var comment = model.Comment;
+            if (string.Equals(model.Comment, "other", StringComparison.OrdinalIgnoreCase)) {
+                comment += $" - {model.CommentOther}";
+            }
+            request.ApprovedComment = comment;
 
             await _dbContext.SaveChangesAsync();
 

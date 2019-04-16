@@ -223,7 +223,6 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 showPagination={false}
                 minRows={1}
                 pageSizeOptions={[requests.length]}
-                defaultPageSize={requests.length}
                 defaultFiltered={[{id: 'isDeleted', value: false }]}
                 defaultSorted={[{id: 'course', desc: true}]}
                 getTrProps={this.decorateTr}
