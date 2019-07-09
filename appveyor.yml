@@ -48,7 +48,8 @@ deploy:
 
 notifications:
 - provider: Slack
-  incoming_webhook: https://hooks.slack.com/services/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
+  incoming_webhook:
+    secure: LuxmN+FnchXMF+YqT22T01ThGevYieMVf68dkPTFWdS1LSps+N7enGRfbwrRuAM2ZRuSxendJrv45G9s0uKeg0XTUHeESC8qRTLSfIpcykQ=
   channel: caes-development
   on_build_success: true
   on_build_failure: true
