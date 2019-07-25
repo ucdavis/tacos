@@ -31,8 +31,13 @@ const writingLectureFormula: IFormula = {
     calculate: (course: ICourse) => {
         const sectionsPerCourse = normalizedSectionsPerCourse(course);
 
-        // minimum enrollment
-        if (course.averageEnrollment / sectionsPerCourse <= 15.0) {
+        // minimum sections - minimum avg non-credit sections is 2 in order to be eligible for funding
+        if (sectionsPerCourse < 2) {
+            return 0;
+        }
+
+        // minimum enrollment -  minimum section size is 20
+        if (course.averageEnrollment / sectionsPerCourse < 20.0) {
             return 0;
         }
 
