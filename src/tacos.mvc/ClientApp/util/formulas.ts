@@ -46,6 +46,11 @@ const writingLectureFormula: IFormula = {
 // (Typically 2-3-hour lab or studio sections)"
 const labFormula: IFormula = {
     calculate: (course: ICourse) => {
+        // minimum enrollment - minimum avg enrollment is 25 students in order to be eligible for TA funding
+        if (course.averageEnrollment < 25) {
+            return 0;
+        }
+
         // "Lab/studio sections average 15-20 students
         // Half-time TA is responsible for 2 lab/studio sections, i.e. 25-30 students
         // Alternative: 10-15 students per section if room size, equipment, or safety concerns require"
