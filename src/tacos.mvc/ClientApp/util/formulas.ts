@@ -29,14 +29,16 @@ const standardLectureFormula: IFormula = {
 // (GE writing or ≥10 page papers)
 const writingLectureFormula: IFormula = {
     calculate: (course: ICourse) => {
+        const sectionsPerCourse = normalizedSectionsPerCourse(course);
+
         // minimum enrollment
-        if (course.averageEnrollment / course.averageSectionsPerCourse <= 15.0) {
+        if (course.averageEnrollment / sectionsPerCourse <= 15.0) {
             return 0;
         }
 
         // "Discussion sections average 20-25 students
         // Half-time TA is responsible for 2 discussion sections, i.e. 40 students"
-        return roundTo((course.averageSectionsPerCourse / 2.0) * 0.5, 0.5);
+        return roundTo((sectionsPerCourse / 2.0) * 0.5, 0.5);
     }
 };
 
@@ -118,6 +120,10 @@ const lectureIntensiveFormula: IFormula = {
         return roundTo((course.averageEnrollment / 40.0) * 0.25, 0.25);
     }
 };
+
+function normalizedSectionsPerCourse(course: ICourse): number {
+    return Math.floor(course.averageSectionsPerCourse);
+}
 
 function roundTo(value: number, unit: number): number {
     return unit * Math.round(value / unit);
