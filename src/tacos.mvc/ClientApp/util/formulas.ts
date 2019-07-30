@@ -29,14 +29,21 @@ const standardLectureFormula: IFormula = {
 // (GE writing or ≥10 page papers)
 const writingLectureFormula: IFormula = {
     calculate: (course: ICourse) => {
-        // minimum enrollment
-        if (course.averageEnrollment / course.averageSectionsPerCourse <= 15.0) {
+        const sectionsPerCourse = normalizedSectionsPerCourse(course);
+
+        // minimum sections - minimum avg non-credit sections is 2 in order to be eligible for funding
+        if (sectionsPerCourse < 2) {
+            return 0;
+        }
+
+        // minimum enrollment -  minimum section size is 20
+        if (course.averageEnrollment / sectionsPerCourse < 20.0) {
             return 0;
         }
 
         // "Discussion sections average 20-25 students
         // Half-time TA is responsible for 2 discussion sections, i.e. 40 students"
-        return roundTo((course.averageSectionsPerCourse / 2.0) * 0.5, 0.5);
+        return roundTo((sectionsPerCourse / 2.0) * 0.5, 0.5);
     }
 };
 
@@ -44,6 +51,11 @@ const writingLectureFormula: IFormula = {
 // (Typically 2-3-hour lab or studio sections)"
 const labFormula: IFormula = {
     calculate: (course: ICourse) => {
+        // minimum enrollment - minimum avg enrollment is 25 students in order to be eligible for TA funding
+        if (course.averageEnrollment < 25) {
+            return 0;
+        }
+
         // "Lab/studio sections average 15-20 students
         // Half-time TA is responsible for 2 lab/studio sections, i.e. 25-30 students
         // Alternative: 10-15 students per section if room size, equipment, or safety concerns require"
@@ -118,6 +130,10 @@ const lectureIntensiveFormula: IFormula = {
         return roundTo((course.averageEnrollment / 40.0) * 0.25, 0.25);
     }
 };
+
+function normalizedSectionsPerCourse(course: ICourse): number {
+    return Math.floor(course.averageSectionsPerCourse);
+}
 
 function roundTo(value: number, unit: number): number {
     return unit * Math.round(value / unit);
