@@ -148,7 +148,7 @@ namespace tacos.mvc.Controllers
             foreach (var m in model.Requests.Where(r => !r.IsDeleted && r.IsDirty))
             {
                 var course = await _context.Courses
-                    .FirstOrDefaultAsync(c => 
+                    .FirstOrDefaultAsync(c =>
                         string.Equals(c.Number, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
 
                 // possible create new course
@@ -175,7 +175,7 @@ namespace tacos.mvc.Controllers
                 else
                 {
                     request = await _context.Requests
-                        .FirstOrDefaultAsync(r =>
+                        .FirstOrDefaultAsync(r => r.DepartmentId == model.DepartmentId &&
                             string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
                 }
 
@@ -252,7 +252,7 @@ namespace tacos.mvc.Controllers
                 else
                 {
                     request = await _context.Requests
-                        .FirstOrDefaultAsync(r =>
+                        .FirstOrDefaultAsync(r => r.DepartmentId == model.DepartmentId &&
                             string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
                 }
 
