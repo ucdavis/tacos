@@ -25,8 +25,8 @@ export function getRequests(department: IDepartment): IRequest[] {
 export function saveRequests(department: IDepartment, requests: IRequest[]) {
     const key = getStorageKey(department);
 
-    // don't save isFocused: true
-    const data = requests.map((r) => {
+    // don't save null entries or isFocused: true
+    const data = requests.filter(r => !!r).map((r) => {
         return { 
             ...r,
             isFocused: false,
