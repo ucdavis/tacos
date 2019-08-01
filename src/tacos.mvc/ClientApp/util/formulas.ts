@@ -132,7 +132,8 @@ const lectureIntensiveFormula: IFormula = {
 };
 
 function normalizedSectionsPerCourse(course: ICourse): number {
-    return Math.floor(course.averageSectionsPerCourse);
+    // normalize by rounding down to even, whole number
+    return 2 * Math.floor(course.averageSectionsPerCourse / 2);
 }
 
 function roundTo(value: number, unit: number): number {
