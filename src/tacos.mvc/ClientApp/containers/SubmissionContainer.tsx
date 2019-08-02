@@ -7,7 +7,6 @@ import RequestsTable from "../components/RequestsTable";
 
 import { annualizationRatio, formulas } from "../util/formulas";
 
-import * as LocalStorageService from "../services/LocalStorageService";
 import * as LogService from "../services/LogService";
 
 import { ICourse } from "../models/ICourse";
@@ -35,11 +34,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     constructor(props: IProps) {
         super(props);
 
-        // check local storage first
-        let requests = LocalStorageService.getRequests(props.department);
-        if (!requests.length) {
-            requests = props.requests || [];
-        }
+        const requests = props.requests || [];
 
         this.state = {
             requests,
@@ -167,9 +162,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     private onReset = () => {
         const { department } = this.props;
 
-        // reset the form, clear storage
+        // reset the form
         if (confirm("Are you sure you want to clear this form and start over?")) {
-            LocalStorageService.clearRequests(department);
             this.setState({
                 requests: this.props.requests || [],
             });
@@ -231,7 +225,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             const result = await response.json();
 
             // TODO: make sure we have success
-            LocalStorageService.clearRequests(department);
             window.location.replace("/requests");
         } catch (err) {
             LogService.error(err);
@@ -269,7 +262,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             const result = await response.json();
 
             // TODO: make sure we have success
-            LocalStorageService.clearRequests(department);
             window.location.replace("/requests");
         } catch (err) {
             LogService.error(err);
@@ -309,7 +301,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         // else, remove it from new array
         const newRequests = requests.filter((r, rIndex) => rIndex !== i);
-        LocalStorageService.saveRequests(department, newRequests);
         this.setState({ requests: newRequests });
     }
 
@@ -383,7 +374,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const newRequests = [...requests];
         newRequests[i] = request;
 
-        LocalStorageService.saveRequests(department, newRequests);
         this.setState({ requests: newRequests });
 
         // trigger validations
@@ -411,7 +401,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             }
         ];
 
-        LocalStorageService.saveRequests(department, newRequests);
         this.setState({ requests: newRequests }, () => {
             // update isFocused to trigger ui flash
             const index = newRequests.length - 1;
