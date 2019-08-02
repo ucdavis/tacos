@@ -145,7 +145,7 @@ namespace tacos.mvc.Controllers
             }
 
             // process updates next
-            foreach (var m in model.Requests.Where(r => !r.IsDeleted && r.IsDirty))
+            foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
                 var course = await _context.Courses
                     .FirstOrDefaultAsync(c =>
@@ -209,9 +209,6 @@ namespace tacos.mvc.Controllers
                 request.Submitted       = false;
                 request.SubmittedBy     = null;
                 request.SubmittedOn     = null;
-
-                // always create a history entry on save
-                CreateRequestHistory(request, course);
             }
 
             await _context.SaveChangesAsync();
@@ -256,12 +253,6 @@ namespace tacos.mvc.Controllers
                             string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
                 }
 
-                // don't overwrite existing data
-                if (request.Submitted)
-                {
-                    continue;
-                }
-
                 // submit request
                 request.Submitted = true;
                 request.SubmittedOn = now;
@@ -278,6 +269,8 @@ namespace tacos.mvc.Controllers
                 {
                     requestsNeedingApproval.Add(request);
                 }
+
+                CreateRequestHistory(request);
             }
 
             await _context.SaveChangesAsync();
@@ -298,8 +291,10 @@ namespace tacos.mvc.Controllers
             return Json(new { success = true });
         }
 
-        private static void CreateRequestHistory(Request request, Course course)
+        private static void CreateRequestHistory(Request request)
         {
+            var course = request.Course;
+
             var history = new RequestHistory()
             {
                 RequestId                = request.Id,

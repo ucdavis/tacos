@@ -38,6 +38,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         this.recalculateRequests(requests);
 
+        // TODO: hack for now, make everything dirty so it all gets processed
+        for (const request of requests) {
+            request.isDirty = true;
+            request.isValid = true;
+        }
+
         this.state = {
             requests,
             isCourseCreateOpen: false,
@@ -180,7 +186,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             return false;
         }
 
-        // make sure all dirty requests are all valid or are being deleted
+        // make sure all requests are all valid or are being deleted
         if (!requests.filter(r => r.isDirty).every(r => r.isValid || r.isDeleted || false)) {
             return false;
         }
@@ -244,10 +250,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 return;
             }
 
+            const validRequests = requests.filter(r => r.isValid);
+
             // create the submission, ship all requests
             const submission: ISubmission = {
                 departmentId: department.id,
-                requests
+                requests: validRequests
             };
 
             const response = await fetch("/requests/submit", {
