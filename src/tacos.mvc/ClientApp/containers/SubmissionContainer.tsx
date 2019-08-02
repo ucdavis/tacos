@@ -36,6 +36,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         const requests = props.requests || [];
 
+        this.recalculateRequests(requests);
+
         this.state = {
             requests,
             isCourseCreateOpen: false,
@@ -304,6 +306,23 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({ requests: newRequests });
     }
 
+    private recalculateRequests = (requests: IRequest[]) => {
+        for (const request of requests) {
+            // if the course info looks good, calculate totals
+            const formula = formulas[request.courseType];
+            if (formula && request.course) {
+                request.calculatedTotal = formula.calculate(request.course);
+                request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
+                request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
+            }
+            else {
+                request.calculatedTotal = 0;
+                request.annualizedTotal = 0;
+                request.exceptionAnnualizedTotal = 0;
+            }
+        }
+    }
+
     private requestUpdated = (i: number, request: IRequest, dirty: boolean = true) => {
         const { department } = this.props;
         const { requests } = this.state;
@@ -317,18 +336,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.courseNumber = "";
         }
 
-        // if the course info looks good, calculate totals
-        const formula = formulas[request.courseType];
-        if (formula && request.course) {
-            request.calculatedTotal = formula.calculate(request.course);
-            request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
-            request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
-        }
-        else {
-            request.calculatedTotal = 0;
-            request.annualizedTotal = 0;
-            request.exceptionAnnualizedTotal = 0;
-        }
+        // calculate totals
+        this.recalculateRequests([request]);
 
         // clear error messages
         request.isValid = true;
