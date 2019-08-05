@@ -224,7 +224,6 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 showPagination={false}
                 pageSize={1000000}  // pick a really big size to avoid paging
                 defaultFiltered={[{id: 'isDeleted', value: false }]}
-                defaultSorted={[{id: 'course', desc: true}]}
                 getTrProps={this.decorateTr}
             />
         );
@@ -422,7 +421,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         const index = row.index;
         const request = row.original;
 
-        if (request.isDirty && !request.isValid) {
+        if (!request.isValid) {
             return (
                 <div>
                     <i id={`request-${index}-error`} className="fas fa-exclamation-triangle text-danger" />
@@ -432,17 +431,6 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                         target={`request-${index}-error`}
                     >
                         {request.error}
-                    </UncontrolledTooltip>
-                </div>
-            );
-        }
-
-        if (request.isDirty) {
-            return (
-                <div>
-                    <i id={`request-${index}-pending`} className="far fa-edit fa-xs" />
-                    <UncontrolledTooltip className="" placement="right" target={`request-${index}-pending`}>
-                        This class has pending edits.
                     </UncontrolledTooltip>
                 </div>
             );

@@ -36,6 +36,14 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         const requests = props.requests || [];
 
+        this.recalculateRequests(requests);
+
+        // TODO: hack for now, make everything dirty so it all gets processed
+        for (const request of requests) {
+            request.isDirty = true;
+            request.isValid = true;
+        }
+
         this.state = {
             requests,
             isCourseCreateOpen: false,
@@ -129,6 +137,18 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     course={createCourseModel}
                     onCourseCreate={this.onCourseCreate}
                 />
+                <div className="row mb-4">
+                    <div className="col d-flex">
+                        <button
+                            className="btn btn-primary"
+                            id="submit-button"
+                            onClick={this.onAddRequest}
+                        >
+                            Create New Request
+                            <i className="fas fa-plus-circle ml-2" /> 
+                        </button>
+                    </div>
+                </div>
                 <Summary
                     canSave={canSave}
                     canSubmit={canSubmit}
@@ -178,7 +198,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             return false;
         }
 
-        // make sure all dirty requests are all valid or are being deleted
+        // make sure all requests are all valid or are being deleted
         if (!requests.filter(r => r.isDirty).every(r => r.isValid || r.isDeleted || false)) {
             return false;
         }
@@ -242,10 +262,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 return;
             }
 
+            // lock down the submission button
+            this.setState({
+                isProcessing: true,
+            });
+
+            const validRequests = requests.filter(r => r.isValid);
+
             // create the submission, ship all requests
             const submission: ISubmission = {
                 departmentId: department.id,
-                requests
+                requests: validRequests
             };
 
             const response = await fetch("/requests/submit", {
@@ -275,7 +302,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.requestUpdated(i, request, false);
 
         // scroll to location
-        window.location.hash = `request-${request.id}`;
+        if (request.id) {
+            window.location.hash = `request-${request.id}`;
+        } else {
+            window.scrollTo(0,document.body.scrollHeight);
+        }
 
         // remove focus after 5s
         setTimeout(() => {
@@ -304,6 +335,23 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({ requests: newRequests });
     }
 
+    private recalculateRequests = (requests: IRequest[]) => {
+        for (const request of requests) {
+            // if the course info looks good, calculate totals
+            const formula = formulas[request.courseType];
+            if (formula && request.course) {
+                request.calculatedTotal = formula.calculate(request.course);
+                request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
+                request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
+            }
+            else {
+                request.calculatedTotal = 0;
+                request.annualizedTotal = 0;
+                request.exceptionAnnualizedTotal = 0;
+            }
+        }
+    }
+
     private requestUpdated = (i: number, request: IRequest, dirty: boolean = true) => {
         const { department } = this.props;
         const { requests } = this.state;
@@ -317,18 +365,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.courseNumber = "";
         }
 
-        // if the course info looks good, calculate totals
-        const formula = formulas[request.courseType];
-        if (formula && request.course) {
-            request.calculatedTotal = formula.calculate(request.course);
-            request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
-            request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
-        }
-        else {
-            request.calculatedTotal = 0;
-            request.annualizedTotal = 0;
-            request.exceptionAnnualizedTotal = 0;
-        }
+        // calculate totals
+        this.recalculateRequests([request]);
 
         // clear error messages
         request.isValid = true;
