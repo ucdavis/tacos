@@ -17,7 +17,7 @@ interface IProps {
 // the overall summary of totals, plus action/submit button
 export default class Summary extends React.PureComponent<IProps, {}> {
     public render() {
-        const { total, pending, isProcessing } = this.props;
+        const { total, isProcessing } = this.props;
 
         return (
             <div className="navbar navbar-default navbar-expand-xs fixed-bottom" role="navigation">
@@ -28,15 +28,10 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                             {total > 0 ? total.toFixed(3) : "---"}
                         </a>
                         <div>
-                            {  pending > 0 &&
-                                <span className="mr-3">{pending} Pending Changes</span>
-                            }
-                            {  pending > 0 &&
-                                <button disabled={isProcessing} className="btn btn-danger" onClick={this.props.onReset}>
-                                    Reset
-                                </button>
-                            }
-
+                            <button disabled={isProcessing} className="btn btn-danger" onClick={this.props.onReset}>
+                                Reset
+                            </button>
+                        
                             <button
                                 className="btn btn-primary"
                                 id="submit-button"
