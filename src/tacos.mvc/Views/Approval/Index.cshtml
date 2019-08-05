@@ -145,16 +145,18 @@
             });
 
         $('.approval-form-submit').click(function () {
+            // TODO: figure out a better way to disable after click, since this blocks submit
             // disable all buttons at the same level
-            $(this).parents('#requestTable tr td').find('button').attr('disabled', true);
+            //$(this).parents('#requestTable tr td').find('button').attr('disabled', true);
 
             $(this).find('.approval-form-submit-text').hide();
             $(this).find('.approval-form-submit-loading-icon').show();
         });
 
         $('.deny-form-submit').click(function () {
+            // TODO: figure out a better way to disable after click, since this blocks submit
             // disable all buttons at the same level
-            $(this).parent().find('button').attr('disabled', true);
+            //$(this).parent().find('button').attr('disabled', true);
 
             $(this).find('.deny-form-submit-text').hide();
             $(this).find('.deny-form-submit-loading-icon').show();
