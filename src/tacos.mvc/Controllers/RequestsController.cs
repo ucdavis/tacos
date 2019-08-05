@@ -108,6 +108,7 @@ namespace tacos.mvc.Controllers
                 .Include(r => r.Course)
                 .Where(r => r.IsActive)
                 .Where(r => r.Department.Id == department.Id)
+                .OrderBy(r => r.CourseNumber)
                 .AsNoTracking()
                 .ToArrayAsync();
 

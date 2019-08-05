@@ -137,6 +137,18 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     course={createCourseModel}
                     onCourseCreate={this.onCourseCreate}
                 />
+                <div className="row mb-4">
+                    <div className="col d-flex">
+                        <button
+                            className="btn btn-primary"
+                            id="submit-button"
+                            onClick={this.onAddRequest}
+                        >
+                            Create New Request
+                            <i className="fas fa-plus-circle ml-2" /> 
+                        </button>
+                    </div>
+                </div>
                 <Summary
                     canSave={canSave}
                     canSubmit={canSubmit}
@@ -250,6 +262,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 return;
             }
 
+            // lock down the submission button
+            this.setState({
+                isProcessing: true,
+            });
+
             const validRequests = requests.filter(r => r.isValid);
 
             // create the submission, ship all requests
@@ -285,7 +302,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.requestUpdated(i, request, false);
 
         // scroll to location
-        window.location.hash = `request-${request.id}`;
+        if (request.id) {
+            window.location.hash = `request-${request.id}`;
+        } else {
+            window.scrollTo(0,document.body.scrollHeight);
+        }
 
         // remove focus after 5s
         setTimeout(() => {

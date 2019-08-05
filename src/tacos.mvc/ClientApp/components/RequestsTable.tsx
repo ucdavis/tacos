@@ -224,7 +224,6 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 showPagination={false}
                 pageSize={1000000}  // pick a really big size to avoid paging
                 defaultFiltered={[{id: 'isDeleted', value: false }]}
-                defaultSorted={[{id: 'course', desc: true}]}
                 getTrProps={this.decorateTr}
             />
         );
