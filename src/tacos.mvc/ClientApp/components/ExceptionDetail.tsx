@@ -4,6 +4,7 @@ import NumberInput from "./NumberInput";
 
 interface IProps {
     exception: boolean;
+    exceptionApproved?: boolean;
     exceptionReason: string;
     exceptionTotal: number;
     onExceptionTotalChange: (exceptionTotal: number) => void;
@@ -38,6 +39,10 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     public render() {
         if (!this.props.exception) { return null; }
 
+        if (this.props.exceptionApproved) {
+            return this.renderApprovedException();
+        }
+
         return (
             <div className="exceptionRow">
                 <p>
@@ -53,6 +58,12 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                 <div className="exceptionRowComponents">{this.renderExceptionReason()}</div>
             </div>
         );
+    }
+
+    private renderApprovedException = () => {
+        if (!this.props.exceptionApproved) { return null; }
+
+        return (<p>Approved!</p>);
     }
 
     private renderExceptionTotal = () => {

@@ -205,7 +205,7 @@ namespace tacos.mvc.Controllers
                 request.UpdatedBy                = user.UserName;
 
                 // clean approval and submission info unless this already has an approved exception
-                if (!request.HasApprovedException()) {
+                if (!request.HasApprovedException) {
                     request.Approved = null;
                     request.ApprovedComment = null;
                     request.Submitted = false;

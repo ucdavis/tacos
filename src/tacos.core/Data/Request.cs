@@ -102,8 +102,10 @@ namespace tacos.core.Data
                 .HasForeignKey(r => r.CourseNumber);
         }
 
-        public bool HasApprovedException() {
-            return Exception && Approved.HasValue && Approved.Value;
+        public bool HasApprovedException {
+            get {
+                return Exception && Approved.HasValue && Approved.Value;
+            }
         }
 
         public Request ShallowCopy() {

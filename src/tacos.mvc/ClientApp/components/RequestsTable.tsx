@@ -450,6 +450,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         return (
             <ExceptionDetail
                 exception={request.exception}
+                exceptionApproved={request.hasApprovedException}
                 exceptionReason={request.exceptionReason}
                 exceptionTotal={request.exceptionTotal}
                 onExceptionTotalChange={exceptionTotal =>
