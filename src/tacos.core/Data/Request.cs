@@ -105,5 +105,9 @@ namespace tacos.core.Data
         public bool HasApprovedException() {
             return Exception && Approved.HasValue && Approved.Value;
         }
+
+        public Request ShallowCopy() {
+            return (Request) this.MemberwiseClone();
+        }
     }
 }
