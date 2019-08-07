@@ -17,11 +17,10 @@ interface IState {
 
 // render a textbox for inputing course number, or show course info if already selected
 export default class ExceptionDetail extends React.PureComponent<IProps, IState> {
-
     public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
         if (nextProps.exceptionReason !== prevState.exceptionReason) {
             return {
-                exceptionReason: nextProps.exceptionReason,
+                exceptionReason: nextProps.exceptionReason
             };
         }
 
@@ -29,15 +28,17 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     }
 
     constructor(props: IProps) {
-        super(props); 
+        super(props);
 
         this.state = {
-            exceptionReason: "",
+            exceptionReason: ""
         };
     }
 
     public render() {
-        if (!this.props.exception) { return null; }
+        if (!this.props.exception) {
+            return null;
+        }
 
         if (this.props.exceptionApproved) {
             return this.renderApprovedException();
@@ -61,10 +62,18 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     }
 
     private renderApprovedException = () => {
-        if (!this.props.exceptionApproved) { return null; }
+        if (!this.props.exceptionApproved) {
+            return null;
+        }
 
-        return (<p>Approved!</p>);
-    }
+        return (
+            <div className="exceptionRow">
+                <p>
+                    <b>Your exception request for {this.props.exceptionTotal} has been approved for the above course.</b>
+                </p>
+            </div>
+        );
+    };
 
     private renderExceptionTotal = () => {
         return (
@@ -78,7 +87,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                 format={this.formatExceptionTotal}
             />
         );
-    }
+    };
 
     private formatExceptionTotal = (value: number) => {
         if (value === 0) {
@@ -86,7 +95,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         }
 
         return value.toFixed(2);
-    }
+    };
 
     private renderExceptionReason = () => {
         const { exceptionReason } = this.state;
@@ -109,10 +118,10 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     private onBlurReason = (e: React.FocusEvent<HTMLTextAreaElement>) => {
         this.props.onReasonChange(e.target.value);
     };
-    
+
     private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         this.setState({
-            exceptionReason: e.target.value,
+            exceptionReason: e.target.value
         });
     };
 }
