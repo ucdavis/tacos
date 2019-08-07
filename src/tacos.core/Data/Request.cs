@@ -101,5 +101,15 @@ namespace tacos.core.Data
                 .WithMany()
                 .HasForeignKey(r => r.CourseNumber);
         }
+
+        public bool HasApprovedException {
+            get {
+                return Exception && Approved.HasValue && Approved.Value;
+            }
+        }
+
+        public Request ShallowCopy() {
+            return (Request) this.MemberwiseClone();
+        }
     }
 }

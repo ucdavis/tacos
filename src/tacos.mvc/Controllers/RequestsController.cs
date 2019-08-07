@@ -191,6 +191,12 @@ namespace tacos.mvc.Controllers
                     _context.Requests.Add(request);
                 }
 
+                // if we have a new exception where there was not one previously, reset approval values
+                if (m.Exception && !request.Exception) {
+                    request.Approved = false;
+                    request.ApprovedComment = null;
+                }
+
                 // update values
                 request.IsActive                 = true;
                 request.CourseType               = m.CourseType;
@@ -204,12 +210,14 @@ namespace tacos.mvc.Controllers
                 request.UpdatedOn                = DateTime.UtcNow;
                 request.UpdatedBy                = user.UserName;
 
-                // clear approval and submission
-                request.Approved        = null;
-                request.ApprovedComment = null;
-                request.Submitted       = false;
-                request.SubmittedBy     = null;
-                request.SubmittedOn     = null;
+                // clean approval and submission info unless this already has an approved exception
+                if (!request.HasApprovedException) {
+                    request.Approved = null;
+                    request.ApprovedComment = null;
+                    request.Submitted = false;
+                    request.SubmittedBy = null;
+                    request.SubmittedOn = null;
+                }
             }
 
             await _context.SaveChangesAsync();
