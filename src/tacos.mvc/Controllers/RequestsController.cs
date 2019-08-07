@@ -204,12 +204,14 @@ namespace tacos.mvc.Controllers
                 request.UpdatedOn                = DateTime.UtcNow;
                 request.UpdatedBy                = user.UserName;
 
-                // clear approval and submission
-                request.Approved        = null;
-                request.ApprovedComment = null;
-                request.Submitted       = false;
-                request.SubmittedBy     = null;
-                request.SubmittedOn     = null;
+                // clean approval and submission info unless this already has an approved exception
+                if (!request.HasApprovedException()) {
+                    request.Approved = null;
+                    request.ApprovedComment = null;
+                    request.Submitted = false;
+                    request.SubmittedBy = null;
+                    request.SubmittedOn = null;
+                }
             }
 
             await _context.SaveChangesAsync();
