@@ -191,6 +191,12 @@ namespace tacos.mvc.Controllers
                     _context.Requests.Add(request);
                 }
 
+                // if we have a new exception where there was not one previously, reset approval values
+                if (m.Exception && !request.Exception) {
+                    request.Approved = false;
+                    request.ApprovedComment = null;
+                }
+
                 // update values
                 request.IsActive                 = true;
                 request.CourseType               = m.CourseType;
