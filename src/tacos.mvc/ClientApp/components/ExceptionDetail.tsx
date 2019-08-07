@@ -69,7 +69,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         return (
             <div className="exceptionRow">
                 <p>
-                    <b>Your exception request for {this.props.exceptionTotal} has been approved for the above course.</b>
+                    <b>Your exception request for {this.props.exceptionTotal}% FTE has been approved for the above course.</b>
                 </p>
             </div>
         );
