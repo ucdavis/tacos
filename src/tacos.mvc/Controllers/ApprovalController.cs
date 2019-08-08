@@ -29,6 +29,7 @@ namespace tacos.mvc.Controllers
             var requests = await _dbContext
                 .Requests
                 .Include(r => r.Course)
+                .Include(r => r.Department)
                 .Where(r => r.IsActive)
                 .Where(r => r.Submitted)
                 .Where(r => r.Approved == null)
