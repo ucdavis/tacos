@@ -1,11 +1,10 @@
-import { ICourse } from './ICourse';
+import { ICourse } from "./ICourse";
 
 export interface IRequest {
     id?: number;
 
-
     course: ICourse | undefined;
-    
+
     // flattened course value
     courseName: string;
 
@@ -20,6 +19,7 @@ export interface IRequest {
     exceptionReason: string;
     exceptionTotal: number;
     exceptionAnnualizedTotal: number;
+    hasApprovedException: boolean;
 
     isDirty?: boolean;
     isFocused?: boolean;
@@ -27,4 +27,4 @@ export interface IRequest {
 
     error?: string;
     isValid?: boolean;
-  }
+}

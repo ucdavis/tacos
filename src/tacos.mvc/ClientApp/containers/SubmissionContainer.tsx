@@ -446,7 +446,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 exceptionReason: "",
                 exceptionTotal: 0.0,
                 exceptionAnnualizedTotal: 0,
-                isValid: true
+                hasApprovedException: false,
+                isValid: true,
             }
         ];
 
