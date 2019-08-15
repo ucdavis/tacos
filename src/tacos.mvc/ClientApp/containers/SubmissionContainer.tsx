@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import { parse as QueryParse } from "query-string";
 
 import Summary from "../components/Summary";
@@ -164,9 +165,47 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     isSaving={this.state.isSaving}
                     isSubmitting={this.state.isSubmitting}
                 />
+                {this.onSavingModelRender()}
+                {this.onSubmittingModelRender()}
             </div>
         );
     }
+
+    private onSavingModelRender = () => {
+        if (this.state.isSaving) {
+            return (
+                <div>
+                    <Modal isOpen={true}>
+                        <ModalHeader>
+                            <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                            Saving...
+                        </ModalHeader>
+                        <ModalBody className="d-flex justify-content-center">
+                            <i className="far fa-save fa-7x text-success" />
+                        </ModalBody>
+                    </Modal>
+                </div>
+            );
+        }
+    };
+
+    private onSubmittingModelRender = () => {
+        if (this.state.isSubmitting) {
+            return (
+                <div>
+                    <Modal isOpen={true}>
+                        <ModalHeader>
+                            <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                            Submitting...
+                        </ModalHeader>
+                        <ModalBody className="d-flex justify-content-center">
+                            <i className="far fa-paper-plane fa-7x text-success" />
+                        </ModalBody>
+                    </Modal>
+                </div>
+            );
+        }
+    };
 
     private submissionTotal = () => {
         const { requests } = this.state;

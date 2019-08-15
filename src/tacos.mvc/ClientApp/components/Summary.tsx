@@ -18,50 +18,33 @@ interface IProps {
 
 // the overall summary of totals, plus action/submit button
 export default class Summary extends React.PureComponent<IProps, {}> {
+    
     saveButtonRender = () => {
-        if (this.props.isSaving === true) {
-            return (
-                <button className="btn btn-primary " type="button" disabled>
-                    <i className="fas fa-spinner fa-pulse fa-lg mr-2" />
-                    Saving...
-                </button>
-            );
-        } else {
-            return (
-                <button
-                    className="btn btn-primary"
-                    id="submit-button"
-                    disabled={!this.props.canSave || this.props.isProcessing}
-                    onClick={this.props.onSave}
-                >
-                    Save Changes
-                    <i className="far fa-save ml-2" />
-                </button>
-            );
-        }
+        return (
+            <button
+                className="btn btn-primary"
+                id="submit-button"
+                disabled={!this.props.canSave || this.props.isProcessing}
+                onClick={this.props.onSave}
+            >
+                Save Changes
+                <i className="far fa-save ml-2" />
+            </button>
+        );
     };
 
     submitButtonRender = () => {
-        if (this.props.isSubmitting === true) {
-            return (
-                <button className="btn btn-primary " type="button" disabled>
-                    <i className="fas fa-spinner fa-pulse fa-lg mr-2" />
-                    Submitting...
-                </button>
-            );
-        } else {
-            return (
-                <button
-                    className="btn btn-primary"
-                    id="submit-button"
-                    disabled={!this.props.canSubmit || this.props.isProcessing}
-                    onClick={this.props.onSubmit}
-                >
-                    Submit for Approval
-                    <i className="far fa-thumbs-up ml-2" />
-                </button>
-            );
-        }
+        return (
+            <button
+                className="btn btn-primary"
+                id="submit-button"
+                disabled={!this.props.canSubmit || this.props.isProcessing}
+                onClick={this.props.onSubmit}
+            >
+                Submit for Approval
+                <i className="far fa-thumbs-up ml-2" />
+            </button>
+        );
     };
 
     public render() {
