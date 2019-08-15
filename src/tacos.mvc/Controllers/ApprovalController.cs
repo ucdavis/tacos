@@ -29,6 +29,7 @@ namespace tacos.mvc.Controllers
             var requests = await _dbContext
                 .Requests
                 .Include(r => r.Course)
+                .Include(r => r.Department)
                 .Where(r => r.IsActive)
                 .Where(r => r.Submitted)
                 .Where(r => r.Approved == null)
@@ -53,14 +54,23 @@ namespace tacos.mvc.Controllers
             if (string.Equals(model.Comment, "other", StringComparison.OrdinalIgnoreCase)) {
                 comment += $" - {model.CommentOther}";
             }
+            
             request.ApprovedComment = comment;
+
+            var notificationRequest = request.ShallowCopy();
+
+            // on denial, turn this back into non-exception
+            if (request.Approved.HasValue && request.Approved.Value == false) {
+                request.Exception = false;
+                request.Approved = true;
+            }
 
             await _dbContext.SaveChangesAsync();
 
             // send emails
             try
             {
-                await _emailService.SendApprovalNotification(request);
+                await _emailService.SendApprovalNotification(notificationRequest);
             }
             catch (Exception ex)
             {
