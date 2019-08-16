@@ -343,7 +343,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     private focusRequest = (i: number) => {
         let request = this.state.requests[i];
         request = { ...request, isFocused: true };
-
         this.requestUpdated(i, request, false);
 
         // scroll to location
@@ -353,12 +352,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             window.scrollTo(0, document.body.scrollHeight);
         }
 
-        // remove focus after 5s
+        // remove focus after 0.5s
         setTimeout(() => {
             let unfocusRequest = this.state.requests[i];
             unfocusRequest = { ...unfocusRequest, isFocused: false };
             this.requestUpdated(i, unfocusRequest, false);
-        }, 3 * 1000);
+        }, 0.5 * 1000);
     };
 
     private removeRequest = (i: number) => {
@@ -367,17 +366,19 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         LogService.info("removing request");
         let request = requests[i];
-
+       
         // if this is an existing request, mark it as deleted, so that we can delete it on the server
         if (request.id) {
             request = { ...request, isDeleted: true };
             this.requestUpdated(i, request);
             return;
         }
-
         // else, remove it from new array
         const newRequests = requests.filter((r, rIndex) => rIndex !== i);
-        this.setState({ requests: newRequests });
+        
+        this.setState((state) => {
+            return ({requests: newRequests});
+        });
     };
 
     private recalculateRequests = (requests: IRequest[]) => {
