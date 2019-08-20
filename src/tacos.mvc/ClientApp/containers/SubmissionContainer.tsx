@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import { parse as QueryParse } from "query-string";
 
 import Summary from "../components/Summary";
@@ -27,10 +28,11 @@ interface IState {
     createCourseModel: ICourse | undefined;
 
     isProcessing: boolean;
+    isSaving: boolean;
+    isSubmitting: boolean;
 }
 
 export default class SubmissionContainer extends React.Component<IProps, IState> {
-    
     constructor(props: IProps) {
         super(props);
 
@@ -50,6 +52,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             createCourseIndex: -1,
             createCourseModel: undefined,
             isProcessing: false,
+            isSaving: false,
+            isSubmitting: false
         };
     }
 
@@ -57,13 +61,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const { requests } = this.state;
 
         // tslint:disable-next-line:variable-name
-        const [__host, __controller, __action, id] = location.pathname.split('/');
+        const [__host, __controller, __action, id] = location.pathname.split("/");
         const { jsAction } = QueryParse(location.search);
         if (!jsAction) {
             return;
         }
 
-        if (jsAction === 'create') {
+        if (jsAction === "create") {
             // check if last request is already empty
             const lastRequest = requests[requests.length - 1];
             if (!lastRequest || !lastRequest.course || !lastRequest.course.number) {
@@ -76,7 +80,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             return;
         }
 
-        if (jsAction === 'edit' && requests) {
+        if (jsAction === "edit" && requests) {
             const parsedId = parseInt(id, 10);
             if (!parsedId) {
                 return;
@@ -114,14 +118,14 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             <div className="pb-4">
                 <div className="row mb-4">
                     <div className="col d-flex justify-content-end">
-                            <button
-                                className="btn btn-primary"
-                                id="submit-button"
-                                onClick={this.onAddRequest}
-                            >
-                                Create New Request
-                                <i className="fas fa-plus-circle ml-2" /> 
-                            </button>
+                        <button
+                            className="btn btn-primary"
+                            id="submit-button"
+                            onClick={this.onAddRequest}
+                        >
+                            Create New Request
+                            <i className="fas fa-plus-circle ml-2" />
+                        </button>
                     </div>
                 </div>
                 <RequestsTable
@@ -145,7 +149,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                             onClick={this.onAddRequest}
                         >
                             Create New Request
-                            <i className="fas fa-plus-circle ml-2" /> 
+                            <i className="fas fa-plus-circle ml-2" />
                         </button>
                     </div>
                 </div>
@@ -158,10 +162,50 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     onSubmit={this.submit}
                     onReset={this.onReset}
                     isProcessing={this.state.isProcessing}
+                    isSaving={this.state.isSaving}
+                    isSubmitting={this.state.isSubmitting}
                 />
+                {this.onSavingModelRender()}
+                {this.onSubmittingModelRender()}
             </div>
         );
     }
+
+    private onSavingModelRender = () => {
+        if (this.state.isSaving) {
+            return (
+                <div>
+                    <Modal isOpen={true}>
+                        <ModalHeader>
+                            <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                            Saving...
+                        </ModalHeader>
+                        <ModalBody className="d-flex justify-content-center">
+                            <i className="far fa-save fa-7x text-success" />
+                        </ModalBody>
+                    </Modal>
+                </div>
+            );
+        }
+    };
+
+    private onSubmittingModelRender = () => {
+        if (this.state.isSubmitting) {
+            return (
+                <div>
+                    <Modal isOpen={true}>
+                        <ModalHeader>
+                            <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                            Submitting...
+                        </ModalHeader>
+                        <ModalBody className="d-flex justify-content-center">
+                            <i className="far fa-paper-plane fa-7x text-success" />
+                        </ModalBody>
+                    </Modal>
+                </div>
+            );
+        }
+    };
 
     private submissionTotal = () => {
         const { requests } = this.state;
@@ -176,19 +220,18 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             }, 0);
 
         return total;
-    }
+    };
 
-    
     private onReset = () => {
         const { department } = this.props;
 
         // reset the form
         if (confirm("Are you sure you want to clear this form and start over?")) {
             this.setState({
-                requests: this.props.requests || [],
+                requests: this.props.requests || []
             });
         }
-    }
+    };
 
     private checkIsValid = (): boolean => {
         const { requests } = this.state;
@@ -204,9 +247,9 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         }
 
         return true;
-    }
+    };
 
-    private save = async() => {
+    private save = async () => {
         try {
             const { department } = this.props;
             const { requests } = this.state;
@@ -223,6 +266,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             // lock down the submission button
             this.setState({
                 isProcessing: true,
+                isSaving: true
             });
 
             // create the submission
@@ -249,7 +293,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         } catch (err) {
             LogService.error(err);
         }
-    }
+    };
 
     private submit = async () => {
         try {
@@ -265,6 +309,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             // lock down the submission button
             this.setState({
                 isProcessing: true,
+                isSubmitting: true
             });
 
             const validRequests = requests.filter(r => r.isValid);
@@ -293,7 +338,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         } catch (err) {
             LogService.error(err);
         }
-    }
+    };
 
     private focusRequest = (i: number) => {
         let request = this.state.requests[i];
@@ -305,7 +350,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (request.id) {
             window.location.hash = `request-${request.id}`;
         } else {
-            window.scrollTo(0,document.body.scrollHeight);
+            window.scrollTo(0, document.body.scrollHeight);
         }
 
         // remove focus after 5s
@@ -314,7 +359,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             unfocusRequest = { ...unfocusRequest, isFocused: false };
             this.requestUpdated(i, unfocusRequest, false);
         }, 3 * 1000);
-    }
+    };
 
     private removeRequest = (i: number) => {
         const { department } = this.props;
@@ -333,7 +378,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         // else, remove it from new array
         const newRequests = requests.filter((r, rIndex) => rIndex !== i);
         this.setState({ requests: newRequests });
-    }
+    };
 
     private recalculateRequests = (requests: IRequest[]) => {
         for (const request of requests) {
@@ -341,16 +386,21 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             const formula = formulas[request.courseType];
             if (formula && request.course) {
                 request.calculatedTotal = formula.calculate(request.course);
-                request.annualizedTotal = request.calculatedTotal * annualizationRatio * request.course.timesOfferedPerYear;
-                request.exceptionAnnualizedTotal = request.exceptionTotal * annualizationRatio * request.course.timesOfferedPerYear;
-            }
-            else {
+                request.annualizedTotal =
+                    request.calculatedTotal *
+                    annualizationRatio *
+                    request.course.timesOfferedPerYear;
+                request.exceptionAnnualizedTotal =
+                    request.exceptionTotal *
+                    annualizationRatio *
+                    request.course.timesOfferedPerYear;
+            } else {
                 request.calculatedTotal = 0;
                 request.annualizedTotal = 0;
                 request.exceptionAnnualizedTotal = 0;
             }
         }
-    }
+    };
 
     private requestUpdated = (i: number, request: IRequest, dirty: boolean = true) => {
         const { department } = this.props;
@@ -370,27 +420,27 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         // clear error messages
         request.isValid = true;
-        request.error = '';
+        request.error = "";
 
         // check validity
         if (!request.course) {
             request.isValid = false;
-            request.error = 'Course required';
+            request.error = "Course required";
         }
 
         if (!request.courseNumber) {
             request.isValid = false;
-            request.error = 'Course required';
+            request.error = "Course required";
         }
 
         if (request.course && request.course.isNew && !request.exception) {
             request.isValid = false;
-            request.error = 'Exception required with new courses';
+            request.error = "Exception required with new courses";
         }
 
         if (request.exception && request.exceptionTotal <= 0) {
             request.isValid = false;
-            request.error = 'Exception > 0 required';
+            request.error = "Exception > 0 required";
         }
 
         // check for duplicate courses earlier in the array
@@ -401,7 +451,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         if (foundDuplicate) {
             request.isValid = false;
-            request.error = 'Duplicate course in request above';
+            request.error = "Duplicate course in request above";
         }
 
         if (dirty) {
@@ -416,7 +466,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         // trigger validations
         this.checkIsValid();
-    }
+    };
 
     private onAddRequest = () => {
         const { department } = this.props;
@@ -445,7 +495,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             const index = newRequests.length - 1;
             this.focusRequest(index);
         });
-    }
+    };
 
     private onOpenCourseCreate = (index: number, defaultValues?: ICourse) => {
         const { requests } = this.state;
@@ -454,19 +504,19 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({
             isCourseCreateOpen: true,
             createCourseIndex: index,
-            createCourseModel: request.course || defaultValues,
+            createCourseModel: request.course || defaultValues
         });
-    }
+    };
 
     private onCloseCourseCreate = () => {
         this.setState({
             isCourseCreateOpen: false,
             createCourseIndex: -1,
-            createCourseModel: undefined,
+            createCourseModel: undefined
         });
-    }
+    };
 
-    private onCourseCreate = (course: ICourse)  => {
+    private onCourseCreate = (course: ICourse) => {
         const { requests, createCourseIndex } = this.state;
 
         if (createCourseIndex < 0) {
@@ -479,15 +529,15 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({
             isCourseCreateOpen: false,
             createCourseIndex: -1,
-            createCourseModel: undefined,
+            createCourseModel: undefined
         });
 
         // update request, add course details, default with exception
         const newRequest = {
             ...request,
             course,
-            exception: true,
+            exception: true
         };
         this.requestUpdated(createCourseIndex, newRequest);
-    }
+    };
 }
