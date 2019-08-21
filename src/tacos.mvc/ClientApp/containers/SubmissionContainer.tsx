@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import { parse as QueryParse } from "query-string";
+import tacoAnimation from "../media/tacoAnimation.gif";
 
 import Summary from "../components/Summary";
 import CreateCourseModal from "../components/CreateCourseModal";
@@ -175,13 +176,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (this.state.isSaving) {
             return (
                 <div>
-                    <Modal isOpen={true}>
+                    <Modal isOpen={true} centered>
                         <ModalHeader>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Saving...
                         </ModalHeader>
                         <ModalBody className="d-flex justify-content-center">
-                            <i className="far fa-save fa-7x text-success" />
+                            <img className="w-75" src={tacoAnimation} alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
                 </div>
@@ -193,13 +194,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (this.state.isSubmitting) {
             return (
                 <div>
-                    <Modal isOpen={true}>
+                    <Modal isOpen={true} centered>
                         <ModalHeader>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Submitting...
                         </ModalHeader>
                         <ModalBody className="d-flex justify-content-center">
-                            <i className="far fa-paper-plane fa-7x text-success" />
+                            <img className="w-75" src={tacoAnimation} alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
                 </div>
