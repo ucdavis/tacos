@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import { parse as QueryParse } from "query-string";
-import tacoAnimation from "../media/tacoAnimation.gif";
 
 import Summary from "../components/Summary";
 import CreateCourseModal from "../components/CreateCourseModal";
@@ -182,7 +181,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                             Saving...
                         </ModalHeader>
                         <ModalBody className="d-flex justify-content-center">
-                            <img className="w-75" src={tacoAnimation} alt="taco animation gif"/>
+                            <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
                 </div>
@@ -200,7 +199,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                             Submitting...
                         </ModalHeader>
                         <ModalBody className="d-flex justify-content-center">
-                            <img className="w-75" src={tacoAnimation} alt="taco animation gif"/>
+                        <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
                 </div>
