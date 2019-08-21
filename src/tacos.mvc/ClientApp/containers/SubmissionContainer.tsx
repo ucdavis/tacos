@@ -180,7 +180,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Saving...
                         </ModalHeader>
-                        <ModalBody className="d-flex justify-content-center tacoAnimation-Parent-Div">
+                        <ModalBody className="d-flex justify-content-center taco-animation-container">
                             <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
@@ -198,7 +198,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Submitting...
                         </ModalHeader>
-                        <ModalBody className="d-flex justify-content-center tacoAnimation-Parent-Div">
+                        <ModalBody className="d-flex justify-content-center taco-animation-container">
                         <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
