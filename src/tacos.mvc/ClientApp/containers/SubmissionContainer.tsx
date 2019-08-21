@@ -175,7 +175,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (this.state.isSaving) {
             return (
                 <div>
-                    <Modal isOpen={true} centered>
+                    <Modal isOpen={true} centered={true}>
                         <ModalHeader>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Saving...
@@ -193,7 +193,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (this.state.isSubmitting) {
             return (
                 <div>
-                    <Modal isOpen={true} centered>
+                    <Modal isOpen={true} centered={true}>
                         <ModalHeader>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Submitting...
