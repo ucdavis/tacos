@@ -175,31 +175,31 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         if (this.state.isSaving) {
             return (
                 <div>
-                    <Modal isOpen={true}>
+                    <Modal isOpen={true} centered={true}>
                         <ModalHeader>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Saving...
                         </ModalHeader>
-                        <ModalBody className="d-flex justify-content-center">
-                            <i className="far fa-save fa-7x text-success" />
+                        <ModalBody className="d-flex justify-content-center taco-animation-container">
+                            <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
                 </div>
             );
         }
     };
-
+    
     private onSubmittingModelRender = () => {
         if (this.state.isSubmitting) {
             return (
                 <div>
-                    <Modal isOpen={true}>
+                    <Modal isOpen={true} centered={true}>
                         <ModalHeader>
                             <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                             Submitting...
                         </ModalHeader>
-                        <ModalBody className="d-flex justify-content-center">
-                            <i className="far fa-paper-plane fa-7x text-success" />
+                        <ModalBody className="d-flex justify-content-center taco-animation-container">
+                        <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
                 </div>
