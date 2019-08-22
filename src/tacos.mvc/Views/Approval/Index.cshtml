@@ -43,7 +43,7 @@
                         {
                             <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
                                 <input type="hidden" name="approved" value="true" />
-                                <button type="submit" class="btn btn-primary mb-2 approval-form-submit">
+                                <button type="submit" class="btn btn-primary mb-2 approval-form-submit" data-toggle="modal" data-target="#ApprovalModal">
                                     <span class="approval-form-submit-text">Approve</span>
                                     <span class="approval-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
                                 </button>
@@ -105,6 +105,26 @@
 
 </form>
 
+<!-- ApprovelModal -->
+<div class="modal fade" id="ApprovalModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+        <i class=" mr-3 fas fa-spinner fa-pulse fa-lg"></i>
+            <span>Approving...</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body d-flex justify-content-center taco-animation-container">
+        <img class="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
+      </div>
+    </div>
+  </div>
+</div>
+
 @section scripts {
     <script>
         $(function() {
@@ -148,7 +168,7 @@
             // TODO: figure out a better way to disable after click, since this blocks submit
             // disable all buttons at the same level
             //$(this).parents('#requestTable tr td').find('button').attr('disabled', true);
-
+            
             $(this).find('.approval-form-submit-text').hide();
             $(this).find('.approval-form-submit-loading-icon').show();
         });
