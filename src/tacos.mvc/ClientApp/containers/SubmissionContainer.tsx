@@ -133,6 +133,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     requests={requests}
                     onEdit={this.requestUpdated}
                     onRemove={this.removeRequest}
+                    onRevoke={this.revokeRequest}
                     onCourseCreate={(i, c) => this.onOpenCourseCreate(i, c)}
                 />
                 <CreateCourseModal
@@ -335,6 +336,29 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
             // TODO: make sure we have success
             window.location.replace("/requests");
+        } catch (err) {
+            LogService.error(err);
+        }
+    };
+
+    private revokeRequest = async (id:number) => {
+        try {
+
+            const response = await fetch(`/requests/Revoke/${id}`, {
+                headers: [["Accept", "application/json"], ["Content-Type", "application/json"]],
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const result = await response.json();
+            if (result.success === true) {
+                window.location.reload();
+            }
+
         } catch (err) {
             LogService.error(err);
         }

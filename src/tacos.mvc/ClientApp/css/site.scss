@@ -95,3 +95,8 @@ table.requests {
 .taco-animation-container {
   background-color: #fbfbfb;
 }
+
+.revokeLink:hover {
+  border-bottom-style: solid;
+  cursor: pointer;
+}

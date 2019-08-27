@@ -82,6 +82,21 @@ namespace tacos.mvc.Controllers
 
             return View(request);
         }
+            
+            [HttpPost]
+           public async Task<IActionResult> Revoke(int id) 
+           {
+               var request = await _context.Requests.SingleAsync(r => r.Id == id);
+               request.Approved = false;
+               request.ApprovedComment = null;
+               request.Submitted = false;
+               request.SubmittedBy = null;
+               request.SubmittedOn = null;
+
+               await _context.SaveChangesAsync();
+               return Json(new {success = true});
+               
+           }
 
         public async Task<IActionResult> Edit(int id, string code)
         {
