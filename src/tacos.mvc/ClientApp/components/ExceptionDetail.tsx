@@ -102,8 +102,9 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                     <Modal isOpen={true}>
                         <ModalHeader>Please confirm</ModalHeader>
                         <ModalBody className="d-flex justify-content-center taco-animation-container">
-                            Are you sure you want to Revoke Approval with id: #
-                            {this.props.requestId}
+                            Clicking the revoke approval button will reset this approved exception
+                            to un-submitted status. If you have unsaved changes on this page, please
+                            cancel and save them before proceeding.
                         </ModalBody>
                         <ModalFooter>
                             {this.renderRevokeButton()}
