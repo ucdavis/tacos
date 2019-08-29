@@ -19,7 +19,7 @@ interface IProps {
     requests: IRequest[];
     onEdit: (i: number, request: IRequest) => void;
     onRemove: (i: number) => void;
-
+    onRevoke: (id: number) => void;
     courseNumberFilter?: string;
 
     onCourseCreate: (i: number, defaultValues?: ICourse) => void;
@@ -446,9 +446,10 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         if (!request.exception) {
             return null;
         }
-
         return (
             <ExceptionDetail
+                requestId={request.id || -1} // need to ask scott.
+                onRevoke={this.props.onRevoke}
                 exception={request.exception}
                 exceptionApproved={request.hasApprovedException}
                 exceptionReason={request.exceptionReason}

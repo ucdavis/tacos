@@ -19,7 +19,7 @@ interface IProps {
 // the overall summary of totals, plus action/submit button
 export default class Summary extends React.PureComponent<IProps, {}> {
     
-    saveButtonRender = () => {
+    public saveButtonRender = () => {
         return (
             <button
                 className="btn btn-primary"
@@ -33,7 +33,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
         );
     };
 
-    submitButtonRender = () => {
+    public submitButtonRender = () => {
         return (
             <button
                 className="btn btn-primary"
