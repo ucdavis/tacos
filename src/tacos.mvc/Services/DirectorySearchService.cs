@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ietws;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Serilog;
 using tacos.mvc.Models;
 
 namespace tacos.mvc.services {
@@ -27,77 +25,79 @@ namespace tacos.mvc.services {
 
         public async Task<Person> GetByEmail(string email)
         {
-            // find the contact via their email
-            var ucdContactResult = await ietClient.Contacts.Search(ContactSearchField.email, email);
-            if (ucdContactResult.ResponseStatus != 0 || !ucdContactResult.ResponseData.Results.Any())
+            // get IAM from email
+            var iamResult = await ietClient.Contacts.Search(ContactSearchField.email, email);
+            var iamId = iamResult.ResponseData.Results.Length > 0 ? iamResult.ResponseData.Results[0].IamId : string.Empty;
+            if (string.IsNullOrWhiteSpace(iamId))
             {
-                Log.ForContext("email", email)
-                    .ForContext("response", ucdContactResult, true)
-                    .Warning("User not found");
-
                 return null;
             }
+            // return info for the user identified by this IAM 
+            var result = await ietClient.Kerberos.Search(KerberosSearchField.iamId, iamId);
 
-            var ucdContact = ucdContactResult.ResponseData.Results.First();
-
-            // now look up the whole person's record by ID including kerb
-            var ucdKerbResult = await ietClient.Kerberos.Search(KerberosSearchField.iamId, ucdContact.IamId);
-
-            if (ucdKerbResult.ResponseStatus != 0 || !ucdKerbResult.ResponseData.Results.Any())
+            if (result.ResponseData.Results.Length > 0)
             {
-                Log.ForContext("email", email)
-                   .ForContext("response", ucdKerbResult, true)
-                   .Warning("User not found");
-
-                return null;
+                var ucdKerbPerson = result.ResponseData.Results.First();
+                var user = CreatePerson(email, ucdKerbPerson, iamId);
+                return user;
             }
-
-            var ucdKerbPerson = ucdKerbResult.ResponseData.Results.Single();
-            return new Person
-            {
-                GivenName = ucdKerbPerson.DFirstName,
-                Surname = ucdKerbPerson.DLastName,
-                FullName = ucdKerbPerson.DFullName,
-                Kerberos = ucdKerbPerson.UserId,
-                Mail = ucdContact.Email
-            };
+            return null;
         }
 
         public async Task<Person> GetByKerberos(string kerb)
         {
             var ucdKerbResult = await ietClient.Kerberos.Search(KerberosSearchField.userId, kerb);
-            if (ucdKerbResult.ResponseStatus != 0 || !ucdKerbResult.ResponseData.Results.Any())
-            {
-                Log.ForContext("kerb", kerb)
-                    .ForContext("response", ucdKerbResult, true)
-                    .Warning("User not found");
 
+            if (ucdKerbResult.ResponseData.Results.Length == 0)
+            {
                 return null;
             }
 
-            var ucdKerbPerson = ucdKerbResult.ResponseData.Results.Single();
+            if (ucdKerbResult.ResponseData.Results.Length != 1)
+            {
+                var iamIds = ucdKerbResult.ResponseData.Results.Select(a => a.IamId).Distinct().ToArray();
+                var userIDs = ucdKerbResult.ResponseData.Results.Select(a => a.UserId).Distinct().ToArray();
+                if (iamIds.Length != 1 && userIDs.Length != 1)
+                {
+                    throw new Exception($"IAM issue with non unique values for kerbs: {string.Join(',', userIDs)} IAM: {string.Join(',', iamIds)}");
+                }
+            }
+
+            var ucdKerbPerson = ucdKerbResult.ResponseData.Results.First();
 
             // find their email
             var ucdContactResult = await ietClient.Contacts.Get(ucdKerbPerson.IamId);
-            if (ucdContactResult.ResponseStatus != 0 || !ucdContactResult.ResponseData.Results.Any())
-            {
-                Log.ForContext("kerb", kerb)
-                    .ForContext("response", ucdContactResult, true)
-                    .Warning("User not found");
 
+            if (ucdContactResult.ResponseData.Results.Length == 0)
+            {
                 return null;
             }
 
             var ucdContact = ucdContactResult.ResponseData.Results.First();
+            var rtValue = CreatePerson(ucdContact.Email, ucdKerbPerson, ucdKerbPerson.IamId);
 
-            return new Person
+            if (string.IsNullOrWhiteSpace(rtValue.Mail))
+            {
+                if (!string.IsNullOrWhiteSpace(ucdKerbPerson.UserId))
+                {
+                    rtValue.Mail = $"{ucdKerbPerson.UserId}@ucdavis.edu";
+                }
+            }
+
+            return rtValue;
+        }
+
+        private Person CreatePerson(string email, KerberosResult ucdKerbPerson, string iamId)
+        {
+            var user = new Person()
             {
                 GivenName = ucdKerbPerson.DFirstName,
                 Surname = ucdKerbPerson.DLastName,
                 FullName = ucdKerbPerson.DFullName,
                 Kerberos = ucdKerbPerson.UserId,
-                Mail = ucdContact.Email
+                Mail = email
             };
+            return user;
         }
     }
 }
