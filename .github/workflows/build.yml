@@ -15,8 +15,8 @@ jobs:
     - name: Run a one-line script
       
     - uses: actions/setup-node@v1
-    with:
-      node-version: '10.x'
+      with:
+        node-version: '10.x'
     - name: Setup node
 
     - uses: actions/setup-dotnet@v1
