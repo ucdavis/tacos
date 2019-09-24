@@ -13,8 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+      
+    - uses: actions/setup-node@v1
+    with:
+      node-version: '10.x'
+    - name: Setup node
+
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '2.1.403' # SDK Version to use.
+    - name: Setup dotnet      
