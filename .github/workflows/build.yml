@@ -18,8 +18,10 @@ jobs:
       with:
         node-version: '10.x'
 
-    - name: Run npm
+    - name: Run npm install
       run: cd ./src/tacos.mvc/ && npm install
+  
+    - name: Run npm build
       run: cd ./src/tacos.mvc/ && npm run build
 
     - uses: actions/setup-dotnet@v1
