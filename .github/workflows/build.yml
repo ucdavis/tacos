@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  buildConfig: ${{ 'Release' }}
+  BUILD_CONFIG: ${{ 'Release' }}
   
 on:
   pull_request:
@@ -26,4 +26,4 @@ jobs:
         dotnet-version: '2.1.403' # SDK Version to use.
 
     - name: Run build
-      run: dotnet build ./Keas.Mvc/Keas.Mvc.csproj --configuration $GITHUB_CONTEXT
+      run: dotnet build ./src/tacos.mvc/tacos.mvc.csproj --configuration $BUILD_CONFIG
