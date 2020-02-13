@@ -88,6 +88,7 @@
                 <th>Reason</th>
                 <th>Reviewed?</th>
                 <th>Approved?</th>
+                <th>Approval Reason</th>
                 <th>Updated On</th>
                 <th>Updated By</th>
             </tr>
@@ -103,6 +104,7 @@
                 <td>@(h.Exception ? h.ExceptionReason : "")</td>
                 <td>@(h.Approved.HasValue ? "Yes" : "No")</td>
                 <td>@(h.Approved.HasValue ? (h.Approved.Value ? "Yes" : "No") : "")</td>
+                <td>@(h.Exception ? h.ApprovedComment : "")</td>
                 <td>@h.UpdatedOn.ToString("G")</td>
                 <td>@h.UpdatedBy</td>
             </tr>
