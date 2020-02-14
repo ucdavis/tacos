@@ -22,4 +22,4 @@
 
 Run SQL Server Agent Job on Db: `Load AZURE Tacos`
 
-Reset exceptions to default (script TODO)
+Reset exceptions to default using `/System/ManageSubmissions`
