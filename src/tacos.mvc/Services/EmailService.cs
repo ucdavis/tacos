@@ -29,6 +29,7 @@ namespace tacos.mvc.services
         private readonly UserManager<User> _userManager;
 
         private readonly Address _replyAddress = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
+        private readonly Address _ccAddress = new Address("tacos-approval-notice@ucdavis.edu", "TACOS Reviewers");
 
         public EmailService(IHostingEnvironment environment, IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
         {
@@ -121,6 +122,7 @@ namespace tacos.mvc.services
                 Recipients = new List<Recipient>()
                 {
                     new Recipient() {Address = GetAddressFromUser(recipient)},
+                    new Recipient { Address = _ccAddress, Type = RecipientType.CC }
                 },
             };
 
