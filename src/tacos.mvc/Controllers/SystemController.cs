@@ -187,5 +187,19 @@ namespace tacos.mvc.Controllers
 
             return RedirectToAction(nameof(DepartmentUsers));
         }
+
+        [HttpGet]
+        public IActionResult ManageSubmissions() {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetSubmissions() {
+            await _dbContext.Database.ExecuteSqlCommandAsync("usp_ResetRequests;");
+
+            Message = "Submissions reset";
+
+            return RedirectToAction("Index");
+        }
     }
 }

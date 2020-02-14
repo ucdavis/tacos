@@ -1,0 +1,14 @@
+@{
+    ViewBag.Title = "Manage Submissions";
+}
+
+<div class="container">
+    <form method="post" asp-action="ResetSubmissions" asp-antiforgery="true">
+        <h2>Reset All Submissions</h2>
+        <p>
+            Warning: Clicking "Reset" will remove all exceptions and place every submission back in an "unsubmitted status".  
+            You probably only want to do this once a year when you are ready to start over with fresh data.
+        </p>
+        <button class="btn btn-danger" type="submit">Reset All Submissions <i class="fas fa-trash"></i></button>
+    </form>
+</div>
