@@ -1,46 +1,31 @@
-using System;
 using AspNetCore.Security.CAS;
-using Mjml.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Serilog;
 using tacos.core;
 using tacos.core.Data;
 using tacos.mvc.Helpers;
 using tacos.mvc.services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Mjml.AspNetCore;
+using Serilog;
+using Microsoft.Extensions.Hosting;
 
 namespace tacos.mvc
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
-            Environment = env;
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
-
-        public IHostingEnvironment Environment { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -62,7 +47,9 @@ namespace tacos.mvc
                     options.CasServerUrlBase = Configuration["Common:CasBaseUrl"];
                 });
 
-            services.AddMvc().AddJsonOptions(o =>
+
+            // TODO: controllers or controllers with views?
+            services.AddControllersWithViews().AddNewtonsoftJson(o =>
             {
                 o.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 o.SerializerSettings.Formatting = Formatting.Indented;
@@ -73,16 +60,17 @@ namespace tacos.mvc
             // add render services
             services.AddMjmlServices(o =>
             {
-                if (Environment.IsDevelopment())
-                {
-                    o.DefaultKeepComments = true;
-                    o.DefaultBeautify = true;
-                }
-                else
-                {
-                    o.DefaultKeepComments = false;
-                    o.DefaultMinify = true;
-                }
+                // TODO: what does this do and why bother?
+                // if (Environment.IsDevelopment())
+                // {
+                //     o.DefaultKeepComments = true;
+                //     o.DefaultBeautify = true;
+                // }
+                // else
+                // {
+                //     o.DefaultKeepComments = false;
+                //     o.DefaultMinify = true;
+                // }
             });
 
             services.AddTransient<IEmailService, EmailService>();
@@ -90,7 +78,7 @@ namespace tacos.mvc
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             // setup logging
             LogHelper.Setup(Configuration);
@@ -100,11 +88,11 @@ namespace tacos.mvc
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    // HotModuleReplacement = true,
-                    // ReactHotModuleReplacement = true
-                });
+                // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                // {
+                //     // HotModuleReplacement = true,
+                //     // ReactHotModuleReplacement = true
+                // });
             }
             else
             {
@@ -113,14 +101,14 @@ namespace tacos.mvc
 
             app.UseStaticFiles();
 
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+            app.UseEndpoints(routes => {
+                routes.MapDefaultControllerRoute();
             });
+            
         }
     }
 }

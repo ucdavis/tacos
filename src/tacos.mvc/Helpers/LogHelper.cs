@@ -11,12 +11,12 @@ namespace tacos.mvc.Helpers
     {
         private static bool _loggingSetup;
 
-        private static IConfigurationRoot _configuration;
+        private static IConfiguration _configuration;
 
         /// <summary>
         /// Configure Application Logging
         /// </summary>
-        public static void Setup(IConfigurationRoot configuration)
+        public static void Setup(IConfiguration configuration)
         {
             if (_loggingSetup) return; //only setup logging once
 
