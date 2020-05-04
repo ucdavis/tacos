@@ -6,6 +6,7 @@
     "node": "8.9.4"
   },
   "scripts": {
+    "start": "npm run debug",
     "debug": "ASPNETCORE_ENVIRONMENT=Development dotnet watch run",
     "build": "node node_modules/webpack/bin/webpack.js --env.prod",
     "webpack": "node node_modules/webpack/bin/webpack.js --env.dev --watch",
