@@ -70,7 +70,7 @@ namespace tacos.core
         private async Task FindOrCreateDepartment(Department department)
         {
             var foundDepartment = await _context.Departments
-                .SingleOrDefaultAsync(d => string.Equals(d.Code, department.Code, StringComparison.OrdinalIgnoreCase));
+                .SingleOrDefaultAsync(d => d.Code == department.Code);
 
             if (foundDepartment != null)
             {
