@@ -37,7 +37,7 @@ namespace tacos.mvc.Controllers
             ViewBag.Departments = departments;
 
             var department = !string.IsNullOrWhiteSpace(code)
-                ? departments.SingleOrDefault(d => string.Equals(d.Code, code, StringComparison.OrdinalIgnoreCase))
+                ? departments.SingleOrDefault(d => d.Code == code)
                 : departments.FirstOrDefault();
 
             if (department == null)
@@ -107,7 +107,7 @@ namespace tacos.mvc.Controllers
             ViewBag.Departments = departments;
 
             var department = !string.IsNullOrWhiteSpace(code)
-                ? departments.SingleOrDefault(d => string.Equals(d.Code, code, StringComparison.OrdinalIgnoreCase))
+                ? departments.SingleOrDefault(d => d.Code == code)
                 : departments.FirstOrDefault();
 
             if (department == null)
@@ -164,8 +164,7 @@ namespace tacos.mvc.Controllers
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
                 var course = await _context.Courses
-                    .FirstOrDefaultAsync(c =>
-                        string.Equals(c.Number, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefaultAsync(c => c.Number == m.CourseNumber);
 
                 // possible create new course
                 if (course == null)
@@ -192,7 +191,7 @@ namespace tacos.mvc.Controllers
                 {
                     request = await _context.Requests
                         .FirstOrDefaultAsync(r => r.DepartmentId == model.DepartmentId &&
-                            string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                            r.CourseNumber == m.CourseNumber);
                 }
 
                 // create request if necessary
@@ -274,7 +273,7 @@ namespace tacos.mvc.Controllers
                 {
                     request = await _context.Requests
                         .FirstOrDefaultAsync(r => r.DepartmentId == model.DepartmentId &&
-                            string.Equals(r.CourseNumber, m.CourseNumber, StringComparison.OrdinalIgnoreCase));
+                            r.CourseNumber == m.CourseNumber);
                 }
 
                 // submit request
