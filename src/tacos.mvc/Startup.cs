@@ -60,20 +60,7 @@ namespace tacos.mvc
             });
 
             // add render services
-            services.AddMjmlServices(o =>
-            {
-                // TODO: what does this do and why bother?
-                // if (Environment.IsDevelopment())
-                // {
-                //     o.DefaultKeepComments = true;
-                //     o.DefaultBeautify = true;
-                // }
-                // else
-                // {
-                //     o.DefaultKeepComments = false;
-                //     o.DefaultMinify = true;
-                // }
-            });
+            services.AddMjmlServices();
 
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IDirectorySearchService, IetWsSearchService>();
@@ -90,11 +77,6 @@ namespace tacos.mvc
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                // {
-                //     // HotModuleReplacement = true,
-                //     // ReactHotModuleReplacement = true
-                // });
             }
             else
             {
