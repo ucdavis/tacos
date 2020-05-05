@@ -29,7 +29,7 @@ namespace tacos.mvc.Controllers
         public async Task<IActionResult> Details(string id)
         {
             var course = await _dbContext.Courses
-                .SingleOrDefaultAsync(c => string.Equals(c.Number, id, StringComparison.OrdinalIgnoreCase));
+                .SingleOrDefaultAsync(c => c.Number == id);
 
             if (course == null)
             {
@@ -37,7 +37,7 @@ namespace tacos.mvc.Controllers
             }
 
             var description = await _dbContext.CourseDescriptions
-                .SingleOrDefaultAsync(c => string.Equals(c.Course, id, StringComparison.OrdinalIgnoreCase));
+                .SingleOrDefaultAsync(c => c.Course == id);
 
             var model = new CourseDetailsViewModel
             {
