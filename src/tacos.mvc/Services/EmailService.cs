@@ -15,6 +15,7 @@ using tacos.core.Resources;
 using tacos.emails.models;
 
 using Request = tacos.core.Data.Request;
+using Microsoft.Extensions.Hosting;
 
 namespace tacos.mvc.services
 {
@@ -31,7 +32,7 @@ namespace tacos.mvc.services
         private readonly Address _replyAddress = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
         private readonly Address _ccAddress = new Address("tacos-approval-notice@ucdavis.edu", "TACOS Reviewers");
 
-        public EmailService(IHostingEnvironment environment, IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
+        public EmailService(IWebHostEnvironment environment, IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
         {
             _isDevelopment = environment.IsDevelopment();
 

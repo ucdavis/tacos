@@ -17,20 +17,27 @@ module.exports = env => {
         stats: {
             modules: false
         },
-        entry: {
-            app: "./ClientApp/app.tsx",
-            edit: "./ClientApp/pages/EditSubmission.tsx",
-        },
+        entry: [
+            isDevBuild && require.resolve('webpack-dev-server/client') + '?/',
+            "./ClientApp/pages/EditSubmission.tsx",
+        ].filter(Boolean),
         resolve: {
             extensions: [".js", ".jsx", ".ts", ".tsx"]
         },
         output: {
             path: path.join(__dirname, bundleOutputDir),
             filename: "[name].js",
-            publicPath: "/"
+            publicPath: "/dist"
         },
         mode: isDevBuild ? 'development' : 'production',
         devtool: isDevBuild ? 'eval-source-map': 'source-map',
+        devServer: {
+            compress: true,
+            port: process.env.DEV_SERVER_PORT || 8080,
+            injectClient: false,
+            // transportMode: 'ws',  // TODO: move to WS once it's no longer experimental
+            contentBase: path.resolve(__dirname, 'wwwroot')
+        },
         module: {
             rules: [{
                     test: /\.tsx?$/,
@@ -42,10 +49,7 @@ module.exports = env => {
                     use: [
                         !isDevBuild ?
                         MiniCssExtractPlugin.loader : {
-                            loader: 'style-loader',
-                            options: {
-                                sourceMap: true,
-                            },
+                            loader: 'style-loader'
                         },
                         {
                             loader: 'css-loader',
@@ -60,10 +64,7 @@ module.exports = env => {
                     use: [
                         !isDevBuild ?
                         MiniCssExtractPlugin.loader : {
-                            loader: 'style-loader',
-                            options: {
-                                sourceMap: true,
-                            },
+                            loader: 'style-loader'
                         },
                         {
                             loader: 'css-loader',

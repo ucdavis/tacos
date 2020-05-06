@@ -7,6 +7,8 @@ import SubmissionContainer from "../containers/SubmissionContainer";
 import { IDepartment } from "../models/IDepartment";
 import { IRequest } from "../models/IRequest";
 
+import "../css/site.scss";
+
 declare var department: IDepartment;
 declare var model: IRequest[];
 

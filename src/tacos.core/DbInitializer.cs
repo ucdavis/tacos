@@ -70,7 +70,7 @@ namespace tacos.core
         private async Task FindOrCreateDepartment(Department department)
         {
             var foundDepartment = await _context.Departments
-                .SingleOrDefaultAsync(d => string.Equals(d.Code, department.Code, StringComparison.OrdinalIgnoreCase));
+                .SingleOrDefaultAsync(d => d.Code == department.Code);
 
             if (foundDepartment != null)
             {
@@ -146,15 +146,6 @@ namespace tacos.core
                 Id = "postit"
             };
             await FindOrCreateUser(scottUser);
-
-            var johnUser = new User()
-            {
-                Email = "jpknoll@ucdavis.edu",
-                UserName = "jpknoll",
-                Name = "John Knoll",
-                Id = "jpknoll"
-            };
-            await FindOrCreateUser(johnUser);
         }
 
         private async Task FindOrCreateUser(User user)
