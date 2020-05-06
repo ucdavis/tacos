@@ -100,7 +100,12 @@ namespace tacos.core.Data
                 .HasOne(r => r.Course)
                 .WithMany()
                 .HasForeignKey(r => r.CourseNumber);
-        }
+
+            builder.Entity<Request>()
+                .HasMany(r => r.History)
+                .WithOne(h => h.Request)
+                .OnDelete(DeleteBehavior.NoAction);
+;        }
 
         public bool HasApprovedException {
             get {
