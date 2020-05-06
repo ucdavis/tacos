@@ -17,6 +17,7 @@ using Serilog;
 using Microsoft.Extensions.Hosting;
 using SpaCliMiddleware;
 using Microsoft.AspNetCore.SpaServices;
+using StackifyLib;
 
 namespace tacos.mvc
 {
@@ -69,10 +70,7 @@ namespace tacos.mvc
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            // setup logging
-            LogHelper.Setup(Configuration);
-            app.UseMiddleware<StackifyMiddleware.RequestTracerMiddleware>();
-            loggerFactory.AddSerilog();
+            Configuration.ConfigureStackifyLogging();
 
             if (env.IsDevelopment())
             {
@@ -84,6 +82,8 @@ namespace tacos.mvc
             }
 
             app.UseStaticFiles();
+
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
             app.UseAuthentication();
