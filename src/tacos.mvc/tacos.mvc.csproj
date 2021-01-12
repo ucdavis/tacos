@@ -23,7 +23,6 @@
     <PackageReference Include="Serilog.Exceptions" Version="5.4.0" />
     <PackageReference Include="Serilog.Sinks.Stackify" Version="2.0.2" />
     <PackageReference Include="SpaCliMiddleware" Version="3.1.2" />
-    <PackageReference Include="SparkPost" Version="1.14.0" />
     <PackageReference Include="StackifyLib" Version="2.1.7" />
     <PackageReference Include="StackifyMiddleware" Version="3.0.5.2" />
   </ItemGroup>
