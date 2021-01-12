@@ -21,6 +21,7 @@
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Exceptions" Version="5.4.0" />
+    <PackageReference Include="serilog.sinks.elasticsearch" Version="8.4.1" />
     <PackageReference Include="Serilog.Sinks.Stackify" Version="2.0.2" />
     <PackageReference Include="SpaCliMiddleware" Version="3.1.2" />
     <PackageReference Include="StackifyLib" Version="2.1.7" />
@@ -52,9 +53,8 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
     <!-- Need to create an empty dist folder.  In dev, these files will be served by webpack -->
-    <RemoveDir
-            Directories="wwwroot\dist" />
-    <MakeDir Directories="wwwroot\dist"/>
+    <RemoveDir Directories="wwwroot\dist" />
+    <MakeDir Directories="wwwroot\dist" />
   </Target>
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
