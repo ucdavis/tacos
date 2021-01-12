@@ -195,7 +195,7 @@ namespace tacos.mvc.Controllers
 
         [HttpPost]
         public async Task<IActionResult> ResetSubmissions() {
-            await _dbContext.Database.ExecuteSqlCommandAsync("usp_ResetRequests;");
+            await _dbContext.Database.ExecuteSqlRawAsync("usp_ResetRequests;");
 
             Message = "Submissions reset";
 

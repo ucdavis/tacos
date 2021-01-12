@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Identity;
 using Mjml.AspNetCore;
 using Microsoft.Extensions.Options;
 using RazorLight;
-using SparkPost;
 using tacos.core;
 using tacos.core.Data;
 using tacos.core.Resources;
 using tacos.emails.models;
 
-using Request = tacos.core.Data.Request;
 using Microsoft.Extensions.Hosting;
+using System.Net.Mail;
+using System.Net;
 
 namespace tacos.mvc.services
 {
@@ -29,8 +29,10 @@ namespace tacos.mvc.services
         private readonly TacoDbContext _dbContext;
         private readonly UserManager<User> _userManager;
 
-        private readonly Address _replyAddress = new Address("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
-        private readonly Address _ccAddress = new Address("tacos-approval-notice@ucdavis.edu", "TACOS Reviewers");
+        private readonly SmtpClient _client;
+
+        private readonly MailAddress _replyAddress = new MailAddress("tacos-donotreply@notify.ucdavis.edu", "TACOS Notification");
+        private readonly MailAddress _ccAddress = new MailAddress("tacos-approval-notice@ucdavis.edu", "TACOS Reviewers");
 
         public EmailService(IWebHostEnvironment environment, IOptions<SparkpostSettings> emailSettings, IMjmlServices mjmlServices, TacoDbContext dbContext, UserManager<User> userManager)
         {
@@ -41,6 +43,8 @@ namespace tacos.mvc.services
             _mjmlServices = mjmlServices;
             _dbContext = dbContext;
             _userManager = userManager;
+
+            _client = new SmtpClient(_emailSettings.Host, _emailSettings.Port) { Credentials = new NetworkCredential(_emailSettings.UserName, _emailSettings.Password), EnableSsl = true };
         }
 
         public async Task SendSubmissionNotification(IReadOnlyList<Request> requests)
@@ -66,21 +70,16 @@ namespace tacos.mvc.services
             // convert email to real html
             var result = await _mjmlServices.Render(prehtml);
 
-            // create transmission
-            
-            var transmission = new Transmission()
+            // create message
+            using (var message = new MailMessage { From = _replyAddress, Subject = "New Pending Approvals on TACOS" })
             {
-                Content = new Content()
-                {
-                    Subject = "New Pending Approvals on TACOS",
-                    Html = result.Html,
-                    From = _replyAddress,
-                },
-                Recipients = new List<Recipient>(admins.Select(a => new Recipient() { Address = GetAddressFromUser(a) })),
-            };
+                message.Body = result.Html;
 
-            var client = GetSparkpostClient();
-            await client.Transmissions.Send(transmission);
+                admins.Select(a => GetMailAddressFromUser(a)).ToList().ForEach(message.To.Add);
+
+                // send it
+                await _client.SendMailAsync(message);
+            }
         }
 
         public async Task SendApprovalNotification(Request request)
@@ -111,24 +110,17 @@ namespace tacos.mvc.services
                 ? $"TACOS Request Approved for {request.CourseNumber}"
                 : $"TACOS Request Denied for {request.CourseNumber}";
 
-            // create transmission
-            var transmission = new Transmission()
+            // create message
+            using (var message = new MailMessage { From = _replyAddress, Subject = subject })
             {
-                Content = new Content()
-                {
-                    Subject = subject,
-                    Html = result.Html,
-                    From = _replyAddress,
-                },
-                Recipients = new List<Recipient>()
-                {
-                    new Recipient() {Address = GetAddressFromUser(recipient)},
-                    new Recipient { Address = _ccAddress, Type = RecipientType.CC }
-                },
-            };
+                message.Body = result.Html;
 
-            var client = GetSparkpostClient();
-            await client.Transmissions.Send(transmission);
+                message.To.Add(GetMailAddressFromUser(recipient));
+                message.CC.Add(_ccAddress);
+
+                // send it
+                await _client.SendMailAsync(message);
+            }
         }
 
         private static RazorLightEngine GetRazorEngine()
@@ -143,20 +135,14 @@ namespace tacos.mvc.services
             return engine;
         }
 
-        private Client GetSparkpostClient()
-        {
-            var client = new Client(_emailSettings.ApiKey);
-            return client;
-        }
-
-        private Address GetAddressFromUser(User user)
+        private MailAddress GetMailAddressFromUser(User user)
         {
             if (_isDevelopment)
             {
-                return new Address("jpknoll@ucdavis.edu");
+                return new MailAddress("srkirkland@ucdavis.edu");
             }
 
-            return new Address(user.Email, user.Name);
+            return new MailAddress(user.Email, user.Name);
         }
     }
 
@@ -170,6 +156,10 @@ namespace tacos.mvc.services
     public class SparkpostSettings
     {
         public string ApiKey { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
+        public string Host { get; set; }
+        public int Port { get; set; }
     }
 
 }
