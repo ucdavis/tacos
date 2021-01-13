@@ -17,9 +17,7 @@ namespace tacos.mvc
     {
         public static void Main(string[] args)
         {
-            var devEnvironmentVariable = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            var isDevelopment = devEnvironmentVariable.ToLower() == "development";
+            var isDevelopment = string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "development", StringComparison.OrdinalIgnoreCase);
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(System.IO.Directory.GetCurrentDirectory())
@@ -36,7 +34,7 @@ namespace tacos.mvc
 
             var loggingSection = configuration.GetSection("Stackify");
                 
-            Log.Logger = new LoggerConfiguration()
+            var loggerConfig = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 // .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning) // uncomment this to hide EF core general info logs
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -45,12 +43,18 @@ namespace tacos.mvc
                 .Enrich.WithProperty("Application", loggingSection.GetValue<string>("AppName"))
                 .Enrich.WithProperty("AppEnvironment", loggingSection.GetValue<string>("Environment"))
                 .WriteTo.Console()
-                .WriteTo.Stackify()
-                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(loggingSection.GetValue<string>("ElasticUrl")))
+                .WriteTo.Stackify();
+
+            // add in elastic search sink if the uri is valid
+            Uri elasticUri;
+            if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out elasticUri)) {
+                loggerConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
                 {
                     IndexFormat = "aspnet-tacos-{0:yyyy.MM.dd}"
-                })
-                .CreateLogger();
+                });
+            }
+
+            Log.Logger = loggerConfig.CreateLogger();
 
             var host = CreateHostBuilder(args).Build();
 
