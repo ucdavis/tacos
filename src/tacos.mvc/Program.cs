@@ -19,12 +19,12 @@ namespace tacos.mvc
         {
             var devEnvironmentVariable = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            var isDevelopment = string.IsNullOrEmpty(devEnvironmentVariable) ||
-                                devEnvironmentVariable.ToLower() == "development";
+            var isDevelopment = devEnvironmentVariable.ToLower() == "development";
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(System.IO.Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables();
 
             //only add secrets in development
             if (isDevelopment)
