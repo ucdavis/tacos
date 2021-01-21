@@ -419,7 +419,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 request.exceptionAnnualizedTotal =
                     request.exceptionTotal *
                     annualizationRatio *
-                    request.course.timesOfferedPerYear;
+                    request.exceptionAnnualCount; // for exceptions, use the desired annual count instead of course times offered history
             } else {
                 request.calculatedTotal = 0;
                 request.annualizedTotal = 0;
