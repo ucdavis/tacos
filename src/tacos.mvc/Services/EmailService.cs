@@ -74,6 +74,7 @@ namespace tacos.mvc.services
             using (var message = new MailMessage { From = _replyAddress, Subject = "New Pending Approvals on TACOS" })
             {
                 message.Body = result.Html;
+                message.IsBodyHtml = true;
 
                 admins.Select(a => GetMailAddressFromUser(a)).ToList().ForEach(message.To.Add);
 
@@ -114,6 +115,7 @@ namespace tacos.mvc.services
             using (var message = new MailMessage { From = _replyAddress, Subject = subject })
             {
                 message.Body = result.Html;
+                message.IsBodyHtml = true;
 
                 message.To.Add(GetMailAddressFromUser(recipient));
                 message.CC.Add(_ccAddress);
