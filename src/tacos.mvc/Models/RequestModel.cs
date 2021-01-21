@@ -19,6 +19,8 @@ namespace tacos.mvc.Models
 
         public double ExceptionTotal { get; set; }
 
+        public double ExceptionAnnualCount { get; set; }
+
         public double ExceptionAnnualizedTotal { get; set; }
 
         // calculated total of TAs, regardless of what is requested

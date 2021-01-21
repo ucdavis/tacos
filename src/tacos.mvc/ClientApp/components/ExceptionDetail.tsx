@@ -9,6 +9,8 @@ interface IProps {
     exceptionApproved?: boolean;
     exceptionReason: string;
     exceptionTotal: number;
+    exceptionAnnualCount: number;
+    onExceptionAnnualCountChange: (exceptionAnnualCount: number) => void;
     onExceptionTotalChange: (exceptionTotal: number) => void;
     onReasonChange: (exceptionReason: string) => void;
 }
@@ -24,7 +26,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
         if (nextProps.exceptionReason !== prevState.exceptionReason) {
             return {
-                exceptionReason: nextProps.exceptionReason
+                exceptionReason: nextProps.exceptionReason,
             };
         }
 
@@ -37,7 +39,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         this.state = {
             exceptionReason: "",
             revoked: false,
-            isRevoking: false
+            isRevoking: false,
         };
     }
 
@@ -56,6 +58,10 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                     <b>Proposed TA % per course offering</b>
                 </p>
                 <div className="exceptionRowComponents">{this.renderExceptionTotal()}</div>
+                <p>
+                    <b>Proposed number of annual course offerings</b>
+                </p>
+                <div className="exceptionRowComponents">{this.renderExceptionAnnualCount()}</div>
                 <p>
                     <b>
                         Reason for requesting an exception. Requests for additional TA or Reader
@@ -90,8 +96,8 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     };
 
     private revokedToggle = () => {
-        this.setState(prevState => ({
-            revoked: !prevState.revoked
+        this.setState((prevState) => ({
+            revoked: !prevState.revoked,
         }));
     };
 
@@ -153,6 +159,20 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         );
     };
 
+    private renderExceptionAnnualCount = () => {
+        return (
+            <NumberInput
+                className="form-control"
+                min={0}
+                step={0.25}
+                placeholder="Annual offerings requested"
+                value={this.props.exceptionAnnualCount}
+                onChange={this.onChangeAnnualCount}
+                format={this.formatExceptionTotal}
+            />
+        );
+    };
+
     private formatExceptionTotal = (value: number) => {
         if (value === 0) {
             return "";
@@ -175,6 +195,10 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         );
     };
 
+    private onChangeAnnualCount = (value: number) => {
+        this.props.onExceptionAnnualCountChange(value);
+    };
+
     private onChangeTotal = (value: number) => {
         this.props.onExceptionTotalChange(value);
     };
@@ -185,7 +209,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
 
     private onChangeReason = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         this.setState({
-            exceptionReason: e.target.value
+            exceptionReason: e.target.value,
         });
     };
 }

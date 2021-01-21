@@ -36,6 +36,8 @@ namespace tacos.core.Data
 
         public double ExceptionTotal { get; set; }
 
+        public double ExceptionAnnualCount { get; set; }
+
         public double ExceptionAnnualizedTotal { get; set; }
 
         public string ApprovedComment { get; set; }
