@@ -454,6 +454,10 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 exceptionApproved={request.hasApprovedException}
                 exceptionReason={request.exceptionReason}
                 exceptionTotal={request.exceptionTotal}
+                exceptionAnnualCount={request.exceptionAnnualCount}
+                onExceptionAnnualCountChange={(exceptionAnnualCount) =>
+                    this.requestChanged(index, "exceptionAnnualCount", exceptionAnnualCount)
+                }
                 onExceptionTotalChange={exceptionTotal =>
                     this.requestChanged(index, "exceptionTotal", exceptionTotal)
                 }

@@ -99,6 +99,7 @@ namespace tacos.mvc.Controllers
                 Exception = request.Exception,
                 ExceptionReason = request.ExceptionReason,
                 ExceptionTotal = request.ExceptionTotal,
+                ExceptionAnnualCount = request.ExceptionAnnualCount,
                 ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
                 CalculatedTotal = request.CalculatedTotal,
                 AnnualizedTotal = request.AnnualizedTotal,

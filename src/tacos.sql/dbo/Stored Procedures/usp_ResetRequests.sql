@@ -13,7 +13,7 @@ BEGIN
 
     -- Insert statements for procedure here
     UPDATE Requests set Approved = null, 
-		Exception = 0, ExceptionAnnualizedTotal = 0, ExceptionReason = null, ExceptionTotal = 0, 
+		Exception = 0, ExceptionAnnualizedTotal = 0, ExceptionAnnualCount = 0, ExceptionReason = null, ExceptionTotal = 0, 
 		ApprovedComment = null, Submitted = 0, SubmittedBy = null, SubmittedOn = null
 
 END

@@ -18,6 +18,7 @@ export interface IRequest {
     exception: boolean;
     exceptionReason: string;
     exceptionTotal: number;
+    exceptionAnnualCount: number;
     exceptionAnnualizedTotal: number;
     hasApprovedException: boolean;
 

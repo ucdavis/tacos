@@ -419,7 +419,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 request.exceptionAnnualizedTotal =
                     request.exceptionTotal *
                     annualizationRatio *
-                    request.course.timesOfferedPerYear;
+                    request.exceptionAnnualCount; // for exceptions, use the desired annual count instead of course times offered history
             } else {
                 request.calculatedTotal = 0;
                 request.annualizedTotal = 0;
@@ -464,9 +464,9 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.error = "Exception required with new courses";
         }
 
-        if (request.exception && request.exceptionTotal <= 0) {
+        if (request.exception && (request.exceptionTotal <= 0 || request.exceptionAnnualCount <= 0)) {
             request.isValid = false;
-            request.error = "Exception > 0 required";
+            request.error = "Exception values > 0 required";
         }
 
         // check for duplicate courses earlier in the array
@@ -510,6 +510,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 exception: false,
                 exceptionReason: "",
                 exceptionTotal: 0.0,
+                exceptionAnnualCount: 0.0,
                 exceptionAnnualizedTotal: 0,
                 hasApprovedException: false,
                 isValid: true,

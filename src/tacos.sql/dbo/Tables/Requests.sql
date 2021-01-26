@@ -9,6 +9,7 @@ CREATE TABLE [dbo].[Requests] (
     [DepartmentId]             INT            NOT NULL,
     [Exception]                BIT            NOT NULL,
     [ExceptionAnnualizedTotal] FLOAT (53)     NOT NULL,
+    [ExceptionAnnualCount]     FLOAT (53)     NOT NULL,
     [ExceptionReason]          NVARCHAR (MAX) NULL,
     [ExceptionTotal]           FLOAT (53)     NOT NULL,
     [ApprovedComment]          NVARCHAR (MAX) NULL, 
