@@ -11,6 +11,11 @@ namespace tacos.core.Data
 
         public string DeptName { get; set; }
 
+        /// <summary>
+        /// Contains the AverageEnrollment value prior to combining the Average Enrollment values
+        /// for cross-listed courses.  Both this value and that for AverageEnrollment will always
+        /// be the same for non cross-listed courses. 
+        /// </summary>
         [DisplayFormat(DataFormatString = "0.##")]
         public double NonCrossListedAverageEnrollment { get; set; }
 
