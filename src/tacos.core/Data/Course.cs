@@ -9,6 +9,9 @@ namespace tacos.core.Data
 
         public string Name { get; set; }
 
+        /// <summary>
+        /// The name of the department offering the course.
+        /// </summary>
         public string DeptName { get; set; }
 
         /// <summary>
