@@ -193,6 +193,11 @@ export default class CourseNumber extends React.Component<IProps, IState> {
             averageEnrollment: 0,
             averageSectionsPerCourse: 0,
             timesOfferedPerYear: 0,
+            crossListingsString: "",
+            isCrossListed: false,
+            isOfferedWithinPastTwoYears: true,
+            isCourseTaughtOnceEveryTwoYears: false,
+            wasCourseTaughtInMostRecentYear: false,
             isNew: true,
         })
     }
