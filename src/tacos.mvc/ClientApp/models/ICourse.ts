@@ -4,6 +4,11 @@ export interface ICourse {
     timesOfferedPerYear: number;
     averageSectionsPerCourse: number;
     averageEnrollment: number;
+    isCrossListed: boolean;
+    crossListingsString: string;
+    isOfferedWithinPastTwoYears: boolean;
+    wasCourseTaughtInMostRecentYear: boolean;
+    isCourseTaughtOnceEveryTwoYears: boolean;
 
     isNew: boolean;
-  }
+}

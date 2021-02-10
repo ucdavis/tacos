@@ -420,6 +420,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     request.exceptionTotal *
                     annualizationRatio *
                     request.exceptionAnnualCount; // for exceptions, use the desired annual count instead of course times offered history
+
+                // courses taught once every two years get 0 for off year, double for on year
+                if (request.course.isCourseTaughtOnceEveryTwoYears) {
+                    request.annualizedTotal = request.course.wasCourseTaughtInMostRecentYear ? 0 : request.annualizedTotal * 2;
+                }
             } else {
                 request.calculatedTotal = 0;
                 request.annualizedTotal = 0;

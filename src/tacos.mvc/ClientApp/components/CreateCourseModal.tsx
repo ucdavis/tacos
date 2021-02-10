@@ -83,7 +83,11 @@ export default class CreateCourseModal extends React.PureComponent<IProps, IStat
             averageEnrollment: 0,
             averageSectionsPerCourse: 0,
             timesOfferedPerYear: 0,
-
+            crossListingsString: "",
+            isCrossListed: false,
+            isOfferedWithinPastTwoYears: true,
+            isCourseTaughtOnceEveryTwoYears: false,
+            wasCourseTaughtInMostRecentYear: false,
             isNew: true,
         });
     }

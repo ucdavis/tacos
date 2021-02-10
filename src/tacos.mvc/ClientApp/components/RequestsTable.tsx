@@ -130,7 +130,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 Header: "Annualized TA FTE",
                 accessor: "annualizedTotal",
                 className: "text-center",
-                Cell: (row: ITypedRowInfo) => row.original.annualizedTotal.toFixed(3),
+                Cell: this.renderAnnualizedFTE,
             },
             {
                 id: "exception",
@@ -415,6 +415,39 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 <i className="fa fa-trash-alt" />
             </button>
         );
+    }
+
+    private renderAnnualizedFTE = (row: ITypedCellInfo) => {
+        const index = row.index;
+        const request = row.original;
+        const course = request.course;
+
+  
+
+        if (course && course.isCourseTaughtOnceEveryTwoYears) {
+            return (
+                <>
+                    {request.annualizedTotal.toFixed(3)}
+                    <span style={{ paddingLeft: '.5em'}}>
+                        <i
+                            id={`request-${index}-otheryear-warning`}
+                            className="fas fa-exclamation-triangle text-warning"
+                        />
+                        <UncontrolledTooltip
+                            className=""
+                            placement="right"
+                            target={`request-${index}-otheryear-warning`}
+                        >
+                            Data shows that this course is offered every other year and {course.wasCourseTaughtInMostRecentYear ? 'WILL NOT' : 'WILL'} be offered 
+                            in the upcoming year. TA funding will not be allocated in the off year. If this is incorrect, please
+                            submit an exception request.
+                        </UncontrolledTooltip>
+                    </span>
+                </>
+            );
+        }
+        
+        return <>{request.annualizedTotal.toFixed(3)}</>;
     }
 
     private renderWarnings = (row: ITypedCellInfo) => {
