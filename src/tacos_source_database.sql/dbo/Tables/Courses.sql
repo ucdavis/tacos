@@ -1,19 +1,22 @@
-﻿CREATE TABLE [dbo].[Courses](
-	[SubjectCode] [nvarchar](4) NOT NULL,
-	[CourseNumber] [nvarchar](7) NOT NULL,
-	[DeptName] [nvarchar](50) NULL,
-	[Number] [nvarchar](15) NOT NULL,
-	[Name] [nvarchar](255) NULL,
-	[AverageEnrollment] [float] NULL,
-	[AverageSectionsPerCourse] [float] NULL,
-	[TimesOfferedPerYear] [float] NULL,
-	[IsCrossListed] [bit] NULL,
-	[IsOfferedWithinPastTwoYears] [bit] NULL,
- CONSTRAINT [PK_Courses] PRIMARY KEY CLUSTERED 
-(
-	[Number] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY];
+﻿CREATE TABLE [dbo].[Courses] (
+    [SubjectCode]                     NVARCHAR (4)   NOT NULL,
+    [CourseNumber]                    NVARCHAR (7)   NOT NULL,
+    [DeptName]                        NVARCHAR (100) NULL,
+    [Number]                          NVARCHAR (15)  NOT NULL,
+    [Name]                            NVARCHAR (255) NULL,
+    [NonCrossListedAverageEnrollment] FLOAT (53)     NULL,
+    [AverageEnrollment]               FLOAT (53)     NULL,
+    [AverageSectionsPerCourse]        FLOAT (53)     NULL,
+    [TimesOfferedPerYear]             FLOAT (53)     NULL,
+    [IsCrossListed]                   BIT            NULL,
+    [CrossListingsString]             VARCHAR (50)   NULL,
+    [IsOfferedWithinPastTwoYears]     BIT            NULL,
+    [WasCourseTaughtInMostRecentYear] BIT            NULL,
+    [IsCourseTaughtOnceEveryTwoYears] BIT            NULL,
+    CONSTRAINT [PK_Courses] PRIMARY KEY CLUSTERED ([Number] ASC)
+);
+
+
 
 
 

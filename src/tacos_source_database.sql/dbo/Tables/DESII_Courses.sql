@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[DESII_Courses] (
+CREATE TABLE [dbo].[DESII_Courses] (
     [AcademicYear]         NVARCHAR (7)  NOT NULL,
     [AcademicTermCode]     NVARCHAR (6)  NOT NULL,
     [College]              NVARCHAR (40) NULL,
@@ -10,6 +10,8 @@
     [NumCreditSections]    INT           NULL,
     [NumNonCreditSections] INT           NULL
 );
+
+
 
 
 GO
@@ -29,6 +31,6 @@ CREATE NONCLUSTERED INDEX [NonClusteredIndex-DESIICourses_AcademicYear] ON [dbo]
 	[AcademicYear] DESC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-
-
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-20180410-095059]
+    ON [dbo].[DESII_Courses]([AcademicTermCode] DESC);
 
