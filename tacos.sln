@@ -10,6 +10,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "tacos.sql", "src\tacos.sql\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tacos.core", "src\tacos.core\tacos.core.csproj", "{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Tacos Source Database", "src\tacos_source_database.sql\Tacos Source Database.sqlproj", "{C2052669-F8A7-4532-9145-CF967D114DD1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,8 @@ Global
 		{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F3ABE20-5652-45FA-9A1A-CEE0D3D7EB1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2052669-F8A7-4532-9145-CF967D114DD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2052669-F8A7-4532-9145-CF967D114DD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
