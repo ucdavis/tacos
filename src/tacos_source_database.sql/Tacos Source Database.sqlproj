@@ -73,5 +73,7 @@
     <Build Include="dbo\Views\vDESII_Courses.sql" />
     <Build Include="AZURE_TACOS Linked Server.sql" />
     <Build Include="Load AZURE Tacos SQL Server Agent Job.sql" />
+    <Build Include="AZURE_TACOS_TEST Linked Server.sql" />
+    <Build Include="Load AZURE Tacos-Test SQL Server Agent Job.sql" />
   </ItemGroup>
 </Project>
