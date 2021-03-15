@@ -46,7 +46,15 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Make a l
 
    INSERT INTO [dbo].[DESII_Courses]
    SELECT * FROM [dbo].[vDESII_Courses]
-   ORDER BY SubjectCode, CourseNumber, AcademicTermCode DESC', 
+   ORDER BY SubjectCode, CourseNumber, AcademicTermCode DESC
+   
+   -- Fix an issue with the wrong term code that causes a PK violation down the line:
+   UPDATE [dbo].[DESII_Courses]
+     SET AcademicTermCode = 201709
+   WHERE AcademicYear = ''2017-18'' AND 
+	SubjectCode = ''LAW'' AND 
+	CourseNumber = ''455'' AND 
+	AcademicTermCode = 201609',  
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
@@ -166,15 +174,68 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 -- for the past two full academic years, plus other active
 -- courses present in the course catalog:
 
-	INSERT INTO [dbo].[Courses]
-	SELECT * FROM [dbo].[vCurrentPlusActiveCourses]
+	INSERT INTO [dbo].[Courses] (
+       [SubjectCode]
+      ,[CourseNumber]
+      ,[DeptName]
+      ,[Number]
+      ,[Name]
+      ,[NonCrossListedAverageEnrollment]
+      ,[AverageEnrollment]
+      ,[AverageSectionsPerCourse]
+      ,[TimesOfferedPerYear]
+      ,[IsCrossListed]
+      ,[IsOfferedWithinPastTwoYears]
+	)
+	SELECT        
+       [SubjectCode]
+      ,[CourseNumber]
+      ,[DeptName]
+      ,[Number]
+      ,[Name]
+      ,[AverageEnrollment] AS [NonCrossListedAverageEnrollment]
+      ,[AverageEnrollment]
+      ,[AverageSectionsPerCourse]
+      ,[TimesOfferedPerYear]
+      ,[IsCrossListed]
+      ,[IsOfferedWithinPastTwoYears]  
+	FROM [dbo].[vCurrentPlusActiveCourses]
 	ORDER BY [Number]', 
 		@database_name=N'Tacos', 
 		@flags=0
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
-/****** Object:  Step [Truncate and Reload AZURE Tacos Courses]    Script Date: 4/4/2019 4:08:46 PM ******/
-EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE Tacos Courses', 
+/****** Object:  Step [Update Various Yearly Course Flags]    Script Date: 2/11/2021 1:53:47 PM ******/
+EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Update Various Yearly Course Flags', 
 		@step_id=6, 
+		@cmdexec_success_code=0, 
+		@on_success_action=3, 
+		@on_success_step_id=0, 
+		@on_fail_action=2, 
+		@on_fail_step_id=0, 
+		@retry_attempts=0, 
+		@retry_interval=0, 
+		@os_run_priority=0, @subsystem=N'TSQL', 
+		@command=N'EXEC usp_UpdateVariousYearlyCourseFlags', 
+		@database_name=N'Tacos', 
+		@flags=0
+IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
+/****** Object:  Step [Update Data For Cross-listed Courses]    Script Date: 2/11/2021 1:53:47 PM ******/
+EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Update Data For Cross-listed Courses', 
+		@step_id=7, 
+		@cmdexec_success_code=0, 
+		@on_success_action=3, 
+		@on_success_step_id=0, 
+		@on_fail_action=2, 
+		@on_fail_step_id=0, 
+		@retry_attempts=0, 
+		@retry_interval=0, 
+		@os_run_priority=0, @subsystem=N'TSQL', 
+		@command=N'EXEC usp_UpdateDataForCrossListedCourses', 
+		@database_name=N'Tacos', 
+		@flags=0
+IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback/****** Object:  Step [Truncate and Reload AZURE Tacos Courses]    Script Date: 4/4/2019 4:08:46 PM ******/
+EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE Tacos Courses', 
+		@step_id=8, 
 		@cmdexec_success_code=0, 
 		@on_success_action=3, 
 		@on_success_step_id=0, 
@@ -187,22 +248,33 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 	EXECUTE AZURE_TACOS.Tacos.dbo.sp_executesql @statement = N''TRUNCATE TABLE dbo.Courses''
 
 -- Reload with updated data:
-	INSERT INTO [AZURE_TACOS].[Tacos].[dbo].[Courses]
-           ([Number]
-           ,[Name]
-           ,[AverageEnrollment]
-           ,[AverageSectionsPerCourse]
-           ,[TimesOfferedPerYear]
-		   ,[IsCrossListed]
-		   ,[IsOfferedWithinPastTwoYears]
-           )
-	SELECT     [Number]
-		  ,[Name]
-		  ,[AverageEnrollment]
-		  ,[AverageSectionsPerCourse]
-		  ,[TimesOfferedPerYear]
-		  ,[IsCrossListed]
-		  ,[IsOfferedWithinPastTwoYears]
+	INSERT INTO [AZURE_TACOS].[Tacos].[dbo].[Courses] (
+       [Number]
+      ,[Name]
+      ,[AverageEnrollment]
+      ,[AverageSectionsPerCourse]
+      ,[TimesOfferedPerYear]
+      ,[IsCrossListed]
+      ,[IsOfferedWithinPastTwoYears]
+      ,[CrossListingsString]
+      ,[WasCourseTaughtInMostRecentYear]
+      ,[IsCourseTaughtOnceEveryTwoYears]
+      ,[NonCrossListedAverageEnrollment]
+      ,[DeptName]
+    )
+	SELECT 
+       [Number]
+      ,[AverageEnrollment]
+      ,[AverageSectionsPerCourse]
+      ,[Name]
+      ,[TimesOfferedPerYear]
+      ,[IsCrossListed]
+      ,[IsOfferedWithinPastTwoYears]
+      ,[CrossListingsString]
+      ,[WasCourseTaughtInMostRecentYear]
+      ,[IsCourseTaughtOnceEveryTwoYears]
+      ,[NonCrossListedAverageEnrollment]
+      ,[DeptName]
 	FROM [dbo].[Courses]
 	ORDER BY Number
 
@@ -212,7 +284,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 /****** Object:  Step [Truncate and Reload AZURE CourseDescription table]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE CourseDescription table', 
-		@step_id=7, 
+		@step_id=9, 
 		@cmdexec_success_code=0, 
 		@on_success_action=3, 
 		@on_success_step_id=0, 
@@ -275,7 +347,7 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate
 IF (@@ERROR <> 0 OR @ReturnCode <> 0) GOTO QuitWithRollback
 /****** Object:  Step [Truncate and Reload AZURE DESII_Courses table with data for all terms within the past four academic years]    Script Date: 4/4/2019 4:08:46 PM ******/
 EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Truncate and Reload AZURE DESII_Courses table with data for all terms within the past four academic years', 
-		@step_id=8, 
+		@step_id=10, 
 		@cmdexec_success_code=0, 
 		@on_success_action=1, 
 		@on_success_step_id=0, 
