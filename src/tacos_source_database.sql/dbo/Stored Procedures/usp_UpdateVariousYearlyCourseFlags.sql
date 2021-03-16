@@ -1,4 +1,4 @@
-﻿
+
 -- =============================================
 -- Author:		Ken Taylor
 -- Create date: February 3, 2021
@@ -11,6 +11,7 @@
 -- Usage:
 
 /*
+
 	USE [Tacos]
 	GO
 
@@ -21,7 +22,8 @@
 --	2021-03-15 by kjt: Inverted setting of WasCourseTaughtInMostRecentYear as per Brian McEligot.
 --
 -- =============================================
-CREATE PROCEDURE [dbo].[usp_UpdateVariousYearlyCourseFlags]
+
+CREATE PROCEDURE usp_UpdateVariousYearlyCourseFlags
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -38,6 +40,7 @@ BEGIN
 	LEFT OUTER JOIN (
 		SELECT
 		   CASE WHEN MAX(AcademicYear) =  @MostRecentYear THEN 0 ELSE 1 END AS WasCourseTaughtInMostRecentYear,
+
 		   CASE WHEN Count(DISTINCT AcademicYear) = 1 THEN 1 ELSE 0 END AS IsCourseTaughtOnceEveryTwoYears, 
 		   SubjectCode, CourseNumber
 		FROM [dbo].[vDESII_CoursesForLastSixQuartersFromDESII_Courses]
