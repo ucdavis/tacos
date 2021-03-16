@@ -62,6 +62,8 @@
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Views\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="dbo\Stored Procedures\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\DESII_Courses.sql" />
@@ -75,5 +77,18 @@
     <Build Include="Load AZURE Tacos SQL Server Agent Job.sql" />
     <Build Include="AZURE_TACOS_TEST Linked Server.sql" />
     <Build Include="Load AZURE Tacos-Test SQL Server Agent Job.sql" />
+    <Build Include="dbo\Tables\AggregatedCourses_1.sql" />
+    <Build Include="dbo\Views\vCurrentPlusActiveCourses_1.sql" />
+    <Build Include="dbo\Functions\udf_GetEndingAcademicYear.sql" />
+    <Build Include="dbo\Functions\udf_GetCurrentTermCode.sql" />
+    <Build Include="dbo\Functions\udf_GetAcademicYearFromTermCode.sql" />
+    <Build Include="dbo\Functions\udf_GetAcademicYearForNYearsAgo.sql" />
+    <Build Include="dbo\Functions\udf_ParseOutCrossListedCourses.sql" />
+    <Build Include="dbo\Functions\udf_GetTermCodeTableForPriorTwoAcademicYears.sql" />
+    <Build Include="dbo\Functions\udf_GetCombinedDataForNonCrossListedCourses.sql" />
+    <Build Include="dbo\Functions\udf_GetCombinedDataForCrossListedCourses.sql" />
+    <Build Include="dbo\Functions\udf_GetCombinedDataForAllCourses.sql" />
+    <Build Include="dbo\Stored Procedures\usp_UpdateVariousYearlyCourseFlags.sql" />
+    <Build Include="dbo\Stored Procedures\usp_UpdateDataForCrossListedCourses.sql" />
   </ItemGroup>
 </Project>
