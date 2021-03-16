@@ -1,4 +1,5 @@
-﻿-- =============================================
+
+-- =============================================
 -- Author:		Ken Taylor
 -- Create date: February 3, 2021
 -- Description:	Sets the WasCourseTaughtInMostRecentYear and
@@ -10,6 +11,7 @@
 -- Usage:
 
 /*
+
 	USE [Tacos]
 	GO
 
@@ -17,8 +19,10 @@
 
 */
 -- Modifications:
+--	2021-03-15 by kjt: Inverted setting of WasCourseTaughtInMostRecentYear as per Brian McEligot.
 --
 -- =============================================
+
 CREATE PROCEDURE usp_UpdateVariousYearlyCourseFlags
 AS
 BEGIN
@@ -35,7 +39,8 @@ BEGIN
 	FROM [dbo].Courses t1
 	LEFT OUTER JOIN (
 		SELECT
-		   CASE WHEN MAX(AcademicYear) =  @MostRecentYear THEN 1 ELSE 0 END AS WasCourseTaughtInMostRecentYear,
+		   CASE WHEN MAX(AcademicYear) =  @MostRecentYear THEN 0 ELSE 1 END AS WasCourseTaughtInMostRecentYear,
+
 		   CASE WHEN Count(DISTINCT AcademicYear) = 1 THEN 1 ELSE 0 END AS IsCourseTaughtOnceEveryTwoYears, 
 		   SubjectCode, CourseNumber
 		FROM [dbo].[vDESII_CoursesForLastSixQuartersFromDESII_Courses]
