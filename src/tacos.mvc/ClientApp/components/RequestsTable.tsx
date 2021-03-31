@@ -421,13 +421,12 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         const index = row.index;
         const request = row.original;
         const course = request.course;
+        const annualizedTotal = request.exception ? request.exceptionAnnualizedTotal : request.annualizedTotal;
 
-  
-
-        if (course && course.isCourseTaughtOnceEveryTwoYears) {
+        if (course && course.isCourseTaughtOnceEveryTwoYears && !request.exception) {
             return (
                 <>
-                    {request.annualizedTotal.toFixed(3)}
+                    {annualizedTotal.toFixed(3)}
                     <span style={{ paddingLeft: '.5em'}}>
                         <i
                             id={`request-${index}-otheryear-warning`}
@@ -447,7 +446,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
             );
         }
         
-        return <>{request.annualizedTotal.toFixed(3)}</>;
+        return <>{annualizedTotal.toFixed(3)}</>;
     }
 
     private renderWarnings = (row: ITypedCellInfo) => {
