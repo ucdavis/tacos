@@ -302,7 +302,7 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         return (
             <div>
                 <span className="mr-3">Course Type</span>
-                <a target="_blank" href="/CAES-TA-Guidelines 2018-21.pdf">
+                <a target="_blank" href="/CAES-TA-Guidelines 2018-23.pdf">
                     Criteria Info <i className="fas fa-external-link-alt" />
                 </a>
             </div>
