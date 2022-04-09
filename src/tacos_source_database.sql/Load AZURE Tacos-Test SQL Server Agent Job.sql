@@ -95,8 +95,8 @@ EXEC @ReturnCode = msdb.dbo.sp_add_jobstep @job_id=@jobId, @step_name=N'Make a l
 		  ,"2ND_LEARNING_ACTIVITY" AS "SecondLearningActivity"
 	      ,"3RD_LEARNING_ACTIVITY" AS "ThirdLearningActivity"
           ,"4TH_LEARNING_ACTIVITY" AS "FourthLearningActivity"
-		  ,CONVERT(nvarchar(4000), QUARTERS) AS "Quarters"
-		  ,QUARTERS_OFFERED AS "QuartersOffered"
+		  ,NULL AS "Quarters"
+		  ,NULL AS "QuartersOffered"
           ,EFFECTIVE_TERM AS "EffectiveTerm"
         ,STVTERM_DESC AS "Effective"
   	  FROM SIS..BANINST1.ZCVGVNT
