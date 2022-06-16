@@ -50,7 +50,7 @@ namespace tacos.mvc
             if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out elasticUri)) {
                 loggerConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
                 {
-                    IndexFormat = "aspnet-tacos-{0:yyyy.MM.dd}"
+                    IndexFormat = "aspnet-tacos-{0:yyyy.MM}"
                 });
             }
 
