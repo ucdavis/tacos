@@ -42,8 +42,7 @@ namespace tacos.mvc
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Application", loggingSection.GetValue<string>("AppName"))
                 .Enrich.WithProperty("AppEnvironment", loggingSection.GetValue<string>("Environment"))
-                .WriteTo.Console()
-                .WriteTo.Stackify();
+                .WriteTo.Console();
 
             // add in elastic search sink if the uri is valid
             Uri elasticUri;
