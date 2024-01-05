@@ -59,7 +59,7 @@ namespace tacos.mvc.services
 
             var model = new SubmissionNotificationViewModel()
             {
-                RecipientName = "Penny",
+                RecipientName = "Brian",
                 Requests = requests.ToList(),
             };
 
