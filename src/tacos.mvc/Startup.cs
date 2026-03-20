@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using tacos.core;
 using tacos.core.Data;
 using tacos.mvc.Helpers;
@@ -13,10 +14,9 @@ using tacos.mvc.services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Mjml.AspNetCore;
+using MvcReact;
 using Serilog;
 using Microsoft.Extensions.Hosting;
-using SpaCliMiddleware;
-using Microsoft.AspNetCore.SpaServices;
 
 namespace tacos.mvc
 {
@@ -59,6 +59,14 @@ namespace tacos.mvc
                 o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             });
 
+            services.AddViteServices(options =>
+            {
+                options.SourcePath = ".";
+                options.DevServerScheme = "http";
+                options.DevServerPort = 5173;
+                options.ViteDevServerEntry = "/index.tsx";
+            });
+
             // add render services
             services.AddMjmlServices();
 
@@ -67,7 +75,7 @@ namespace tacos.mvc
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, IOptions<MvcReactOptions> mvcReactOptions)
         {
             if (env.IsDevelopment())
             {
@@ -76,9 +84,12 @@ namespace tacos.mvc
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseMvcReactStaticFiles();
 
             app.UseSerilogRequestLogging();
 
@@ -86,23 +97,23 @@ namespace tacos.mvc
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(routes => {
-                routes.MapDefaultControllerRoute();
-
+            app.UseEndpoints(routes =>
+            {
                 if (env.IsDevelopment())
                 {
-                    routes.MapToSpaCliProxy(
-                        "{*path}",
-                        new SpaOptions { SourcePath = "wwwroot/dist" },
-                        npmScript: "devpack",
-                        port: default(int), // Allow webpack to find own port
-                        regex: "Project is running",
-                        forceKill: true, // kill anything running on our webpack port
-                        useProxy: true // proxy webpack requests back through our aspnet server
+                    routes.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller=Home}/{action=Index}/{id?}",
+                        constraints: new { controller = mvcReactOptions.Value.ExcludeHmrPathsRegex }
                     );
                 }
+                else
+                {
+                    routes.MapDefaultControllerRoute();
+                }
             });
-            
+
+            app.UseMvcReact();
         }
     }
 }

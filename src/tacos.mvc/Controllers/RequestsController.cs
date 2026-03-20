@@ -59,7 +59,7 @@ namespace tacos.mvc.Controllers
             return View(requests);
         }
 
-        public IActionResult Empty()
+        public new IActionResult Empty()
         {
             return View();
         }

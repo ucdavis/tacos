@@ -19,10 +19,7 @@
 
     <partial name="_DatatablesStylesPartial" />
 
-    <environment names="Staging,Production">
-        <link rel="stylesheet" href="~/dist/vendor.min.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/dist/main.min.css" asp-append-version="true" />
-    </environment>
+    <react-styles />
 
     @RenderSection("styles", required: false)
 </head>
@@ -108,8 +105,8 @@
         });
     </script>
 
-    <script src="~/dist/vendor.js" asp-append-version="true"></script>
-
     @RenderSection("scripts", required: false)
+
+    <react-scripts />
 </body>
 </html>

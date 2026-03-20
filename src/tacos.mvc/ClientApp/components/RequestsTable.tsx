@@ -185,13 +185,17 @@ export default class RequestsTable extends React.Component<IProps, IState> {
         ];
     }
 
-    public componentWillReceiveProps(nextProps: IProps) {
+    public componentDidUpdate(prevProps: IProps) {
         // add course number filter
+        if (prevProps.courseNumberFilter === this.props.courseNumberFilter) {
+            return;
+        }
+
         const filtered = [];
         if (this.props.courseNumberFilter) {
             filtered.push({
                 id: 'course',
-                value: nextProps.courseNumberFilter,
+                value: this.props.courseNumberFilter,
             });
         }
 

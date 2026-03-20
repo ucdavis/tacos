@@ -130,7 +130,7 @@ namespace tacos.mvc.services
             var path = Path.GetFullPath("./Emails");
 
             var engine = new RazorLightEngineBuilder()
-                .UseFilesystemProject(path)
+                .UseFileSystemProject(path)
                 .UseMemoryCachingProvider()
                 .Build();
 

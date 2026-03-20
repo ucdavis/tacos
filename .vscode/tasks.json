@@ -1,0 +1,105 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "restore solution",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "restore",
+        "${workspaceFolder}/tacos.sln"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "build web app",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/tacos.mvc/tacos.mvc.csproj",
+        "--no-restore",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": "restore solution"
+    },
+    {
+      "label": "install client deps",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "install",
+        "--legacy-peer-deps"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/src/tacos.mvc"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run tests",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "test",
+        "${workspaceFolder}/Test/Test.csproj",
+        "--no-restore",
+        "-m:1",
+        "/nodeReuse:false"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": "restore solution"
+    },
+    {
+      "label": "run frontend tests",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "test"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/src/tacos.mvc"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "watch tests",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "watch",
+        "test",
+        "--project",
+        "${workspaceFolder}/Test/Test.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": "test"
+    },
+    {
+      "label": "watch frontend tests",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "run",
+        "test:watch"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/src/tacos.mvc"
+      },
+      "problemMatcher": [],
+      "group": "test"
+    }
+  ]
+}

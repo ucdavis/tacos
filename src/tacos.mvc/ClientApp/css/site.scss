@@ -1,10 +1,10 @@
-@import 'depends';
-@import 'animations';
-@import 'regions';
-@import 'vendor';
+@use "depends" as *;
+@use "animations";
+@use "regions";
+@use "vendor";
 
-@import '~pretty-checkbox/src/pretty-checkbox.scss';
-@import '~react-table/react-table.css';
+@import "pretty-checkbox/dist/pretty-checkbox.css";
+@import "react-table/react-table.css";
 
 /* site specific sass here */
 
