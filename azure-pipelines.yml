@@ -7,7 +7,7 @@ trigger:
 name: 1.1.$(Date:yyMM).$(Build.BuildId)
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 variables:
   solution: '**/*.sln'
@@ -17,7 +17,7 @@ variables:
 stages:
 - stage: Test
   jobs:
-  - job:
+  - job: Test
     steps:
     - task: NodeTool@0
       displayName: 'Use Node 22'
@@ -53,7 +53,7 @@ stages:
 
 - stage: Publish
   jobs:
-  - job:
+  - job: Publish
     steps:
     - task: NodeTool@0
       displayName: 'Use Node 22'
