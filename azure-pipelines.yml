@@ -4,6 +4,9 @@
 trigger:
 - master
 
+pr:
+- master
+
 name: 1.1.$(Date:yyMM).$(Build.BuildId)
 
 pool:
