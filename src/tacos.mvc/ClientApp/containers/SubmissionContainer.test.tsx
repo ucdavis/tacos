@@ -13,7 +13,7 @@ vi.mock("../components/CreateCourseModal", () => ({
 }));
 
 vi.mock("../components/RequestsTable", () => ({
-    default: ({ requests, onEdit }: any) => (
+    default: ({ requests, onEdit, onRemove }: any) => (
         <div data-testid="requests-table">
             {requests.map((request: IRequest, index: number) => {
                 const displayedAnnualized = request.exception
@@ -21,7 +21,7 @@ vi.mock("../components/RequestsTable", () => ({
                     : request.annualizedTotal;
 
                 return (
-                    <section data-testid={`request-${index}`} key={request.courseNumber || index}>
+                    <section data-testid={`request-${index}`} key={request.stableId || request.courseNumber || index}>
                         <div>{`Calculated: ${request.calculatedTotal.toFixed(3)}`}</div>
                         <div>{`Annualized: ${displayedAnnualized.toFixed(3)}`}</div>
                         <button
@@ -42,6 +42,12 @@ vi.mock("../components/RequestsTable", () => ({
                             }
                         >
                             Request exception
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onRemove(index)}
+                        >
+                            Remove request
                         </button>
                     </section>
                 );
@@ -152,6 +158,64 @@ describe("SubmissionContainer", () => {
         expect(within(request).getByText("Annualized: 0.000")).toBeInTheDocument();
         expect(screen.getByText(/Request Total:/)).toHaveTextContent("Request Total: ---");
     });
+
+    it("ignores late calculation responses for removed unsaved requests", async () => {
+        const pendingResponse = createDeferredFetchResponse();
+        const fetchMock = vi.fn().mockReturnValue(pendingResponse.promise);
+
+        vi.stubGlobal("fetch", fetchMock);
+
+        render(
+            <SubmissionContainer
+                department={createDepartment()}
+                requests={[
+                    createRequest({
+                        stableId: "client-pending",
+                        courseNumber: "ECS001",
+                        courseName: "ECS 001",
+                        calculatedTotal: 0.5,
+                        annualizedTotal: 0.333
+                    }),
+                    createRequest({
+                        stableId: "client-remaining",
+                        course: createCourse({
+                            name: "ECS 002",
+                            number: "ECS002",
+                            averageEnrollment: 80
+                        }),
+                        courseName: "ECS 002",
+                        courseNumber: "ECS002",
+                        calculatedTotal: 0.75,
+                        annualizedTotal: 0.5
+                    })
+                ]}
+            />
+        );
+
+        fireEvent.click(within(screen.getByTestId("request-0")).getByRole("button", { name: "Switch to intensive" }));
+
+        await waitFor(() => {
+            expect(fetchMock).toHaveBeenCalledTimes(1);
+        });
+
+        fireEvent.click(within(screen.getByTestId("request-0")).getByRole("button", { name: "Remove request" }));
+
+        await waitFor(() => {
+            expect(within(screen.getByTestId("request-0")).getByText("Calculated: 0.750")).toBeInTheDocument();
+            expect(within(screen.getByTestId("request-0")).getByText("Annualized: 0.500")).toBeInTheDocument();
+        });
+
+        pendingResponse.resolve(createFetchResponse({
+            calculatedTotal: 0.25,
+            annualizedTotal: 0.167,
+            exceptionAnnualizedTotal: 0
+        }));
+
+        await waitFor(() => {
+            expect(within(screen.getByTestId("request-0")).getByText("Calculated: 0.750")).toBeInTheDocument();
+            expect(within(screen.getByTestId("request-0")).getByText("Annualized: 0.500")).toBeInTheDocument();
+        });
+    });
 });
 
 function createDepartment(): IDepartment {
@@ -203,5 +267,17 @@ function createFetchResponse(body: object) {
     return {
         ok: true,
         json: async () => body
+    };
+}
+
+function createDeferredFetchResponse() {
+    let resolve!: (value: { ok: true; json: () => Promise<object> }) => void;
+    const promise = new Promise<{ ok: true; json: () => Promise<object> }>((res) => {
+        resolve = res;
+    });
+
+    return {
+        promise,
+        resolve
     };
 }

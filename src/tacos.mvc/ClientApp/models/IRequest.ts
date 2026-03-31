@@ -2,6 +2,7 @@ import { ICourse } from "./ICourse";
 
 export interface IRequest {
     id?: number;
+    stableId?: string;
 
     course: ICourse | undefined;
 

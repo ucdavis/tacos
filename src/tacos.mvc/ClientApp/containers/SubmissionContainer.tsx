@@ -37,12 +37,13 @@ interface ICalculationResponse {
 }
 
 export default class SubmissionContainer extends React.Component<IProps, IState> {
-    private calculationTokens: Record<number, number> = {};
+    private calculationTokens: Record<string, number> = {};
+    private nextClientStableId = 0;
 
     constructor(props: IProps) {
         super(props);
 
-        const requests = props.requests || [];
+        const requests = this.normalizeRequests(props.requests || []);
 
         // TODO: hack for now, make everything dirty so it all gets processed
         for (const request of requests) {
@@ -233,7 +234,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         // reset the form
         if (confirm("Are you sure you want to clear this form and start over?")) {
             this.setState({
-                requests: this.props.requests || []
+                requests: this.normalizeRequests(this.props.requests || [])
             });
         }
     };
@@ -392,11 +393,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     };
 
     private removeRequest = (i: number) => {
-        const { department } = this.props;
         const { requests } = this.state;
 
         LogService.info("removing request");
         let request = requests[i];
+        if (request?.stableId) {
+            delete this.calculationTokens[request.stableId];
+        }
 
         // if this is an existing request, mark it as deleted, so that we can delete it on the server
         if (request.id) {
@@ -420,14 +423,19 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         this.setState({ requests: newRequests }, () => {
             if (shouldRecalculate) {
-                void this.calculateRequestTotals(i, preparedRequest);
+                void this.calculateRequestTotals(preparedRequest);
             }
         });
     };
 
-    private calculateRequestTotals = async (index: number, request: IRequest) => {
-        const token = (this.calculationTokens[index] || 0) + 1;
-        this.calculationTokens[index] = token;
+    private calculateRequestTotals = async (request: IRequest) => {
+        const stableId = request.stableId;
+        if (!stableId) {
+            return;
+        }
+
+        const token = (this.calculationTokens[stableId] || 0) + 1;
+        this.calculationTokens[stableId] = token;
 
         if (!request || !request.course || !request.courseNumber || request.isDeleted) {
             return;
@@ -447,13 +455,18 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
             const totals: ICalculationResponse = await response.json();
 
-            if (this.calculationTokens[index] !== token) {
+            if (this.calculationTokens[stableId] !== token) {
                 return;
             }
 
             this.setState((prevState) => {
+                const index = prevState.requests.findIndex(current => current.stableId === stableId);
+                if (index < 0) {
+                    return null;
+                }
+
                 const currentRequest = prevState.requests[index];
-                if (!currentRequest) {
+                if (!currentRequest || currentRequest.isDeleted) {
                     return null;
                 }
 
@@ -477,7 +490,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     };
 
     private prepareRequest = (index: number, request: IRequest, requests: IRequest[], dirty: boolean) => {
-        const nextRequest = this.hydrateRequest(request);
+        const nextRequest = this.ensureStableId(this.hydrateRequest(request));
 
         if (!nextRequest.course || !nextRequest.courseNumber) {
             nextRequest.calculatedTotal = 0;
@@ -560,11 +573,10 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     };
 
     private onAddRequest = () => {
-        const { department } = this.props;
-
         const newRequests: IRequest[] = [
             ...this.state.requests,
             {
+                stableId: this.createStableId(),
                 course: undefined,
                 courseName: "",
                 courseNumber: "",
@@ -631,5 +643,29 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             exception: true
         };
         this.requestUpdated(createCourseIndex, newRequest);
+    };
+
+    private normalizeRequests = (requests: IRequest[]) => {
+        return requests.map(request => this.ensureStableId({ ...request }));
+    };
+
+    private ensureStableId = (request: IRequest) => {
+        if (request.stableId) {
+            return request;
+        }
+
+        return {
+            ...request,
+            stableId: this.createStableId(request.id)
+        };
+    };
+
+    private createStableId = (requestId?: number) => {
+        if (requestId) {
+            return `request-${requestId}`;
+        }
+
+        this.nextClientStableId += 1;
+        return `client-${this.nextClientStableId}`;
     };
 }
