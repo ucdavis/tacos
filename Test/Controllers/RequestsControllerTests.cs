@@ -83,7 +83,8 @@ namespace Test.Controllers
             context.Courses.Add(course);
             await context.SaveChangesAsync();
 
-            var controller = CreateController(context, user);
+            await using var controllerContext = await CreateContextAsync(connection);
+            var controller = CreateController(controllerContext, user);
             var model = new SubmissionModel
             {
                 DepartmentId = 1,
@@ -110,7 +111,12 @@ namespace Test.Controllers
 
             result.ShouldBeOfType<JsonResult>();
 
-            var savedRequest = await context.Requests.SingleAsync();
+            await using var verifyContext = await CreateContextAsync(connection);
+            verifyContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            var savedRequest = await verifyContext.Requests
+                .AsNoTracking()
+                .SingleAsync();
             savedRequest.CalculatedTotal.ShouldBe(1.0);
             savedRequest.AnnualizedTotal.ShouldBe(2.0 / 3.0, 0.0001);
             savedRequest.ExceptionAnnualizedTotal.ShouldBe(5.0 / 6.0, 0.0001);
@@ -141,7 +147,8 @@ namespace Test.Controllers
             context.Courses.Add(course);
             await context.SaveChangesAsync();
 
-            var controller = CreateController(context, user);
+            await using var controllerContext = await CreateContextAsync(connection);
+            var controller = CreateController(controllerContext, user);
             var model = new SubmissionModel
             {
                 DepartmentId = 1,
@@ -159,7 +166,12 @@ namespace Test.Controllers
 
             await controller.Save(model);
 
-            var savedRequest = await context.Requests.SingleAsync();
+            await using var verifyContext = await CreateContextAsync(connection);
+            verifyContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            var savedRequest = await verifyContext.Requests
+                .AsNoTracking()
+                .SingleAsync();
             savedRequest.CalculatedTotal.ShouldBe(0.5);
             savedRequest.AnnualizedTotal.ShouldBe(0);
         }
@@ -212,7 +224,8 @@ namespace Test.Controllers
             context.Requests.Add(existingRequest);
             await context.SaveChangesAsync();
 
-            var controller = CreateController(context, user);
+            await using var controllerContext = await CreateContextAsync(connection);
+            var controller = CreateController(controllerContext, user);
             var model = new SubmissionModel
             {
                 DepartmentId = 1,
@@ -233,7 +246,11 @@ namespace Test.Controllers
 
             result.ShouldBeOfType<JsonResult>();
 
-            var savedRequest = await context.Requests
+            await using var verifyContext = await CreateContextAsync(connection);
+            verifyContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            var savedRequest = await verifyContext.Requests
+                .AsNoTracking()
                 .Include(r => r.Course)
                 .SingleAsync(r => r.Id == existingRequest.Id);
 
@@ -267,7 +284,8 @@ namespace Test.Controllers
             await context.SaveChangesAsync();
 
             var emailService = new Mock<IEmailService>();
-            var controller = CreateController(context, user, emailService);
+            await using var controllerContext = await CreateContextAsync(connection);
+            var controller = CreateController(controllerContext, user, emailService);
             var model = new SubmissionModel
             {
                 DepartmentId = 1,
@@ -287,7 +305,11 @@ namespace Test.Controllers
 
             result.ShouldBeOfType<JsonResult>();
 
-            var savedRequest = await context.Requests
+            await using var verifyContext = await CreateContextAsync(connection);
+            verifyContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            var savedRequest = await verifyContext.Requests
+                .AsNoTracking()
                 .Include(r => r.History)
                 .SingleAsync();
 
