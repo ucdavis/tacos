@@ -18,14 +18,15 @@ namespace tacos.core.Services
             double exceptionTotal = 0,
             double exceptionAnnualCount = 0)
         {
+            var exceptionAnnualizedTotal = CalculateExceptionAnnualizedTotal(exceptionTotal, exceptionAnnualCount);
+
             if (course == null)
             {
-                return new TaAllocationTotals(0, 0, 0);
+                return new TaAllocationTotals(0, 0, exceptionAnnualizedTotal);
             }
 
             var calculatedTotal = CalculatePerCourse(courseType, course);
             var annualizedTotal = CalculateAnnualizedTotal(calculatedTotal, course);
-            var exceptionAnnualizedTotal = CalculateExceptionAnnualizedTotal(exceptionTotal, exceptionAnnualCount);
 
             return new TaAllocationTotals(calculatedTotal, annualizedTotal, exceptionAnnualizedTotal);
         }

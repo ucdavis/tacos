@@ -77,6 +77,20 @@ namespace Test.Services
         }
 
         [Fact]
+        public void Calculate_should_preserve_exception_annualized_total_when_course_is_null()
+        {
+            var totals = TaAllocationCalculator.Calculate(
+                "STD",
+                null,
+                exceptionTotal: 1.25,
+                exceptionAnnualCount: 2);
+
+            totals.CalculatedTotal.ShouldBe(0);
+            totals.AnnualizedTotal.ShouldBe(0);
+            totals.ExceptionAnnualizedTotal.ShouldBe(5.0 / 6.0, 0.0001);
+        }
+
+        [Fact]
         public void CalculateAnnualizedTotal_should_zero_out_every_other_year_courses_in_the_off_year()
         {
             var course = CreateCourse(
