@@ -75,10 +75,15 @@ namespace tacos.core.Services
             return exceptionTotal * AnnualizationRatio * exceptionAnnualCount;
         }
 
+        /// <summary>
+        /// Standard lecture classes with sections
+        /// (Grading is through tests and/or short papers; sections typically 1 hour)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateStandardLecture(Course course)
         {
-            // Standard lecture classes with sections
-            // (Grading is through tests and/or short papers; sections typically 1 hour)
+            // minimum enrollment - minimum average enrollment is 55 students in order to be eligible for TA funding
             if (course.AverageEnrollment < 55.0)
             {
                 return 0;
@@ -88,10 +93,15 @@ namespace tacos.core.Services
             return RoundTo((course.AverageEnrollment / 55.0) * 0.5, 0.5);
         }
 
+        /// <summary>
+        /// Writing intensive lecture classes with sections
+        /// (GE writing or >=10 page papers)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateWritingLecture(Course course)
         {
-            // Writing intensive lecture classes with sections
-            // (GE writing or >=10 page papers)
+
             var sectionsPerCourse = NormalizeSectionsPerCourse(course);
 
             // minimum sections - minimum avg non-credit sections is 2 in order to be eligible for funding
@@ -111,10 +121,15 @@ namespace tacos.core.Services
             return RoundTo((sectionsPerCourse / 2.0) * 0.5, 0.5);
         }
 
+        /// <summary>
+        /// Lab or studio classes
+        /// (Typically 2-3-hour lab or studio sections)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateLab(Course course)
         {
-            // Lab or studio classes
-            // (Typically 2-3-hour lab or studio sections)
+
             // minimum avg enrollment is 25 students in order to be eligible for TA funding
             if (course.AverageEnrollment < 25)
             {
@@ -127,17 +142,26 @@ namespace tacos.core.Services
             return RoundTo((course.AverageEnrollment / 30.0) * 0.5, 0.5);
         }
 
+        /// <summary>
+        /// Field courses
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateField(Course course)
         {
-            // Field courses
             // Half-time TA per 25 students
             return RoundTo((course.AverageEnrollment / 25.0) * 0.5, 0.5);
         }
 
+        /// <summary>
+        /// Lecture-only classes, automated grading
+        /// (No sections; grading is by Scantron or similar)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateLectureAutoGrading(Course course)
         {
-            // Lecture-only classes, automated grading
-            // (No sections; grading is by Scantron or similar)
+
             if (course.AverageEnrollment < 150)
             {
                 return 0;
@@ -148,10 +172,15 @@ namespace tacos.core.Services
             return RoundTo(0.25 + ((course.AverageEnrollment - 150) / 100.0) * 0.25, 0.25);
         }
 
+        /// <summary>
+        /// Lecture-only classes, manual grading
+        /// (Tests require grader attention)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateLectureManualGrading(Course course)
         {
-            // Lecture-only classes, manual grading
-            // (Tests require grader attention)
+
             if (course.AverageEnrollment < 150)
             {
                 return 0;
@@ -167,10 +196,14 @@ namespace tacos.core.Services
                 0.25);
         }
 
+        /// <summary>
+        /// Lecture-only classes, moderate writing
+        /// (5-10 page papers)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateLectureModerateWriting(Course course)
         {
-            // Lecture-only classes, moderate writing
-            // (5-10 page papers)
             if (course.AverageEnrollment < 100)
             {
                 return 0;
@@ -180,10 +213,17 @@ namespace tacos.core.Services
             return RoundTo((course.AverageEnrollment / 100.0) * 0.25, 0.25);
         }
 
+        /// <summary>
+        /// Lecture-only classes, writing-intensive or substantial project
+        /// (No sections; GE writing or ≥10 page papers: 'substantial project’ is a project that comprises 
+        /// at least 25% of the total course grade and requires input from faculty/TA’s over more than one 
+        /// class meeting for organization, planning, implementation, and/or evaluation/grading of student work)
+        /// </summary>
+        /// <param name="course"></param>
+        /// <returns></returns>
         private static double CalculateLectureIntensive(Course course)
         {
-            // Lecture-only classes, writing intensive or substantial project
-            // (No sections; GE writing or >=10 page papers)
+
             if (course.AverageEnrollment < 40)
             {
                 return 0;
