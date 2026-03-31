@@ -132,6 +132,20 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> Calculate([FromBody] RequestModel model)
+        {
+            var course = await GetCourseForCalculation(model);
+            var totals = CalculateTotals(model, course);
+
+            return Json(new RequestCalculationResultModel
+            {
+                CalculatedTotal = totals.CalculatedTotal,
+                AnnualizedTotal = totals.AnnualizedTotal,
+                ExceptionAnnualizedTotal = totals.ExceptionAnnualizedTotal,
+            });
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Save([FromBody]SubmissionModel model)
         {
             // get user's departments
@@ -170,14 +184,7 @@ namespace tacos.mvc.Controllers
                 // possible create new course
                 if (course == null)
                 {
-                    course = new Course()
-                    {
-                        Number = m.CourseNumber,
-                        Name = m.CourseName,
-                        AverageEnrollment = 0,
-                        AverageSectionsPerCourse = 0,
-                        TimesOfferedPerYear = 0,
-                    };
+                    course = CreateCourseFromModel(m);
                     await _context.Courses.AddAsync(course);
                 }
 
@@ -349,6 +356,50 @@ namespace tacos.mvc.Controllers
                 TimesOfferedPerYear      = course.TimesOfferedPerYear,
             };
             request.History.Add(history);
+        }
+
+        private async Task<Course> GetCourseForCalculation(RequestModel model)
+        {
+            if (!string.IsNullOrWhiteSpace(model.CourseNumber))
+            {
+                var persistedCourse = await _context.Courses
+                    .FirstOrDefaultAsync(c => c.Number == model.CourseNumber);
+
+                if (persistedCourse != null)
+                {
+                    return persistedCourse;
+                }
+            }
+
+            return model.Course ?? CreateCourseFromModel(model);
+        }
+
+        private static Course CreateCourseFromModel(RequestModel model)
+        {
+            return new Course
+            {
+                Number = model.CourseNumber,
+                Name = model.CourseName,
+                AverageEnrollment = model.Course?.AverageEnrollment ?? 0,
+                AverageSectionsPerCourse = model.Course?.AverageSectionsPerCourse ?? 0,
+                TimesOfferedPerYear = model.Course?.TimesOfferedPerYear ?? 0,
+                CrossListingsString = model.Course?.CrossListingsString ?? string.Empty,
+                DeptName = model.Course?.DeptName,
+                IsCrossListed = model.Course?.IsCrossListed ?? false,
+                IsOfferedWithinPastTwoYears = model.Course?.IsOfferedWithinPastTwoYears ?? true,
+                IsCourseTaughtOnceEveryTwoYears = model.Course?.IsCourseTaughtOnceEveryTwoYears ?? false,
+                NonCrossListedAverageEnrollment = model.Course?.NonCrossListedAverageEnrollment ?? 0,
+                WasCourseTaughtInMostRecentYear = model.Course?.WasCourseTaughtInMostRecentYear ?? false,
+            };
+        }
+
+        private static TaAllocationTotals CalculateTotals(RequestModel model, Course course)
+        {
+            return TaAllocationCalculator.Calculate(
+                model.CourseType,
+                course,
+                model.ExceptionTotal,
+                model.ExceptionAnnualCount);
         }
     }
 }

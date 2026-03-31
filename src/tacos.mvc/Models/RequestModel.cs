@@ -1,9 +1,13 @@
 
+using tacos.core.Data;
+
 namespace tacos.mvc.Models
 {
     public class RequestModel
     {
         public int Id { get; set; }
+
+        public Course Course { get; set; }
 
         public string CourseName { get; set; }
 

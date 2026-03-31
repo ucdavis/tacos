@@ -6,8 +6,6 @@ import Summary from "../components/Summary";
 import CreateCourseModal from "../components/CreateCourseModal";
 import RequestsTable from "../components/RequestsTable";
 
-import { annualizationRatio, formulas } from "../util/formulas";
-
 import * as LogService from "../services/LogService";
 
 import { ICourse } from "../models/ICourse";
@@ -32,13 +30,19 @@ interface IState {
     isSubmitting: boolean;
 }
 
+interface ICalculationResponse {
+    calculatedTotal: number;
+    annualizedTotal: number;
+    exceptionAnnualizedTotal: number;
+}
+
 export default class SubmissionContainer extends React.Component<IProps, IState> {
+    private calculationTokens: Record<number, number> = {};
+
     constructor(props: IProps) {
         super(props);
 
         const requests = props.requests || [];
-
-        this.recalculateRequests(requests);
 
         // TODO: hack for now, make everything dirty so it all gets processed
         for (const request of requests) {
@@ -406,97 +410,154 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({ requests: newRequests });
     };
 
-    private recalculateRequests = (requests: IRequest[]) => {
-        for (const request of requests) {
-            // if the course info looks good, calculate totals
-            const formula = formulas[request.courseType];
-            if (formula && request.course) {
-                request.calculatedTotal = formula.calculate(request.course);
-                request.annualizedTotal =
-                    request.calculatedTotal *
-                    annualizationRatio *
-                    request.course.timesOfferedPerYear;
-                request.exceptionAnnualizedTotal =
-                    request.exceptionTotal *
-                    annualizationRatio *
-                    request.exceptionAnnualCount; // for exceptions, use the desired annual count instead of course times offered history
-
-                // courses taught once every two years get 0 for off year, double for on year
-                if (request.course.isCourseTaughtOnceEveryTwoYears) {
-                    request.annualizedTotal = request.course.wasCourseTaughtInMostRecentYear ? 0 : request.annualizedTotal * 2;
-                }
-            } else {
-                request.calculatedTotal = 0;
-                request.annualizedTotal = 0;
-                request.exceptionAnnualizedTotal = 0;
-            }
-        }
-    };
-
     private requestUpdated = (i: number, request: IRequest, dirty: boolean = true) => {
-        const { department } = this.props;
         const { requests } = this.state;
 
-        // flatten model
-        if (request.course) {
-            request.courseName = request.course.name;
-            request.courseNumber = request.course.number;
-        } else {
-            request.courseName = "";
-            request.courseNumber = "";
-        }
-
-        // calculate totals
-        this.recalculateRequests([request]);
-
-        // clear error messages
-        request.isValid = true;
-        request.error = "";
-
-        // check validity
-        if (!request.course) {
-            request.isValid = false;
-            request.error = "Course required";
-        }
-
-        if (!request.courseNumber) {
-            request.isValid = false;
-            request.error = "Course required";
-        }
-
-        if (request.course && request.course.isNew && !request.exception) {
-            request.isValid = false;
-            request.error = "Exception required with new courses";
-        }
-
-        if (request.exception && (request.exceptionTotal <= 0 || request.exceptionAnnualCount <= 0)) {
-            request.isValid = false;
-            request.error = "Exception values > 0 required";
-        }
-
-        // check for duplicate courses earlier in the array
-        const foundDuplicate = requests
-            .filter((r, rIndex) => rIndex < i)
-            .filter(r => !r.isDeleted)
-            .find(r => r.courseNumber === request.courseNumber);
-
-        if (foundDuplicate) {
-            request.isValid = false;
-            request.error = "Duplicate course in request above";
-        }
-
-        if (dirty) {
-            request.isDirty = true;
-        }
-
-        // create new array and replace item
+        const shouldRecalculate = this.shouldRecalculate(requests[i], request);
+        const preparedRequest = this.prepareRequest(i, request, requests, dirty);
         const newRequests = [...requests];
-        newRequests[i] = request;
+        newRequests[i] = preparedRequest;
 
         this.setState({ requests: newRequests });
 
-        // trigger validations
-        this.checkIsValid();
+        if (shouldRecalculate) {
+            void this.calculateRequestTotals(i);
+        }
+    };
+
+    private calculateRequestTotals = async (index: number) => {
+        const token = (this.calculationTokens[index] || 0) + 1;
+        this.calculationTokens[index] = token;
+
+        const request = this.state.requests[index];
+        if (!request || !request.course || !request.courseNumber || request.isDeleted) {
+            return;
+        }
+
+        try {
+            const response = await fetch("/requests/calculate", {
+                body: JSON.stringify(request),
+                headers: [["Accept", "application/json"], ["Content-Type", "application/json"]],
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            const totals: ICalculationResponse = await response.json();
+
+            if (this.calculationTokens[index] !== token) {
+                return;
+            }
+
+            this.setState((prevState) => {
+                const currentRequest = prevState.requests[index];
+                if (!currentRequest) {
+                    return null;
+                }
+
+                const updatedRequest = this.validateRequest(index, {
+                    ...currentRequest,
+                    calculatedTotal: totals.calculatedTotal,
+                    annualizedTotal: totals.annualizedTotal,
+                    exceptionAnnualizedTotal: totals.exceptionAnnualizedTotal
+                }, prevState.requests);
+
+                const updatedRequests = [...prevState.requests];
+                updatedRequests[index] = updatedRequest;
+
+                return {
+                    requests: updatedRequests
+                };
+            });
+        } catch (err) {
+            LogService.error(err);
+        }
+    };
+
+    private prepareRequest = (index: number, request: IRequest, requests: IRequest[], dirty: boolean) => {
+        const nextRequest = this.hydrateRequest(request);
+
+        if (!nextRequest.course || !nextRequest.courseNumber) {
+            nextRequest.calculatedTotal = 0;
+            nextRequest.annualizedTotal = 0;
+            nextRequest.exceptionAnnualizedTotal = 0;
+        }
+
+        if (dirty) {
+            nextRequest.isDirty = true;
+        }
+
+        const nextRequests = [...requests];
+        nextRequests[index] = nextRequest;
+
+        return this.validateRequest(index, nextRequest, nextRequests);
+    };
+
+    private hydrateRequest = (request: IRequest) => {
+        const nextRequest = { ...request };
+
+        if (nextRequest.course) {
+            nextRequest.courseName = nextRequest.course.name;
+            nextRequest.courseNumber = nextRequest.course.number;
+        } else {
+            nextRequest.courseName = "";
+            nextRequest.courseNumber = "";
+        }
+
+        return nextRequest;
+    };
+
+    private validateRequest = (index: number, request: IRequest, requests: IRequest[]) => {
+        const nextRequest = { ...request, isValid: true, error: "" };
+
+        if (!nextRequest.course || !nextRequest.courseNumber) {
+            nextRequest.isValid = false;
+            nextRequest.error = "Course required";
+        }
+
+        if (nextRequest.course && nextRequest.course.isNew && !nextRequest.exception) {
+            nextRequest.isValid = false;
+            nextRequest.error = "Exception required with new courses";
+        }
+
+        if (nextRequest.exception && (nextRequest.exceptionTotal <= 0 || nextRequest.exceptionAnnualCount <= 0)) {
+            nextRequest.isValid = false;
+            nextRequest.error = "Exception values > 0 required";
+        }
+
+        const foundDuplicate = requests
+            .filter((r, rIndex) => rIndex < index)
+            .filter(r => !r.isDeleted)
+            .find(r => r.courseNumber === nextRequest.courseNumber);
+
+        if (foundDuplicate) {
+            nextRequest.isValid = false;
+            nextRequest.error = "Duplicate course in request above";
+        }
+
+        return nextRequest;
+    };
+
+    private shouldRecalculate = (currentRequest: IRequest | undefined, nextRequest: IRequest) => {
+        if (!currentRequest) {
+            return true;
+        }
+
+        const currentCourse = currentRequest.course;
+        const nextCourse = nextRequest.course;
+
+        return currentRequest.courseType !== nextRequest.courseType
+            || currentRequest.exceptionTotal !== nextRequest.exceptionTotal
+            || currentRequest.exceptionAnnualCount !== nextRequest.exceptionAnnualCount
+            || currentCourse?.number !== nextCourse?.number
+            || currentCourse?.averageEnrollment !== nextCourse?.averageEnrollment
+            || currentCourse?.averageSectionsPerCourse !== nextCourse?.averageSectionsPerCourse
+            || currentCourse?.timesOfferedPerYear !== nextCourse?.timesOfferedPerYear
+            || currentCourse?.isCourseTaughtOnceEveryTwoYears !== nextCourse?.isCourseTaughtOnceEveryTwoYears
+            || currentCourse?.wasCourseTaughtInMostRecentYear !== nextCourse?.wasCourseTaughtInMostRecentYear;
     };
 
     private onAddRequest = () => {

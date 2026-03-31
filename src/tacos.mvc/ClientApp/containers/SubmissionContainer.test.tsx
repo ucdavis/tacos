@@ -1,6 +1,6 @@
 import * as React from "react";
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import SubmissionContainer from "./SubmissionContainer";
@@ -52,10 +52,26 @@ vi.mock("../components/RequestsTable", () => ({
 
 afterEach(() => {
     cleanup();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
 });
 
 describe("SubmissionContainer", () => {
-    it("shows recalculated totals and updates the request total when request settings change", () => {
+    it("uses backend calculations to update request totals when request settings change", async () => {
+        const fetchMock = vi.fn()
+            .mockResolvedValueOnce(createFetchResponse({
+                calculatedTotal: 0.25,
+                annualizedTotal: 0.167,
+                exceptionAnnualizedTotal: 0
+            }))
+            .mockResolvedValueOnce(createFetchResponse({
+                calculatedTotal: 0.25,
+                annualizedTotal: 0.167,
+                exceptionAnnualizedTotal: 0.833
+            }));
+
+        vi.stubGlobal("fetch", fetchMock);
+
         render(
             <SubmissionContainer
                 department={createDepartment()}
@@ -65,8 +81,8 @@ describe("SubmissionContainer", () => {
                             averageEnrollment: 55,
                             timesOfferedPerYear: 2
                         }),
-                        calculatedTotal: 99,
-                        annualizedTotal: 99
+                        calculatedTotal: 0.5,
+                        annualizedTotal: 0.333
                     })
                 ]}
             />
@@ -79,15 +95,26 @@ describe("SubmissionContainer", () => {
 
         fireEvent.click(screen.getByRole("button", { name: "Switch to intensive" }));
 
-        expect(within(request).getByText("Calculated: 0.250")).toBeInTheDocument();
-        expect(within(request).getByText("Annualized: 0.167")).toBeInTheDocument();
-        expect(screen.getByText(/Request Total:/)).toHaveTextContent("Request Total: 0.167");
+        await waitFor(() => {
+            expect(within(request).getByText("Calculated: 0.250")).toBeInTheDocument();
+            expect(within(request).getByText("Annualized: 0.167")).toBeInTheDocument();
+            expect(screen.getByText(/Request Total:/)).toHaveTextContent("Request Total: 0.167");
+        });
 
         fireEvent.click(screen.getByRole("button", { name: "Request exception" }));
 
-        expect(within(request).getByText("Calculated: 0.250")).toBeInTheDocument();
-        expect(within(request).getByText("Annualized: 0.833")).toBeInTheDocument();
-        expect(screen.getByText(/Request Total:/)).toHaveTextContent("Request Total: 0.833");
+        await waitFor(() => {
+            expect(within(request).getByText("Calculated: 0.250")).toBeInTheDocument();
+            expect(within(request).getByText("Annualized: 0.833")).toBeInTheDocument();
+            expect(screen.getByText(/Request Total:/)).toHaveTextContent("Request Total: 0.833");
+        });
+
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(fetchMock).toHaveBeenNthCalledWith(
+            1,
+            "/requests/calculate",
+            expect.objectContaining({ method: "POST" })
+        );
     });
 
     it("shows no annualized total in the summary for off-year every-other-year courses", () => {
@@ -97,6 +124,8 @@ describe("SubmissionContainer", () => {
                 requests={[
                     createRequest({
                         courseType: "FLD",
+                        calculatedTotal: 0.5,
+                        annualizedTotal: 0,
                         course: createCourse({
                             averageEnrollment: 25,
                             timesOfferedPerYear: 1,
@@ -157,5 +186,12 @@ function createRequest(overrides: Partial<IRequest> = {}): IRequest {
         hasApprovedException: false,
         isValid: true,
         ...overrides
+    };
+}
+
+function createFetchResponse(body: object) {
+    return {
+        ok: true,
+        json: async () => body
     };
 }

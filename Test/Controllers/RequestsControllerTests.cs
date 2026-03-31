@@ -21,6 +21,46 @@ namespace Test.Controllers
     public class RequestsControllerTests
     {
         [Fact]
+        public async Task Calculate_should_return_backend_preview_totals_for_the_request()
+        {
+            await using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+            await using var context = await CreateContextAsync(connection);
+
+            var user = await SeedUserAndDepartmentAsync(context);
+            var controller = CreateController(context, user);
+            var model = new RequestModel
+            {
+                Course = new Course
+                {
+                    Number = "ECS010",
+                    Name = "Special Topics",
+                    AverageEnrollment = 80,
+                    AverageSectionsPerCourse = 5,
+                    TimesOfferedPerYear = 1,
+                    CrossListingsString = string.Empty,
+                    IsCrossListed = false,
+                    IsOfferedWithinPastTwoYears = true,
+                },
+                CourseName = "Special Topics",
+                CourseNumber = "ECS010",
+                CourseType = "WRT",
+                RequestType = "TA",
+                ExceptionTotal = 1.25,
+                ExceptionAnnualCount = 2,
+            };
+
+            var result = await controller.Calculate(model);
+
+            var json = result.ShouldBeOfType<JsonResult>();
+            var payload = json.Value.ShouldBeOfType<RequestCalculationResultModel>();
+
+            payload.CalculatedTotal.ShouldBe(1.0);
+            payload.AnnualizedTotal.ShouldBe(1.0 / 3.0, 0.0001);
+            payload.ExceptionAnnualizedTotal.ShouldBe(5.0 / 6.0, 0.0001);
+        }
+
+        [Fact]
         public async Task Save_should_recalculate_totals_from_course_data_instead_of_trusting_the_client()
         {
             await using var connection = new SqliteConnection("Data Source=:memory:");
