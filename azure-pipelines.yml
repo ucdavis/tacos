@@ -16,6 +16,14 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  artifactName: 'drop'
+  publishOutput: '$(Build.ArtifactStagingDirectory)/webapp'
+  testServiceConnection: 'UC Davis CAES Test'
+  testWebAppName: 'tacos-test'
+  testEnvironmentName: 'tacos-test'
+  prodServiceConnection: 'UC Davis CAES Production'
+  prodWebAppName: 'tacosucd'
+  prodEnvironmentName: 'tacos-production'
 
 stages:
 - stage: Test
@@ -55,6 +63,8 @@ stages:
         customCommand: 'run test'
 
 - stage: Publish
+  dependsOn: Test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   jobs:
   - job: Publish
     steps:
@@ -77,12 +87,56 @@ stages:
         zipAfterPublish: false
         modifyOutputPath: false
         projects: './src/tacos.mvc/tacos.mvc.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/'
+        arguments: '--configuration $(buildConfiguration) --output $(publishOutput)'
 
-    - task: PublishBuildArtifacts@1
-      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-      displayName: 'Publish Build Artifacts for master branch builds'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish web app artifact'
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+        targetPath: '$(publishOutput)'
+        artifact: '$(artifactName)'
+
+- stage: Deploy_Test
+  displayName: 'Deploy Test'
+  dependsOn: Publish
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy_Test
+    displayName: 'Deploy to test web app'
+    environment: '$(testEnvironmentName)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: '$(artifactName)'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy tacos-test'
+            inputs:
+              azureSubscription: '$(testServiceConnection)'
+              appType: 'webApp'
+              appName: '$(testWebAppName)'
+              package: '$(Pipeline.Workspace)/$(artifactName)'
+
+- stage: Deploy_Prod
+  displayName: 'Deploy Production'
+  dependsOn: Deploy_Test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy_Prod
+    displayName: 'Deploy to production web app'
+    environment: '$(prodEnvironmentName)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: '$(artifactName)'
+
+          - task: AzureWebApp@1
+            displayName: 'Deploy tacosucd'
+            inputs:
+              azureSubscription: '$(prodServiceConnection)'
+              appType: 'webApp'
+              appName: '$(prodWebAppName)'
+              package: '$(Pipeline.Workspace)/$(artifactName)'
