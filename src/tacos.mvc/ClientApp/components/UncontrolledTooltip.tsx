@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Tooltip, TooltipProps } from "reactstrap";
-import { compose, defaultProps } from "recompose";
 
 // the typing for this element isn't complete, so we're wrapping the component to fix it
 interface IProps extends TooltipProps {
@@ -12,6 +11,10 @@ interface IState {
 }
 
 class UncontrolledTooltip extends React.Component<IProps, IState> {
+    public static defaultProps: Partial<IProps> = {
+        boundariesElement: "viewport",
+    };
+
     constructor(props: IProps) {
         super(props);
 
@@ -35,7 +38,4 @@ class UncontrolledTooltip extends React.Component<IProps, IState> {
     };
 }
 
-export default compose<IProps, IProps>(
-    defaultProps({
-        boundariesElement: "viewport",
-    }))(UncontrolledTooltip)
+export default UncontrolledTooltip;

@@ -217,7 +217,11 @@ FakesAssemblies/
 _Pvt_Extensions
 
 *.db
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
 src/tacos.mvc/npm-shrinkwrap.json
 
 *.jfm

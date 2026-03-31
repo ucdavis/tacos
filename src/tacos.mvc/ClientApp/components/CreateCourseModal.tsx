@@ -28,12 +28,12 @@ export default class CreateCourseModal extends React.PureComponent<IProps, IStat
         };
     }
 
-    public componentWillReceiveProps(nextProps: IProps) {
+    public componentDidUpdate(prevProps: IProps) {
         // map state from provided course
-        if (this.props.course !== nextProps.course) {
+        if (prevProps.course !== this.props.course) {
             this.setState({
-                courseNumber: nextProps.course ? nextProps.course.number : "",
-                courseName: nextProps.course ? nextProps.course.name : "",
+                courseNumber: this.props.course ? this.props.course.number : "",
+                courseName: this.props.course ? this.props.course.name : "",
             });
         }
     }

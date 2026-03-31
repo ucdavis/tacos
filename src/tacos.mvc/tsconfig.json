@@ -1,15 +1,14 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "lib": [ "dom", "es2015" ],
-    "module": "es2015",
-    "moduleResolution": "node",
-    "target": "es5",
+    "lib": [ "dom", "es2020" ],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2020",
     "jsx": "react",
     "sourceMap": true,
-    "skipDefaultLibCheck": true,
-    "strict": true,
-    "types": ["webpack-env"]
+    "skipLibCheck": true,
+    "strict": true
   },
   "exclude": [
       "bin",

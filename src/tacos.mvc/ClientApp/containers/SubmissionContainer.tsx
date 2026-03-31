@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Modal, ModalHeader, ModalBody } from "reactstrap";
-import { parse as QueryParse } from "query-string";
+import queryString from "query-string";
 
 import Summary from "../components/Summary";
 import CreateCourseModal from "../components/CreateCourseModal";
@@ -62,7 +62,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
         // tslint:disable-next-line:variable-name
         const [__host, __controller, __action, id] = location.pathname.split("/");
-        const { jsAction } = QueryParse(location.search);
+        const { jsAction } = queryString.parse(location.search);
         if (!jsAction) {
             return;
         }

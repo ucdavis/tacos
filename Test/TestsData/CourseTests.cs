@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
+using Shouldly;
 using tacos.core.Data;
-using TestHelpers.Helpers;
 using Xunit;
 
 namespace Test.TestsData
@@ -9,22 +12,40 @@ namespace Test.TestsData
     public class CourseTests
     {
         [Fact]
-        public void TestAllFieldsInTheDatabaseHaveBeenTested()
+        public void Course_should_expose_the_expected_public_properties()
         {
-            #region Arrange
-            var expectedFields = new List<NameAndType>();
-            expectedFields.Add(new NameAndType("AverageEnrollment", "System.Double", new List<string>()));
-            expectedFields.Add(new NameAndType("AverageSectionsPerCourse", "System.Double", new List<string>()));
-            expectedFields.Add(new NameAndType("Name", "System.String", new List<string>()));
-            expectedFields.Add(new NameAndType("Number", "System.String", new List<string>
+            var expectedProperties = new Dictionary<string, string>
             {
-                "[System.ComponentModel.DataAnnotations.KeyAttribute()]"
-            }));
+                ["AverageEnrollment"] = typeof(double).FullName,
+                ["AverageSectionsPerCourse"] = typeof(double).FullName,
+                ["CrossListingsString"] = typeof(string).FullName,
+                ["DeptName"] = typeof(string).FullName,
+                ["IsCourseTaughtOnceEveryTwoYears"] = typeof(bool).FullName,
+                ["IsCrossListed"] = typeof(bool).FullName,
+                ["IsOfferedWithinPastTwoYears"] = typeof(bool).FullName,
+                ["Name"] = typeof(string).FullName,
+                ["NonCrossListedAverageEnrollment"] = typeof(double).FullName,
+                ["Number"] = typeof(string).FullName,
+                ["TimesOfferedPerYear"] = typeof(double).FullName,
+                ["WasCourseTaughtInMostRecentYear"] = typeof(bool).FullName,
+            };
 
+            var actualProperties = typeof(Course)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Select(p => new KeyValuePair<string, string>(p.Name, p.PropertyType.FullName))
+                .OrderBy(p => p.Key)
+                .ToArray();
 
-            #endregion Arrange
+            expectedProperties
+                .OrderBy(p => p.Key)
+                .ToArray()
+                .ShouldBe(actualProperties);
 
-            AttributeAndFieldValidation.ValidateFieldsAndAttributes(expectedFields, typeof(Course));
+            typeof(Course)
+                .GetProperty(nameof(Course.Number))
+                .ShouldNotBeNull()
+                .GetCustomAttribute<KeyAttribute>()
+                .ShouldNotBeNull();
 
         }
     }
