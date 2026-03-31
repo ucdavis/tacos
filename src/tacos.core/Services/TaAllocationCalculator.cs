@@ -37,7 +37,9 @@ namespace tacos.core.Services
                 return 0;
             }
 
-            return courseType.ToUpperInvariant() switch
+            var normalizedCourseType = courseType.Trim().ToUpperInvariant();
+
+            return normalizedCourseType switch
             {
                 "STD" => CalculateStandardLecture(course),
                 "WRT" => CalculateWritingLecture(course),
