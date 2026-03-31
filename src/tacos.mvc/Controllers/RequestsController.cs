@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using tacos.core;
 using tacos.core.Data;
+using tacos.core.Services;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models;
 using tacos.mvc.services;
@@ -212,6 +213,12 @@ namespace tacos.mvc.Controllers
                 }
 
                 // update values
+                var totals = TaAllocationCalculator.Calculate(
+                    m.CourseType,
+                    course,
+                    m.ExceptionTotal,
+                    m.ExceptionAnnualCount);
+
                 request.IsActive                 = true;
                 request.CourseType               = m.CourseType;
                 request.RequestType              = m.RequestType;
@@ -219,9 +226,9 @@ namespace tacos.mvc.Controllers
                 request.ExceptionReason          = m.ExceptionReason;
                 request.ExceptionTotal           = m.ExceptionTotal;
                 request.ExceptionAnnualCount     = m.ExceptionAnnualCount;
-                request.ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal;
-                request.CalculatedTotal          = m.CalculatedTotal;
-                request.AnnualizedTotal          = m.AnnualizedTotal;
+                request.ExceptionAnnualizedTotal = totals.ExceptionAnnualizedTotal;
+                request.CalculatedTotal          = totals.CalculatedTotal;
+                request.AnnualizedTotal          = totals.AnnualizedTotal;
                 request.UpdatedOn                = DateTime.UtcNow;
                 request.UpdatedBy                = user.UserName;
 

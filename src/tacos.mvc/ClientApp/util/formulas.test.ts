@@ -21,29 +21,45 @@ function createCourse(overrides: Partial<ICourse> = {}): ICourse {
 }
 
 describe("formulas", () => {
-    it("returns no standard lecture support below the minimum enrollment", () => {
-        expect(formulas.STD.calculate(createCourse({ averageEnrollment: 54 }))).toBe(0);
+    it.each([
+        ["STD", createCourse({ averageEnrollment: 54 }), 0],
+        ["STD", createCourse({ averageEnrollment: 55 }), 0.5],
+        ["STD", createCourse({ averageEnrollment: 111 }), 1],
+        ["LAB", createCourse({ averageEnrollment: 24 }), 0],
+        ["LAB", createCourse({ averageEnrollment: 45 }), 1],
+        ["FLD", createCourse({ averageEnrollment: 25 }), 0.5],
+        ["AUTO", createCourse({ averageEnrollment: 149 }), 0],
+        ["AUTO", createCourse({ averageEnrollment: 150 }), 0.25],
+        ["AUTO", createCourse({ averageEnrollment: 250 }), 0.5],
+        ["MAN", createCourse({ averageEnrollment: 150 }), 0.75],
+        ["MAN", createCourse({ averageEnrollment: 250 }), 1.25],
+        ["MODW", createCourse({ averageEnrollment: 99 }), 0],
+        ["MODW", createCourse({ averageEnrollment: 100 }), 0.25],
+        ["MODW", createCourse({ averageEnrollment: 250 }), 0.75],
+        ["INT", createCourse({ averageEnrollment: 39 }), 0],
+        ["INT", createCourse({ averageEnrollment: 40 }), 0.25],
+        ["INT", createCourse({ averageEnrollment: 100 }), 0.75]
+    ])("calculates %s support for visible threshold and rounding cases", (courseType, course, expected) => {
+        expect(formulas[courseType].calculate(course)).toBe(expected);
     });
 
-    it("rounds standard lecture support to half-time increments", () => {
-        expect(formulas.STD.calculate(createCourse({ averageEnrollment: 55 }))).toBe(0.5);
-        expect(formulas.STD.calculate(createCourse({ averageEnrollment: 111 }))).toBe(1);
-    });
-
-    it("normalizes odd writing sections before calculating support", () => {
-        expect(
-            formulas.WRT.calculate(
-                createCourse({
-                    averageEnrollment: 80,
-                    averageSectionsPerCourse: 5
-                })
-            )
-        ).toBe(1);
-    });
-
-    it("applies manual grading support in quarter-time increments", () => {
-        expect(formulas.MAN.calculate(createCourse({ averageEnrollment: 250 }))).toBe(1.25);
-    });
+    it.each([
+        [1.9, 80, 0],
+        [2, 39, 0],
+        [5, 80, 1]
+    ])(
+        "normalizes writing sections before calculating support",
+        (averageSectionsPerCourse, averageEnrollment, expected) => {
+            expect(
+                formulas.WRT.calculate(
+                    createCourse({
+                        averageEnrollment,
+                        averageSectionsPerCourse
+                    })
+                )
+            ).toBe(expected);
+        }
+    );
 
     it("exports the annualization ratio used by request totals", () => {
         expect(annualizationRatio).toBeCloseTo(1 / 3);
