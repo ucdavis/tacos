@@ -165,6 +165,85 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Save_should_update_the_existing_request_course_number_before_recalculating()
+        {
+            await using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+            await using var context = await CreateContextAsync(connection);
+
+            var user = await SeedUserAndDepartmentAsync(context);
+            var originalCourse = new Course
+            {
+                Number = "ECS010",
+                Name = "Original Course",
+                AverageEnrollment = 55,
+                AverageSectionsPerCourse = 2,
+                TimesOfferedPerYear = 1,
+                CrossListingsString = string.Empty,
+                IsCrossListed = false,
+                IsOfferedWithinPastTwoYears = true,
+            };
+            var updatedCourse = new Course
+            {
+                Number = "ECS020",
+                Name = "Updated Course",
+                AverageEnrollment = 120,
+                AverageSectionsPerCourse = 2,
+                TimesOfferedPerYear = 2,
+                CrossListingsString = string.Empty,
+                IsCrossListed = false,
+                IsOfferedWithinPastTwoYears = true,
+            };
+
+            context.Courses.AddRange(originalCourse, updatedCourse);
+
+            var existingRequest = new Request
+            {
+                DepartmentId = 1,
+                CourseNumber = originalCourse.Number,
+                Course = originalCourse,
+                CourseType = "STD",
+                RequestType = "TA",
+                IsActive = true,
+                UpdatedBy = user.UserName,
+                UpdatedOn = DateTime.UtcNow,
+            };
+
+            context.Requests.Add(existingRequest);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+            var model = new SubmissionModel
+            {
+                DepartmentId = 1,
+                Requests =
+                [
+                    new RequestModel
+                    {
+                        Id = existingRequest.Id,
+                        CourseName = updatedCourse.Name,
+                        CourseNumber = updatedCourse.Number,
+                        CourseType = "STD",
+                        RequestType = "TA",
+                    }
+                ]
+            };
+
+            var result = await controller.Save(model);
+
+            result.ShouldBeOfType<JsonResult>();
+
+            var savedRequest = await context.Requests
+                .Include(r => r.Course)
+                .SingleAsync(r => r.Id == existingRequest.Id);
+
+            savedRequest.CourseNumber.ShouldBe(updatedCourse.Number);
+            savedRequest.Course.Number.ShouldBe(updatedCourse.Number);
+            savedRequest.CalculatedTotal.ShouldBe(1.0);
+            savedRequest.AnnualizedTotal.ShouldBe(2.0 / 3.0, 0.0001);
+        }
+
+        [Fact]
         public async Task Submit_should_auto_approve_non_exception_requests_and_capture_history()
         {
             await using var connection = new SqliteConnection("Data Source=:memory:");

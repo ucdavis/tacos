@@ -227,6 +227,8 @@ namespace tacos.mvc.Controllers
                     m.ExceptionAnnualCount);
 
                 request.IsActive                 = true;
+                request.Course                  = course;
+                request.CourseNumber            = course.Number;
                 request.CourseType               = m.CourseType;
                 request.RequestType              = m.RequestType;
                 request.Exception                = m.Exception;
