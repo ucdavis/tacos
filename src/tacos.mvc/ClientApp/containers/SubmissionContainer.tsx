@@ -418,18 +418,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const newRequests = [...requests];
         newRequests[i] = preparedRequest;
 
-        this.setState({ requests: newRequests });
-
-        if (shouldRecalculate) {
-            void this.calculateRequestTotals(i);
-        }
+        this.setState({ requests: newRequests }, () => {
+            if (shouldRecalculate) {
+                void this.calculateRequestTotals(i, preparedRequest);
+            }
+        });
     };
 
-    private calculateRequestTotals = async (index: number) => {
+    private calculateRequestTotals = async (index: number, request: IRequest) => {
         const token = (this.calculationTokens[index] || 0) + 1;
         this.calculationTokens[index] = token;
 
-        const request = this.state.requests[index];
         if (!request || !request.course || !request.courseNumber || request.isDeleted) {
             return;
         }

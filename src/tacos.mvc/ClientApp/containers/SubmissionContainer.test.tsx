@@ -115,6 +115,16 @@ describe("SubmissionContainer", () => {
             "/requests/calculate",
             expect.objectContaining({ method: "POST" })
         );
+
+        const firstPayload = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+        expect(firstPayload.courseType).toBe("INT");
+        expect(firstPayload.exception).toBe(false);
+
+        const secondPayload = JSON.parse(fetchMock.mock.calls[1][1].body as string);
+        expect(secondPayload.courseType).toBe("INT");
+        expect(secondPayload.exception).toBe(true);
+        expect(secondPayload.exceptionTotal).toBe(1.25);
+        expect(secondPayload.exceptionAnnualCount).toBe(2);
     });
 
     it("shows no annualized total in the summary for off-year every-other-year courses", () => {
