@@ -321,6 +321,6 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(text).toContain("approved for the above course");
         expect(text).toContain("Request Total: 1.500");
-        expect(host.querySelector("#revoke-button")).toBeDefined();
+        expect(host.querySelector("#revoke-button")).not.toBeNull();
     });
 });
