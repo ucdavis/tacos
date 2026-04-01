@@ -83,7 +83,11 @@ function createCourse(overrides: Partial<ICourse> = {}): ICourse {
     };
 }
 
-function createRequest(courseType: string, courseOverrides: Partial<ICourse> = {}): IRequest {
+function createRequest(
+    courseType: string,
+    courseOverrides: Partial<ICourse> = {},
+    requestOverrides: Partial<IRequest> = {}
+): IRequest {
     const course = createCourse(courseOverrides);
 
     return {
@@ -102,7 +106,8 @@ function createRequest(courseType: string, courseOverrides: Partial<ICourse> = {
         exceptionAnnualizedTotal: 0,
         hasApprovedException: false,
         isDirty: true,
-        isValid: true
+        isValid: true,
+        ...requestOverrides
     };
 }
 
@@ -133,11 +138,56 @@ describe("SubmissionContainer formula UI coverage", () => {
         host = document.createElement("div");
         document.body.appendChild(host);
 
+        vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
         vi.stubGlobal("scrollTo", vi.fn());
         root = createRoot(host);
 
         await act(async () => {
             root!.render(<SubmissionContainer department={department} requests={requests} />);
+        });
+    }
+
+    function getButton(label: string): HTMLButtonElement {
+        const button = Array.from(document.body.querySelectorAll("button")).find(
+            element => normalizeText(element.textContent) === label
+        ) as HTMLButtonElement | undefined;
+
+        expect(button).toBeDefined();
+        return button!;
+    }
+
+    function getInputByPlaceholder(placeholder: string): HTMLInputElement {
+        const input = document.body.querySelector(
+            `input[placeholder="${placeholder}"]`
+        ) as HTMLInputElement | null;
+
+        expect(input).toBeDefined();
+        return input!;
+    }
+
+    async function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
+        if (checkbox.checked === checked) {
+            return;
+        }
+
+        await act(async () => {
+            checkbox.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        });
+    }
+
+    async function setInputValue(input: HTMLInputElement, value: string) {
+        const valueSetter = Object.getOwnPropertyDescriptor(
+            HTMLInputElement.prototype,
+            "value"
+        )?.set;
+
+        expect(valueSetter).toBeDefined();
+
+        await act(async () => {
+            valueSetter!.call(input, value);
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            input.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
         });
     }
 
@@ -179,5 +229,98 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(updatedText).toContain("1.250");
         expect(updatedText).toContain("Request Total: 0.417");
+    });
+
+    it("uses exception values in the rendered annualized totals once they are entered", async () => {
+        await renderSubmission([
+            createRequest("STD", {
+                averageEnrollment: 111,
+                name: "ECS 111",
+                number: "111"
+            })
+        ]);
+
+        expect(normalizeText(host.textContent)).toContain("Request Total: 0.333");
+
+        const exceptionCheckbox = host.querySelector(
+            "input[type=\"checkbox\"]"
+        ) as HTMLInputElement | null;
+
+        expect(exceptionCheckbox).toBeDefined();
+
+        await setCheckboxValue(exceptionCheckbox!, true);
+
+        expect(normalizeText(host.textContent)).toContain("Proposed TA % per course offering");
+        expect(getButton("Save Changes").disabled).toBe(true);
+        expect(getButton("Submit for Approval").disabled).toBe(true);
+
+        await setInputValue(getInputByPlaceholder("Total FTE requested"), "1.50");
+        await setInputValue(getInputByPlaceholder("Annual offerings requested"), "3");
+
+        const updatedText = normalizeText(host.textContent);
+
+        expect(updatedText).toContain("Request Total: 1.500");
+        expect(updatedText).toContain("1.500");
+        expect(getButton("Save Changes").disabled).toBe(false);
+        expect(getButton("Submit for Approval").disabled).toBe(false);
+    });
+
+    it("restores formula-based totals when an exception is removed", async () => {
+        await renderSubmission([
+            createRequest(
+                "STD",
+                {
+                    averageEnrollment: 111,
+                    name: "ECS 111",
+                    number: "111"
+                },
+                {
+                    exception: true,
+                    exceptionTotal: 1.5,
+                    exceptionAnnualCount: 3
+                }
+            )
+        ]);
+
+        expect(normalizeText(host.textContent)).toContain("Request Total: 1.500");
+
+        const exceptionCheckbox = host.querySelector(
+            "input[type=\"checkbox\"]"
+        ) as HTMLInputElement | null;
+
+        expect(exceptionCheckbox).toBeDefined();
+
+        await setCheckboxValue(exceptionCheckbox!, false);
+
+        const updatedText = normalizeText(host.textContent);
+
+        expect(updatedText).not.toContain("Proposed TA % per course offering");
+        expect(updatedText).toContain("Request Total: 0.333");
+    });
+
+    it("renders the approved exception state using the exception totals", async () => {
+        await renderSubmission([
+            createRequest(
+                "MAN",
+                {
+                    averageEnrollment: 250,
+                    name: "ECS 250",
+                    number: "250"
+                },
+                {
+                    id: 42,
+                    exception: true,
+                    exceptionTotal: 1.5,
+                    exceptionAnnualCount: 3,
+                    hasApprovedException: true
+                }
+            )
+        ]);
+
+        const text = normalizeText(host.textContent);
+
+        expect(text).toContain("approved for the above course");
+        expect(text).toContain("Request Total: 1.500");
+        expect(host.querySelector("#revoke-button")).toBeDefined();
     });
 });
