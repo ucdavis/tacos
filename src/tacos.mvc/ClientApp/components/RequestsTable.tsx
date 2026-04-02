@@ -45,23 +45,19 @@ interface IExpandedState {
     [index: number]: true;
 }
 
+const deletedFilter: Filter = {
+    id: "isDeleted",
+    value: false,
+};
+
 export default class RequestsTable extends React.Component<IProps, IState> {
     private columns: Column[];
 
     constructor(props: IProps) {
         super(props);
 
-        // add course number filter
-        const filtered = [];
-        if (this.props.courseNumberFilter) {
-            filtered.push({
-                id: 'course',
-                value: props.courseNumberFilter,
-            });
-        }
-
         this.state = {
-            filtered,
+            filtered: this.buildFilteredState([], props.courseNumberFilter),
         };
 
         this.columns = [
@@ -191,16 +187,8 @@ export default class RequestsTable extends React.Component<IProps, IState> {
             return;
         }
 
-        const filtered = [];
-        if (this.props.courseNumberFilter) {
-            filtered.push({
-                id: 'course',
-                value: this.props.courseNumberFilter,
-            });
-        }
-
         this.setState({
-            filtered
+            filtered: this.buildFilteredState(this.state.filtered, this.props.courseNumberFilter),
         });
     }
 
@@ -222,15 +210,32 @@ export default class RequestsTable extends React.Component<IProps, IState> {
                 className={this.props.className}
                 data={requests}
                 columns={this.columns}
+                filtered={this.state.filtered}
                 expanded={expanded}
                 SubComponent={this.renderExceptionDetail}
                 minRows={1}
                 showPagination={false}
                 pageSize={1000000}  // pick a really big size to avoid paging
-                defaultFiltered={[{id: 'isDeleted', value: false }]}
+                onFilteredChange={filtered => this.setState({
+                    filtered: this.buildFilteredState(filtered, this.props.courseNumberFilter)
+                })}
                 getTrProps={this.decorateTr}
             />
         );
+    }
+
+    private buildFilteredState = (filtered: Filter[], courseNumberFilter?: string) => {
+        const nextFiltered = filtered
+            .filter(filter => filter.id !== deletedFilter.id && filter.id !== "course");
+
+        if (courseNumberFilter) {
+            nextFiltered.push({
+                id: "course",
+                value: courseNumberFilter,
+            });
+        }
+
+        return [deletedFilter, ...nextFiltered];
     }
 
     private renderNewIndicator = (row: ITypedCellInfo) => {
