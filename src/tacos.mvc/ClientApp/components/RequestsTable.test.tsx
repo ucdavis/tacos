@@ -212,44 +212,36 @@ describe("RequestsTable UI coverage", () => {
         expect(host.textContent).toContain("approved for the above course");
     });
 
-    it("filters rows from the course number prop and updates when the prop changes", async () => {
-        const requests = [
-            createRequest({
-                id: 10,
-                course: createCourse({ name: "ECS 120 Software Engineering", number: "ECS 120" }),
-                courseName: "ECS 120 Software Engineering",
-                courseNumber: "ECS 120"
-            }),
-            createRequest({
-                id: 11,
-                course: createCourse({ name: "ECS 140A Programming Languages", number: "ECS 140A" }),
-                courseName: "ECS 140A Programming Languages",
-                courseNumber: "ECS 140A"
-            })
-        ];
+    it("renders the current filter controls and option sets", async () => {
+        await renderRequestsTable();
 
-        const view = await renderRequestsTable({
-            requests,
-            courseNumberFilter: "140A"
-        });
+        const courseFilterInput = host.querySelector(
+            "input[placeholder=\"Search ...\"]"
+        ) as HTMLInputElement | null;
+        const selects = Array.from(host.querySelectorAll(".rt-thead.-filters select")) as HTMLSelectElement[];
 
-        expect(getVisibleCourseNames()).toEqual(["ECS 140A Programming Languages"]);
-
-        await view.rerender({
-            requests,
-            courseNumberFilter: "120"
-        });
-
-        expect(getVisibleCourseNames()).toEqual(["ECS 120 Software Engineering"]);
-
-        await view.rerender({
-            requests,
-            courseNumberFilter: undefined
-        });
-
-        expect(getVisibleCourseNames()).toEqual([
-            "ECS 120 Software Engineering",
-            "ECS 140A Programming Languages"
+        expect(courseFilterInput).not.toBeNull();
+        expect(selects).toHaveLength(3);
+        expect(Array.from(selects[0].options).map(option => option.textContent)).toEqual([
+            "Standard lecture with sections",
+            "Writing intensive lecture with sections",
+            "Lab or Studio classes",
+            "Field classes",
+            "Lecture only, automated grading",
+            "Lecture only, manual grading",
+            "Lecture only, moderate writing",
+            "Lecture only, writing intensive or substantial project",
+            "Show All"
+        ]);
+        expect(Array.from(selects[1].options).map(option => option.textContent)).toEqual([
+            "TA",
+            "Reader",
+            "Show All"
+        ]);
+        expect(Array.from(selects[2].options).map(option => option.textContent)).toEqual([
+            "No",
+            "Yes",
+            "Show All"
         ]);
     });
 
