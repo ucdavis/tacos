@@ -142,7 +142,7 @@ describe("RequestsTable UI coverage", () => {
     function getCourseFilterInput(): HTMLInputElement {
         const input = host!.querySelector("input[placeholder='Search ...']") as HTMLInputElement | null;
 
-        expect(input).toBeDefined();
+        expect(input).not.toBeNull();
         return input!;
     }
 
@@ -278,7 +278,7 @@ describe("RequestsTable UI coverage", () => {
         });
 
         const secondRowRemoveButton = host!.querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
-        expect(secondRowRemoveButton).toBeDefined();
+        expect(secondRowRemoveButton).not.toBeNull();
 
         await click(secondRowRemoveButton!);
         expect(onRemove).toHaveBeenCalledWith(1);
@@ -340,7 +340,7 @@ describe("RequestsTable UI coverage", () => {
         await setSelectValue(getRequestTypeCellSelect(), "READ");
 
         const exceptionCheckbox = host.querySelector("input[type='checkbox']") as HTMLInputElement | null;
-        expect(exceptionCheckbox).toBeDefined();
+        expect(exceptionCheckbox).not.toBeNull();
 
         await setCheckboxValue(exceptionCheckbox!, true);
 
@@ -369,9 +369,9 @@ describe("RequestsTable UI coverage", () => {
             "textarea[placeholder='Reason for exceptioning the course request']"
         ) as HTMLTextAreaElement | null;
 
-        expect(totalInput).toBeDefined();
-        expect(annualCountInput).toBeDefined();
-        expect(reasonInput).toBeDefined();
+        expect(totalInput).not.toBeNull();
+        expect(annualCountInput).not.toBeNull();
+        expect(reasonInput).not.toBeNull();
 
         await setInputValue(totalInput!, "2.25");
         await setInputValue(annualCountInput!, "3");
@@ -439,7 +439,7 @@ describe("RequestsTable UI coverage", () => {
         expect(host.querySelector("#request-0-otheryear-warning")).toBeNull();
 
         const revokeLink = host.querySelector("#revoke-button") as HTMLAnchorElement | null;
-        expect(revokeLink).toBeDefined();
+        expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
         expect(normalizeText(document.body.textContent)).toContain("Please confirm");
