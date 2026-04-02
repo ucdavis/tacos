@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Modal, ModalHeader, ModalBody } from "reactstrap";
 import queryString from "query-string";
 
 import Summary from "../components/Summary";
 import CreateCourseModal from "../components/CreateCourseModal";
+import Modal, { ModalHeader, ModalBody } from "../components/Modal";
 import RequestsTable from "../components/RequestsTable";
 
 import { annualizationRatio, formulas } from "../util/formulas";
