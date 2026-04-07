@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IDepartment } from "ClientApp/models/IDepartment";
+import { IDepartment } from "../models/IDepartment";
 
 interface IProps {
   value: IDepartment | undefined;

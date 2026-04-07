@@ -3,25 +3,6 @@ import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRoot, Root } from "react-dom/client";
 
-vi.mock("reactstrap", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("reactstrap")>();
-
-    return {
-        ...actual,
-        Tooltip: () => null,
-        Modal: ({ children, isOpen }: { children: React.ReactNode; isOpen?: boolean }) => isOpen ? <div>{children}</div> : null,
-        ModalHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        ModalBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        ModalFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        Button: ({
-            children,
-            onClick,
-            ...props
-        }: React.ButtonHTMLAttributes<HTMLButtonElement>) => <button onClick={onClick} {...props}>{children}</button>,
-        NavLink: ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props}>{children}</a>,
-    };
-});
-
 import RequestsTable from "./RequestsTable";
 
 import type { ICourse } from "../models/ICourse";
@@ -119,20 +100,29 @@ describe("RequestsTable UI coverage", () => {
             };
         }
 
-        props = {
+        const nextProps: RequestsTableProps = {
             ...props,
             ...overrideProps,
         };
+        props = nextProps;
 
         await act(async () => {
-            root!.render(<RequestsTable {...props} />);
+            root!.render(<RequestsTable {...nextProps} />);
         });
 
-        return props;
+        return nextProps;
+    }
+
+    function getHost(): HTMLDivElement {
+        if (!host) {
+            throw new Error("Test host has not been initialized.");
+        }
+
+        return host;
     }
 
     function getVisibleRequestRows(): HTMLDivElement[] {
-        return Array.from(host!.querySelectorAll("div.rt-tr[id^='request-']")) as HTMLDivElement[];
+        return Array.from(getHost().querySelectorAll("div.rt-tr[id^='request-']")) as HTMLDivElement[];
     }
 
     function getVisibleRequestIds(): string[] {
@@ -140,14 +130,14 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getCourseFilterInput(): HTMLInputElement {
-        const input = host!.querySelector("input[placeholder='Search ...']") as HTMLInputElement | null;
+        const input = getHost().querySelector("input[placeholder='Search ...']") as HTMLInputElement | null;
 
         expect(input).not.toBeNull();
         return input!;
     }
 
     function getCourseTypeCellSelect(): HTMLSelectElement {
-        const select = Array.from(host!.querySelectorAll("select")).find(element => {
+        const select = Array.from(getHost().querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.includes("STD") && values.includes("MAN") && !values.includes("");
         }) as HTMLSelectElement | undefined;
@@ -157,7 +147,7 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getRequestTypeCellSelect(): HTMLSelectElement {
-        const select = Array.from(host!.querySelectorAll("select")).find(element => {
+        const select = Array.from(getHost().querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.length === 2 && values[0] === "TA" && values[1] === "READ";
         }) as HTMLSelectElement | undefined;
@@ -167,7 +157,7 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getExceptionFilterSelect(): HTMLSelectElement {
-        const select = Array.from(host!.querySelectorAll("select")).find(element => {
+        const select = Array.from(getHost().querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.length === 3 && values[0] === "false" && values[1] === "true" && values[2] === "";
         }) as HTMLSelectElement | undefined;
@@ -176,8 +166,8 @@ describe("RequestsTable UI coverage", () => {
         return select!;
     }
 
-    function getButtonByText(label: string): HTMLButtonElement {
-        const button = Array.from(document.body.querySelectorAll("button")).find(
+    function getButtonByText(label: string, scope: ParentNode = document.body): HTMLButtonElement {
+        const button = Array.from(scope.querySelectorAll("button")).find(
             element => normalizeText(element.textContent) === label
         ) as HTMLButtonElement | undefined;
 
@@ -224,7 +214,7 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getCourseHeader(): HTMLElement {
-        const header = Array.from(host!.querySelectorAll(".rt-th")).find(
+        const header = Array.from(getHost().querySelectorAll(".rt-th")).find(
             element => normalizeText(element.textContent) === "Course"
         ) as HTMLElement | undefined;
 
@@ -241,10 +231,11 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
+        const currentHost = getHost();
         expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
-        expect(host.querySelector("#request-1")?.className).not.toContain("target-flash");
-        expect(host.querySelector("#request-2")?.className).toContain("target-flash");
-        expect(normalizeText(host.textContent)).not.toContain("Charlie");
+        expect(currentHost.querySelector("#request-1")?.className).not.toContain("target-flash");
+        expect(currentHost.querySelector("#request-2")?.className).toContain("target-flash");
+        expect(normalizeText(currentHost.textContent)).not.toContain("Charlie");
     });
 
     it("filters rows through the course search input by number or name without case sensitivity", async () => {
@@ -277,7 +268,7 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        const secondRowRemoveButton = host!.querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
+        const secondRowRemoveButton = getHost().querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
         expect(secondRowRemoveButton).not.toBeNull();
 
         await click(secondRowRemoveButton!);
@@ -313,15 +304,15 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        expect(host.querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
 
         await setSelectValue(getExceptionFilterSelect(), "true");
         expect(getVisibleRequestIds()).toEqual(["request-2"]);
-        expect(host.querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
 
         await setSelectValue(getExceptionFilterSelect(), "false");
         expect(getVisibleRequestIds()).toEqual(["request-1"]);
-        expect(host.querySelector("input[placeholder='Total FTE requested']")).toBeNull();
+        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).toBeNull();
     });
 
     it("emits onEdit with updated request values from the row controls", async () => {
@@ -339,7 +330,7 @@ describe("RequestsTable UI coverage", () => {
         await setSelectValue(getCourseTypeCellSelect(), "MAN");
         await setSelectValue(getRequestTypeCellSelect(), "READ");
 
-        const exceptionCheckbox = host.querySelector("input[type='checkbox']") as HTMLInputElement | null;
+        const exceptionCheckbox = getHost().querySelector("input[type='checkbox']") as HTMLInputElement | null;
         expect(exceptionCheckbox).not.toBeNull();
 
         await setCheckboxValue(exceptionCheckbox!, true);
@@ -363,9 +354,10 @@ describe("RequestsTable UI coverage", () => {
             onEdit,
         });
 
-        const totalInput = host.querySelector("input[placeholder='Total FTE requested']") as HTMLInputElement | null;
-        const annualCountInput = host.querySelector("input[placeholder='Annual offerings requested']") as HTMLInputElement | null;
-        const reasonInput = host.querySelector(
+        const currentHost = getHost();
+        const totalInput = currentHost.querySelector("input[placeholder='Total FTE requested']") as HTMLInputElement | null;
+        const annualCountInput = currentHost.querySelector("input[placeholder='Annual offerings requested']") as HTMLInputElement | null;
+        const reasonInput = currentHost.querySelector(
             "textarea[placeholder='Reason for exceptioning the course request']"
         ) as HTMLTextAreaElement | null;
 
@@ -403,10 +395,11 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        expect(host.querySelector("#request-new-indicator-0")).not.toBeNull();
-        expect(host.querySelector("#request-1-error")).not.toBeNull();
-        expect(host.querySelector("#request-2-otheryear-warning")).not.toBeNull();
-        expect(normalizeText(host.textContent)).toContain("0.500");
+        const currentHost = getHost();
+        expect(currentHost.querySelector("#request-new-indicator-0")).not.toBeNull();
+        expect(currentHost.querySelector("#request-1-error")).not.toBeNull();
+        expect(currentHost.querySelector("#request-2-otheryear-warning")).not.toBeNull();
+        expect(normalizeText(currentHost.textContent)).toContain("0.500");
     });
 
     it("uses exception annualized totals for approved exceptions and forwards revoke actions", async () => {
@@ -432,19 +425,22 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        const text = normalizeText(host.textContent);
+        const currentHost = getHost();
+        const text = normalizeText(currentHost.textContent);
 
         expect(text).toContain("approved for the above course");
         expect(text).toContain("1.500");
-        expect(host.querySelector("#request-0-otheryear-warning")).toBeNull();
+        expect(currentHost.querySelector("#request-0-otheryear-warning")).toBeNull();
 
-        const revokeLink = host.querySelector("#revoke-button") as HTMLAnchorElement | null;
+        const revokeLink = currentHost.querySelector("#revoke-button") as HTMLButtonElement | null;
         expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
+        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        expect(modal).not.toBeNull();
         expect(normalizeText(document.body.textContent)).toContain("Please confirm");
 
-        await click(getButtonByText("Revoke Approval"));
+        await click(getButtonByText("Revoke Approval", modal!));
         expect(onRevoke).toHaveBeenCalledWith(42);
     });
 });

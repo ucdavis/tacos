@@ -116,7 +116,7 @@ function normalizeText(value: string | null | undefined): string {
 }
 
 describe("SubmissionContainer formula UI coverage", () => {
-    let host: HTMLDivElement;
+    let host: HTMLDivElement | undefined;
     let root: Root | undefined;
 
     afterEach(async () => {
@@ -145,6 +145,14 @@ describe("SubmissionContainer formula UI coverage", () => {
         await act(async () => {
             root!.render(<SubmissionContainer department={department} requests={requests} />);
         });
+    }
+
+    function getHost(): HTMLDivElement {
+        if (!host) {
+            throw new Error("Test host has not been initialized.");
+        }
+
+        return host;
     }
 
     function getButton(label: string): HTMLButtonElement {
@@ -196,7 +204,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         async ({ courseType, course, expectedPerOffering, expectedAnnualized }) => {
             await renderSubmission([createRequest(courseType, course)]);
 
-            const text = normalizeText(host.textContent);
+            const text = normalizeText(getHost().textContent);
 
             expect(text).toContain(expectedPerOffering);
             expect(text).toContain(`Request Total: ${expectedAnnualized}`);
@@ -212,9 +220,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             })
         ]);
 
-        expect(normalizeText(host.textContent)).toContain("Request Total: 0.833");
+        const currentHost = getHost();
 
-        const courseTypeSelect = Array.from(host.querySelectorAll("select")).find(
+        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 0.833");
+
+        const courseTypeSelect = Array.from(currentHost.querySelectorAll("select")).find(
             element => (element as HTMLSelectElement).value === "STD"
         ) as HTMLSelectElement | undefined;
 
@@ -225,7 +235,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             courseTypeSelect!.dispatchEvent(new Event("change", { bubbles: true }));
         });
 
-        const updatedText = normalizeText(host.textContent);
+        const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).toContain("1.250");
         expect(updatedText).toContain("Request Total: 0.417");
@@ -240,9 +250,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             })
         ]);
 
-        expect(normalizeText(host.textContent)).toContain("Request Total: 0.333");
+        const currentHost = getHost();
 
-        const exceptionCheckbox = host.querySelector(
+        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 0.333");
+
+        const exceptionCheckbox = currentHost.querySelector(
             "input[type=\"checkbox\"]"
         ) as HTMLInputElement | null;
 
@@ -250,14 +262,14 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         await setCheckboxValue(exceptionCheckbox!, true);
 
-        expect(normalizeText(host.textContent)).toContain("Proposed TA % per course offering");
+        expect(normalizeText(getHost().textContent)).toContain("Proposed TA % per course offering");
         expect(getButton("Save Changes").disabled).toBe(true);
         expect(getButton("Submit for Approval").disabled).toBe(true);
 
         await setInputValue(getInputByPlaceholder("Total FTE requested"), "1.50");
         await setInputValue(getInputByPlaceholder("Annual offerings requested"), "3");
 
-        const updatedText = normalizeText(host.textContent);
+        const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).toContain("Request Total: 1.500");
         expect(updatedText).toContain("1.500");
@@ -282,9 +294,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             )
         ]);
 
-        expect(normalizeText(host.textContent)).toContain("Request Total: 1.500");
+        const currentHost = getHost();
 
-        const exceptionCheckbox = host.querySelector(
+        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 1.500");
+
+        const exceptionCheckbox = currentHost.querySelector(
             "input[type=\"checkbox\"]"
         ) as HTMLInputElement | null;
 
@@ -292,7 +306,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         await setCheckboxValue(exceptionCheckbox!, false);
 
-        const updatedText = normalizeText(host.textContent);
+        const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).not.toContain("Proposed TA % per course offering");
         expect(updatedText).toContain("Request Total: 0.333");
@@ -317,10 +331,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             )
         ]);
 
-        const text = normalizeText(host.textContent);
+        const currentHost = getHost();
+        const text = normalizeText(currentHost.textContent);
 
         expect(text).toContain("approved for the above course");
         expect(text).toContain("Request Total: 1.500");
-        expect(host.querySelector("#revoke-button")).not.toBeNull();
+        expect(currentHost.querySelector("#revoke-button")).not.toBeNull();
     });
 });
