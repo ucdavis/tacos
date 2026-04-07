@@ -147,6 +147,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         });
     }
 
+    // just a simple wrappper to eliminate a bunch of TS warnings about potential uninitialized variable
     function getHost(): HTMLDivElement {
         if (!host) {
             throw new Error("Test host has not been initialized.");
@@ -178,7 +179,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             return;
         }
 
-        await act(async () => {
+        act(() => {
             checkbox.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
@@ -191,7 +192,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(valueSetter).toBeDefined();
 
-        await act(async () => {
+        act(() => {
             valueSetter!.call(input, value);
             input.dispatchEvent(new Event("input", { bubbles: true }));
             input.dispatchEvent(new Event("change", { bubbles: true }));
@@ -230,7 +231,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(courseTypeSelect).toBeDefined();
 
-        await act(async () => {
+        act(() => {
             courseTypeSelect!.value = "MAN";
             courseTypeSelect!.dispatchEvent(new Event("change", { bubbles: true }));
         });

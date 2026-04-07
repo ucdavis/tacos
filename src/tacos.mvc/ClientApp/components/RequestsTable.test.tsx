@@ -113,6 +113,7 @@ describe("RequestsTable UI coverage", () => {
         return nextProps;
     }
 
+    // just a simple wrappper to eliminate a bunch of TS warnings about potential uninitialized variable
     function getHost(): HTMLDivElement {
         if (!host) {
             throw new Error("Test host has not been initialized.");
@@ -121,8 +122,8 @@ describe("RequestsTable UI coverage", () => {
         return host;
     }
 
-    function getVisibleRequestRows(): HTMLDivElement[] {
-        return Array.from(getHost().querySelectorAll("div.rt-tr[id^='request-']")) as HTMLDivElement[];
+    function getVisibleRequestRows(): HTMLTableRowElement[] {
+        return Array.from(getHost().querySelectorAll("tr[data-request-row='true'][id^='request-']")) as HTMLTableRowElement[];
     }
 
     function getVisibleRequestIds(): string[] {
@@ -136,8 +137,8 @@ describe("RequestsTable UI coverage", () => {
         return input!;
     }
 
-    function getCourseTypeCellSelect(): HTMLSelectElement {
-        const select = Array.from(getHost().querySelectorAll("select")).find(element => {
+    function getCourseTypeCellSelect(scope: ParentNode = getHost()): HTMLSelectElement {
+        const select = Array.from(scope.querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.includes("STD") && values.includes("MAN") && !values.includes("");
         }) as HTMLSelectElement | undefined;
@@ -146,8 +147,8 @@ describe("RequestsTable UI coverage", () => {
         return select!;
     }
 
-    function getRequestTypeCellSelect(): HTMLSelectElement {
-        const select = Array.from(getHost().querySelectorAll("select")).find(element => {
+    function getRequestTypeCellSelect(scope: ParentNode = getHost()): HTMLSelectElement {
+        const select = Array.from(scope.querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.length === 2 && values[0] === "TA" && values[1] === "READ";
         }) as HTMLSelectElement | undefined;
@@ -166,6 +167,13 @@ describe("RequestsTable UI coverage", () => {
         return select!;
     }
 
+    function getExceptionCheckbox(scope: ParentNode = getHost()): HTMLInputElement {
+        const checkbox = scope.querySelector("input[type='checkbox']") as HTMLInputElement | null;
+
+        expect(checkbox).not.toBeNull();
+        return checkbox!;
+    }
+
     function getButtonByText(label: string, scope: ParentNode = document.body): HTMLButtonElement {
         const button = Array.from(scope.querySelectorAll("button")).find(
             element => normalizeText(element.textContent) === label
@@ -176,13 +184,13 @@ describe("RequestsTable UI coverage", () => {
     }
 
     async function click(element: Element) {
-        await act(async () => {
+        act(() => {
             element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
 
     async function setSelectValue(select: HTMLSelectElement, value: string) {
-        await act(async () => {
+        act(() => {
             select.value = value;
             select.dispatchEvent(new Event("change", { bubbles: true }));
         });
@@ -193,7 +201,7 @@ describe("RequestsTable UI coverage", () => {
             return;
         }
 
-        await act(async () => {
+        act(() => {
             checkbox.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
@@ -204,7 +212,7 @@ describe("RequestsTable UI coverage", () => {
 
         expect(valueSetter).toBeDefined();
 
-        await act(async () => {
+        act(() => {
             valueSetter!.call(input, value);
             input.dispatchEvent(new Event("input", { bubbles: true }));
             input.dispatchEvent(new Event("change", { bubbles: true }));
@@ -214,7 +222,7 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getCourseHeader(): HTMLElement {
-        const header = Array.from(getHost().querySelectorAll(".rt-th")).find(
+        const header = Array.from(getHost().querySelectorAll("thead tr:first-child th")).find(
             element => normalizeText(element.textContent) === "Course"
         ) as HTMLElement | undefined;
 
@@ -257,16 +265,19 @@ describe("RequestsTable UI coverage", () => {
         expect(getVisibleRequestIds()).toEqual(["request-1", "request-2", "request-3"]);
     });
 
-    it("calls onRemove with the rendered row index when the remove button is clicked", async () => {
+    it("calls onRemove with the original request index when the visible row order changes", async () => {
         const onRemove = vi.fn();
 
         await renderTable({
             onRemove,
             requests: [
-                createRequest(1, { course: createCourse({ number: "ECS 020", name: "Algorithms" }) }),
-                createRequest(2, { course: createCourse({ number: "MAT 030", name: "Matrix Methods" }) }),
+                createRequest(1, { course: createCourse({ number: "MAT 030", name: "Matrix Methods" }) }),
+                createRequest(2, { course: createCourse({ number: "ECS 020", name: "Algorithms" }) }),
             ]
         });
+
+        await click(getCourseHeader());
+        expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
         const secondRowRemoveButton = getHost().querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
         expect(secondRowRemoveButton).not.toBeNull();
@@ -315,29 +326,35 @@ describe("RequestsTable UI coverage", () => {
         expect(getHost().querySelector("input[placeholder='Total FTE requested']")).toBeNull();
     });
 
-    it("emits onEdit with updated request values from the row controls", async () => {
+    it("emits onEdit with updated request values from the original request index after sorting", async () => {
         const onEdit = vi.fn();
 
-        const request = createRequest(1, {
+        const firstRequest = createRequest(1, {
+            course: createCourse({ number: "TAC 250", name: "Later Row" }),
+        });
+        const secondRequest = createRequest(2, {
             course: createCourse({ number: "TAC 150", name: "Editable Row" }),
         });
 
         await renderTable({
-            requests: [request],
+            requests: [firstRequest, secondRequest],
             onEdit,
         });
 
-        await setSelectValue(getCourseTypeCellSelect(), "MAN");
-        await setSelectValue(getRequestTypeCellSelect(), "READ");
+        await click(getCourseHeader());
+        expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
-        const exceptionCheckbox = getHost().querySelector("input[type='checkbox']") as HTMLInputElement | null;
-        expect(exceptionCheckbox).not.toBeNull();
+        const sortedRow = getHost().querySelector("#request-2") as HTMLTableRowElement | null;
+        expect(sortedRow).not.toBeNull();
 
-        await setCheckboxValue(exceptionCheckbox!, true);
+        await setSelectValue(getCourseTypeCellSelect(sortedRow!), "MAN");
+        await setSelectValue(getRequestTypeCellSelect(sortedRow!), "READ");
 
-        expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, courseType: "MAN" });
-        expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, requestType: "READ" });
-        expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exception: true });
+        await setCheckboxValue(getExceptionCheckbox(sortedRow!), true);
+
+        expect(onEdit).toHaveBeenNthCalledWith(1, 1, { ...secondRequest, courseType: "MAN" });
+        expect(onEdit).toHaveBeenNthCalledWith(2, 1, { ...secondRequest, requestType: "READ" });
+        expect(onEdit).toHaveBeenNthCalledWith(3, 1, { ...secondRequest, exception: true });
     });
 
     it("forwards numeric edits from the expanded exception detail inputs and renders the reason field", async () => {
