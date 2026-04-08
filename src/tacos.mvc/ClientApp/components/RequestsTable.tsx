@@ -27,7 +27,7 @@ interface IProps {
     requests: IRequest[];
     onEdit: (i: number, request: IRequest) => void;
     onRemove: (i: number) => void;
-    onRevoke: (id: number) => void;
+    onRevoke: (id: number) => void | Promise<void>;
     courseNumberFilter?: string;
 
     onCourseCreate: (i: number, defaultValues?: ICourse) => void;
@@ -266,26 +266,47 @@ const RequestsTable = (props: IProps) => {
                                 {headerGroup.headers.map((header) => {
                                     const meta = getColumnMeta(header.column.columnDef);
                                     const canSort = header.column.getCanSort();
+                                    const nextSortOrder = header.column.getNextSortingOrder();
                                     const sortState = header.column.getIsSorted();
                                     const widthStyle = getWidthStyle(meta);
 
                                     return (
                                         <th
+                                            aria-sort={getAriaSort(canSort, sortState)}
                                             className={buildClassName(
                                                 meta.headerClassName,
                                                 canSort ? "requests-sortable" : undefined
                                             )}
                                             key={header.id}
-                                            onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                                             style={widthStyle}
                                             scope="col"
                                         >
-                                            <div className="d-flex align-items-center">
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(header.column.columnDef.header, header.getContext())}
-                                                {sortState === "asc" && <span className="ml-2">▲</span>}
-                                                {sortState === "desc" && <span className="ml-2">▼</span>}
+                                            <div
+                                                className={buildClassName(
+                                                    "d-flex align-items-center",
+                                                    canSort ? "justify-content-between" : undefined
+                                                )}
+                                            >
+                                                <div className="d-flex align-items-center">
+                                                    {header.isPlaceholder
+                                                        ? null
+                                                        : flexRender(header.column.columnDef.header, header.getContext())}
+                                                </div>
+                                                {canSort && !header.isPlaceholder && (
+                                                    <button
+                                                        aria-label={getSortButtonLabel(
+                                                            header.column.id,
+                                                            header.column.columnDef.header,
+                                                            nextSortOrder,
+                                                        )}
+                                                        className="btn btn-link btn-sm p-0 ml-2 requests-sort-button"
+                                                        data-column-sort-button={header.column.id}
+                                                        onClick={header.column.getToggleSortingHandler()}
+                                                        type="button"
+                                                    >
+                                                        {renderSortIcon(sortState)}
+                                                    </button>
+                                                )}
                                             </div>
                                         </th>
                                     );
@@ -378,7 +399,7 @@ const RequestsTable = (props: IProps) => {
         switch (meta.filterVariant) {
             case "icon":
                 return (
-                    <div className="text-center">
+                    <div className="text-center requests-filter-icon">
                         <i className="fas fa-filter" />
                     </div>
                 );
@@ -497,6 +518,83 @@ function getWidthStyle(meta: IColumnMeta): React.CSSProperties | undefined {
     };
 }
 
+function getAriaSort(
+    canSort: boolean,
+    sortState: false | "asc" | "desc",
+): React.AriaAttributes["aria-sort"] | undefined {
+    if (!canSort) {
+        return undefined;
+    }
+
+    if (sortState === "asc") {
+        return "ascending";
+    }
+
+    if (sortState === "desc") {
+        return "descending";
+    }
+
+    return "none";
+}
+
+function getSortButtonLabel(
+    columnId: string,
+    header: ColumnDef<IRequestTableRow>["header"],
+    nextSortOrder: false | "asc" | "desc",
+) {
+    const headerLabel = getSortableHeaderLabel(columnId, header);
+
+    if (nextSortOrder === "asc") {
+        return `Sort ${headerLabel} ascending`;
+    }
+
+    if (nextSortOrder === "desc") {
+        return `Sort ${headerLabel} descending`;
+    }
+
+    return `Clear ${headerLabel} sorting`;
+}
+
+function getSortableHeaderLabel(columnId: string, header: ColumnDef<IRequestTableRow>["header"]) {
+    if (typeof header === "string") {
+        return header;
+    }
+
+    switch (columnId) {
+        case "courseType":
+            return "Course Type";
+        case "requestType":
+            return "Request Type";
+        default:
+            return columnId;
+    }
+}
+
+function renderSortIcon(sortState: false | "asc" | "desc") {
+    if (sortState === "asc") {
+        return <span aria-hidden="true">▲</span>;
+    }
+
+    if (sortState === "desc") {
+        return <span aria-hidden="true">▼</span>;
+    }
+
+    return <span aria-hidden="true">↕</span>;
+}
+
+function renderIconTrigger(id: string, label: string, iconClassName: string) {
+    return (
+        <button
+            aria-label={label}
+            className="btn p-0 border-0 bg-transparent align-baseline requests-icon-button"
+            id={id}
+            type="button"
+        >
+            <i aria-hidden="true" className={iconClassName} />
+        </button>
+    );
+}
+
 function renderNewIndicator(row: IRequestTableRow) {
     const { originalIndex, request } = row;
 
@@ -506,7 +604,11 @@ function renderNewIndicator(row: IRequestTableRow) {
 
     return (
         <span>
-            <i className="fas fa-plus-circle" id={`request-new-indicator-${originalIndex}`} />
+            {renderIconTrigger(
+                `request-new-indicator-${originalIndex}`,
+                "New course details",
+                "fas fa-plus-circle",
+            )}
             <UncontrolledTooltip
                 placement="left"
                 target={`request-new-indicator-${originalIndex}`}
@@ -552,7 +654,7 @@ function renderCourseTypeHeader() {
     return (
         <div>
             <span className="mr-3">Course Type</span>
-            <a href="/CAES-TA-Guidelines 2018-23.pdf" target="_blank">
+            <a href="/CAES-TA-Guidelines 2018-23.pdf" rel="noopener noreferrer" target="_blank">
                 Criteria Info <i className="fas fa-external-link-alt" />
             </a>
         </div>
@@ -577,7 +679,11 @@ function renderRequestTypeHeader() {
     return (
         <div>
             <span className="mr-2">Request Type</span>
-            <i className="fas fa-question-circle" id="requestTypeHeader" />
+            {renderIconTrigger(
+                "requestTypeHeader",
+                "Request type help",
+                "fas fa-question-circle",
+            )}
             <UncontrolledTooltip
                 placement="right"
                 target="requestTypeHeader"
@@ -605,10 +711,12 @@ function renderException(
 function renderRemoveButton(row: IRequestTableRow, onRemove: (i: number) => void) {
     return (
         <button
+            aria-label="Remove request"
             className="btn btn-danger"
+            type="button"
             onClick={() => onRemove(row.originalIndex)}
         >
-            <i className="fa fa-trash-alt" />
+            <i aria-hidden="true" className="fa fa-trash-alt" />
         </button>
     );
 }
@@ -623,10 +731,11 @@ function renderAnnualizedFTE(row: IRequestTableRow) {
             <>
                 {annualizedTotal.toFixed(3)}
                 <span style={{ paddingLeft: ".5em" }}>
-                    <i
-                        className="fas fa-exclamation-triangle text-warning"
-                        id={`request-${originalIndex}-otheryear-warning`}
-                    />
+                    {renderIconTrigger(
+                        `request-${originalIndex}-otheryear-warning`,
+                        "Every-other-year course warning",
+                        "fas fa-exclamation-triangle text-warning",
+                    )}
                     <UncontrolledTooltip
                         className=""
                         placement="right"
@@ -648,7 +757,11 @@ function renderWarnings(row: IRequestTableRow) {
     if (!request.isValid) {
         return (
             <div>
-                <i className="fas fa-exclamation-triangle text-danger" id={`request-${originalIndex}-error`} />
+                {renderIconTrigger(
+                    `request-${originalIndex}-error`,
+                    "Request validation warning",
+                    "fas fa-exclamation-triangle text-danger",
+                )}
                 <UncontrolledTooltip
                     className=""
                     placement="right"

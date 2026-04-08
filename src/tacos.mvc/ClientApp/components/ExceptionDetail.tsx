@@ -4,7 +4,7 @@ import Modal, { ModalHeader, ModalBody, ModalFooter } from "./Modal";
 
 interface IProps {
     requestId: number;
-    onRevoke: (id: number) => void;
+    onRevoke: (id: number) => void | Promise<void>;
     exception: boolean;
     exceptionApproved?: boolean;
     exceptionReason: string;
@@ -23,6 +23,8 @@ interface IState {
 
 // render a textbox for inputing course number, or show course info if already selected
 export default class ExceptionDetail extends React.PureComponent<IProps, IState> {
+    private isMountedFlag = false;
+
     public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
         if (nextProps.exceptionReason !== prevState.exceptionReason) {
             return {
@@ -41,6 +43,14 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
             revoked: false,
             isRevoking: false,
         };
+    }
+
+    public componentDidMount() {
+        this.isMountedFlag = true;
+    }
+
+    public componentWillUnmount() {
+        this.isMountedFlag = false;
     }
 
     public render() {
@@ -146,10 +156,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                 <button
                     type="button"
                     className="btn btn-primary"
-                    onClick={() => {
-                        this.setState({ isRevoking: true });
-                        return this.props.onRevoke(this.props.requestId);
-                    }}
+                    onClick={this.onRevokeClick}
                 >
                     Revoke Approval
                 </button>
@@ -223,5 +230,17 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         this.setState({
             exceptionReason: e.target.value,
         });
+    };
+
+    private onRevokeClick = async () => {
+        this.setState({ isRevoking: true });
+
+        try {
+            await this.props.onRevoke(this.props.requestId);
+        } finally {
+            if (this.isMountedFlag) {
+                this.setState({ isRevoking: false });
+            }
+        }
     };
 }

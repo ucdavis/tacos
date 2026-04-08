@@ -147,7 +147,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         });
     }
 
-    // just a simple wrappper to eliminate a bunch of TS warnings about potential uninitialized variable
+    // just a simple wrapper to eliminate a bunch of TS warnings about potential uninitialized variable
     function getHost(): HTMLDivElement {
         if (!host) {
             throw new Error("Test host has not been initialized.");
@@ -174,7 +174,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         return input!;
     }
 
-    async function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
+    function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
         if (checkbox.checked === checked) {
             return;
         }
@@ -184,7 +184,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         });
     }
 
-    async function setInputValue(input: HTMLInputElement, value: string) {
+    function setInputValue(input: HTMLInputElement, value: string) {
         const valueSetter = Object.getOwnPropertyDescriptor(
             HTMLInputElement.prototype,
             "value"

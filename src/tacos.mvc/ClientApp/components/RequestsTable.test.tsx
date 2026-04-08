@@ -113,7 +113,7 @@ describe("RequestsTable UI coverage", () => {
         return nextProps;
     }
 
-    // just a simple wrappper to eliminate a bunch of TS warnings about potential uninitialized variable
+    // just a simple wrapper to eliminate a bunch of TS warnings about potential uninitialized variable
     function getHost(): HTMLDivElement {
         if (!host) {
             throw new Error("Test host has not been initialized.");
@@ -183,20 +183,20 @@ describe("RequestsTable UI coverage", () => {
         return button!;
     }
 
-    async function click(element: Element) {
+    function click(element: Element) {
         act(() => {
             element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
 
-    async function setSelectValue(select: HTMLSelectElement, value: string) {
+    function setSelectValue(select: HTMLSelectElement, value: string) {
         act(() => {
             select.value = value;
             select.dispatchEvent(new Event("change", { bubbles: true }));
         });
     }
 
-    async function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
+    function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
         if (checkbox.checked === checked) {
             return;
         }
@@ -206,7 +206,7 @@ describe("RequestsTable UI coverage", () => {
         });
     }
 
-    async function setInputValue(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
+    function setInputValue(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
         const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
         const valueSetter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
 
@@ -221,13 +221,13 @@ describe("RequestsTable UI coverage", () => {
         });
     }
 
-    function getCourseHeader(): HTMLElement {
-        const header = Array.from(getHost().querySelectorAll("thead tr:first-child th")).find(
-            element => normalizeText(element.textContent) === "Course"
-        ) as HTMLElement | undefined;
+    function getSortButton(columnId: string): HTMLButtonElement {
+        const button = getHost().querySelector(
+            `button[data-column-sort-button="${columnId}"]`
+        ) as HTMLButtonElement | null;
 
-        expect(header).toBeDefined();
-        return header!;
+        expect(button).not.toBeNull();
+        return button!;
     }
 
     it("renders only non-deleted rows and decorates focused rows with request ids", async () => {
@@ -276,7 +276,7 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        await click(getCourseHeader());
+        await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
         const secondRowRemoveButton = getHost().querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
@@ -295,10 +295,33 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        const header = getCourseHeader();
-
-        await click(header);
+        await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-3", "request-1"]);
+    });
+
+    it("keeps header help controls separate from sorting and hardens the external criteria link", async () => {
+        await renderTable({
+            requests: [
+                createRequest(1, { requestType: "READ" }),
+                createRequest(2, { requestType: "TA" }),
+            ]
+        });
+
+        const requestTypeHelpButton = getHost().querySelector("#requestTypeHeader") as HTMLButtonElement | null;
+        const criteriaInfoLink = Array.from(getHost().querySelectorAll("a")).find(
+            element => normalizeText(element.textContent).includes("Criteria Info")
+        ) as HTMLAnchorElement | undefined;
+
+        expect(requestTypeHelpButton).not.toBeNull();
+        expect(requestTypeHelpButton!.tagName).toBe("BUTTON");
+        expect(requestTypeHelpButton!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+
+        expect(criteriaInfoLink).toBeDefined();
+        expect(criteriaInfoLink!.getAttribute("rel")).toBe("noopener noreferrer");
+
+        expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
+        await click(requestTypeHelpButton!);
+        expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
     });
 
     it("filters rows with the exception dropdown and preserves the expanded exception detail", async () => {
@@ -341,7 +364,7 @@ describe("RequestsTable UI coverage", () => {
             onEdit,
         });
 
-        await click(getCourseHeader());
+        await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
         const sortedRow = getHost().querySelector("#request-2") as HTMLTableRowElement | null;
@@ -413,9 +436,21 @@ describe("RequestsTable UI coverage", () => {
         });
 
         const currentHost = getHost();
-        expect(currentHost.querySelector("#request-new-indicator-0")).not.toBeNull();
-        expect(currentHost.querySelector("#request-1-error")).not.toBeNull();
-        expect(currentHost.querySelector("#request-2-otheryear-warning")).not.toBeNull();
+        const newIndicator = currentHost.querySelector("#request-new-indicator-0") as HTMLButtonElement | null;
+        const validationWarning = currentHost.querySelector("#request-1-error") as HTMLButtonElement | null;
+        const alternatingWarning = currentHost.querySelector("#request-2-otheryear-warning") as HTMLButtonElement | null;
+
+        expect(newIndicator).not.toBeNull();
+        expect(newIndicator!.tagName).toBe("BUTTON");
+        expect(newIndicator!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+
+        expect(validationWarning).not.toBeNull();
+        expect(validationWarning!.tagName).toBe("BUTTON");
+        expect(validationWarning!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+
+        expect(alternatingWarning).not.toBeNull();
+        expect(alternatingWarning!.tagName).toBe("BUTTON");
+        expect(alternatingWarning!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
         expect(normalizeText(currentHost.textContent)).toContain("0.500");
     });
 
@@ -459,5 +494,44 @@ describe("RequestsTable UI coverage", () => {
 
         await click(getButtonByText("Revoke Approval", modal!));
         expect(onRevoke).toHaveBeenCalledWith(42);
+    });
+
+    it("restores the revoke button after an async revoke attempt settles", async () => {
+        let resolveRevoke: (() => void) | undefined;
+        const revokePromise = new Promise<void>((resolve) => {
+            resolveRevoke = resolve;
+        });
+        const onRevoke = vi.fn(() => revokePromise);
+
+        await renderTable({
+            onRevoke,
+            requests: [
+                createRequest(42, {
+                    course: createCourse({ number: "TAC 420", name: "Approved Exception" }),
+                    exception: true,
+                    exceptionTotal: 1.5,
+                    exceptionAnnualCount: 3,
+                    exceptionAnnualizedTotal: 1.5,
+                    hasApprovedException: true
+                }),
+            ]
+        });
+
+        const revokeLink = getHost().querySelector("#revoke-button") as HTMLButtonElement | null;
+        expect(revokeLink).not.toBeNull();
+
+        await click(revokeLink!);
+        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        expect(modal).not.toBeNull();
+
+        await click(getButtonByText("Revoke Approval", modal!));
+        expect(normalizeText(modal!.textContent)).toContain("Revoking...");
+
+        await act(async () => {
+            resolveRevoke!();
+            await revokePromise;
+        });
+
+        expect(normalizeText(modal!.textContent)).toContain("Revoke Approval");
     });
 });

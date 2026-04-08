@@ -13,114 +13,229 @@ interface IModalSectionProps {
     className?: string;
 }
 
+interface IModalStackEntry {
+    focusDialog: () => void;
+    handleWindowKeyDown: (e: KeyboardEvent) => void;
+    token: symbol;
+}
+
 let openModalCount = 0;
+let modalTitleCount = 0;
+const modalStack: IModalStackEntry[] = [];
+const focusableSelector = [
+    "a[href]",
+    "button:not([disabled])",
+    "input:not([disabled])",
+    "select:not([disabled])",
+    "textarea:not([disabled])",
+    "[tabindex]:not([tabindex='-1'])",
+].join(", ");
 
 const joinClassNames = (...classNames: Array<string | undefined>) =>
     classNames.filter(Boolean).join(" ");
 
-class Modal extends React.PureComponent<IModalProps> {
-    private hasBodyLock = false;
+const ModalTitleContext = React.createContext<string | undefined>(undefined);
 
-    public componentDidMount() {
-        if (this.props.isOpen) {
-            this.onOpen();
-        }
+const routeWindowKeyDown = (e: KeyboardEvent) => {
+    const activeModal = modalStack[modalStack.length - 1];
+    activeModal?.handleWindowKeyDown(e);
+};
+
+function getFocusableElements(dialog: HTMLDivElement | null) {
+    if (!dialog) {
+        return [];
     }
 
-    public componentDidUpdate(prevProps: IModalProps) {
-        if (!prevProps.isOpen && this.props.isOpen) {
-            this.onOpen();
-        }
+    return Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector));
+}
 
-        if (prevProps.isOpen && !this.props.isOpen) {
-            this.onCloseModal();
-        }
+function pushModalToStack(entry: IModalStackEntry) {
+    const existingIndex = modalStack.findIndex((modalEntry) => modalEntry.token === entry.token);
+    if (existingIndex >= 0) {
+        modalStack.splice(existingIndex, 1);
     }
 
-    public componentWillUnmount() {
-        this.onCloseModal();
+    modalStack.push(entry);
+
+    if (modalStack.length === 1) {
+        window.addEventListener("keydown", routeWindowKeyDown);
+    }
+}
+
+function removeModalFromStack(entry: IModalStackEntry) {
+    const index = modalStack.findIndex((modalEntry) => modalEntry.token === entry.token);
+    if (index >= 0) {
+        modalStack.splice(index, 1);
     }
 
-    public render() {
-        const { children, centered, isOpen } = this.props;
+    if (modalStack.length === 0) {
+        window.removeEventListener("keydown", routeWindowKeyDown);
+    }
+}
 
+const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
+    const dialogRef = React.useRef<HTMLDivElement>(null);
+    const onCloseRef = React.useRef(onClose);
+    const previousFocusedElementRef = React.useRef<HTMLElement | null>(null);
+    const stackEntryRef = React.useRef<IModalStackEntry | null>(null);
+    const titleId = React.useRef(`modal-title-${++modalTitleCount}`).current;
+
+    React.useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
+    const focusDialog = React.useCallback(() => {
+        const dialog = dialogRef.current;
+
+        if (!dialog) {
+            return;
+        }
+
+        const [firstFocusable] = getFocusableElements(dialog);
+        (firstFocusable || dialog).focus();
+    }, []);
+
+    const handleWindowKeyDown = React.useCallback((e: KeyboardEvent) => {
+        if (e.key === "Escape" && onCloseRef.current) {
+            e.preventDefault();
+            onCloseRef.current();
+        }
+    }, []);
+
+    if (stackEntryRef.current === null) {
+        stackEntryRef.current = {
+            focusDialog,
+            handleWindowKeyDown,
+            token: Symbol("modal"),
+        };
+    } else {
+        stackEntryRef.current.focusDialog = focusDialog;
+        stackEntryRef.current.handleWindowKeyDown = handleWindowKeyDown;
+    }
+
+    React.useEffect(() => {
         if (!isOpen || typeof document === "undefined") {
-            return null;
+            return undefined;
         }
 
-        const dialogClassName = joinClassNames(
-            "modal-dialog",
-            centered ? "modal-dialog-centered" : undefined,
-        );
+        openModalCount += 1;
+        document.body.classList.add("modal-open");
+        previousFocusedElementRef.current = document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : null;
 
-        return createPortal(
+        const stackEntry = stackEntryRef.current!;
+        pushModalToStack(stackEntry);
+        focusDialog();
+
+        return () => {
+            openModalCount = Math.max(0, openModalCount - 1);
+
+            if (openModalCount === 0) {
+                document.body.classList.remove("modal-open");
+            }
+
+            removeModalFromStack(stackEntry);
+
+            const activeModal = modalStack[modalStack.length - 1];
+            if (activeModal) {
+                activeModal.focusDialog();
+                return;
+            }
+
+            const previousFocusedElement = previousFocusedElementRef.current;
+            if (previousFocusedElement && document.contains(previousFocusedElement)) {
+                previousFocusedElement.focus();
+            }
+        };
+    }, [focusDialog, isOpen]);
+
+    const handleBackdropClick = React.useCallback(() => {
+        onCloseRef.current?.();
+    }, []);
+
+    const stopPropagation = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+    }, []);
+
+    const handleDialogKeyDown = React.useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key !== "Tab") {
+            return;
+        }
+
+        const focusableElements = getFocusableElements(dialogRef.current);
+        if (focusableElements.length === 0) {
+            e.preventDefault();
+            dialogRef.current?.focus();
+            return;
+        }
+
+        const activeElement = document.activeElement as HTMLElement | null;
+        const activeIndex = activeElement
+            ? focusableElements.indexOf(activeElement)
+            : -1;
+
+        if (e.shiftKey) {
+            if (activeIndex <= 0) {
+                e.preventDefault();
+                focusableElements[focusableElements.length - 1].focus();
+            }
+
+            return;
+        }
+
+        if (activeIndex === -1 || activeIndex === focusableElements.length - 1) {
+            e.preventDefault();
+            focusableElements[0].focus();
+        }
+    }, []);
+
+    if (!isOpen || typeof document === "undefined") {
+        return null;
+    }
+
+    const dialogClassName = joinClassNames(
+        "modal-dialog",
+        centered ? "modal-dialog-centered" : undefined,
+    );
+
+    return createPortal(
+        <ModalTitleContext.Provider value={titleId}>
             <>
                 <div
                     className="modal fade show"
                     style={{ display: "block" }}
-                    role="dialog"
-                    aria-modal="true"
-                    tabIndex={-1}
-                    onClick={this.handleBackdropClick}
+                    onClick={handleBackdropClick}
                 >
-                    <div className={dialogClassName} role="document" onClick={this.stopPropagation}>
+                    <div
+                        aria-labelledby={titleId}
+                        aria-modal="true"
+                        className={dialogClassName}
+                        onClick={stopPropagation}
+                        onKeyDown={handleDialogKeyDown}
+                        ref={dialogRef}
+                        role="dialog"
+                        tabIndex={-1}
+                    >
                         <div className="modal-content">{children}</div>
                     </div>
                 </div>
                 <div className="modal-backdrop fade show" />
-            </>,
-            document.body,
-        );
-    }
+            </>
+        </ModalTitleContext.Provider>,
+        document.body,
+    );
+};
 
-    private onOpen = () => {
-        if (!this.hasBodyLock) {
-            openModalCount += 1;
-            this.hasBodyLock = true;
-        }
+export const ModalHeader = ({ children, className }: IModalSectionProps) => {
+    const titleId = React.useContext(ModalTitleContext);
 
-        document.body.classList.add("modal-open");
-        window.addEventListener("keydown", this.handleKeyDown);
-    };
-
-    private onCloseModal = () => {
-        if (!this.hasBodyLock) {
-            return;
-        }
-
-        openModalCount = Math.max(0, openModalCount - 1);
-        this.hasBodyLock = false;
-
-        if (openModalCount === 0) {
-            document.body.classList.remove("modal-open");
-        }
-
-        window.removeEventListener("keydown", this.handleKeyDown);
-    };
-
-    private handleBackdropClick = () => {
-        if (this.props.onClose) {
-            this.props.onClose();
-        }
-    };
-
-    private handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && this.props.onClose) {
-            e.preventDefault();
-            this.props.onClose();
-        }
-    };
-
-    private stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation();
-    };
-}
-
-export const ModalHeader = ({ children, className }: IModalSectionProps) => (
-    <div className={joinClassNames("modal-header", className)}>
-        <h5 className="modal-title mb-0">{children}</h5>
-    </div>
-);
+    return (
+        <div className={joinClassNames("modal-header", className)}>
+            <h5 className="modal-title mb-0" id={titleId}>{children}</h5>
+        </div>
+    );
+};
 
 export const ModalBody = ({ children, className }: IModalSectionProps) => (
     <div className={joinClassNames("modal-body", className)}>{children}</div>
