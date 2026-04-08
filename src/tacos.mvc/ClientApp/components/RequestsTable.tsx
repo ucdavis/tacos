@@ -51,6 +51,9 @@ const RequestsTable = (props: IProps) => {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(() =>
         buildInitialFilters(courseNumberFilter)
     );
+    const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
+    const headerRefs = React.useRef<Record<string, HTMLTableCellElement | null>>({});
+    const activeResizeRef = React.useRef<{ columnId: string; startWidth: number; startX: number } | null>(null);
 
     React.useEffect(() => {
         setColumnFilters((currentFilters) => {
@@ -238,6 +241,16 @@ const RequestsTable = (props: IProps) => {
         },
     ], [onCourseChange, onCourseCreate, onRemove, requestChanged]);
 
+    const columnsById = React.useMemo(() =>
+        columns.reduce<Record<string, ColumnDef<IRequestTableRow>>>((currentColumns, column) => {
+            if (column.id) {
+                currentColumns[column.id] = column;
+            }
+
+            return currentColumns;
+        }, {}),
+    [columns]);
+
     const table = useReactTable({
         columns,
         data: tableData,
@@ -253,6 +266,74 @@ const RequestsTable = (props: IProps) => {
         },
     });
 
+    const handleColumnResize = React.useCallback((e: MouseEvent) => {
+        const activeResize = activeResizeRef.current;
+        if (!activeResize) {
+            return;
+        }
+
+        const { columnId, startWidth, startX } = activeResize;
+        const column = columnsById[columnId];
+        if (!column) {
+            return;
+        }
+
+        const minimumWidth = getMinimumColumnWidth(column);
+        const nextWidth = Math.max(minimumWidth, Math.round(startWidth + (e.clientX - startX)));
+
+        setColumnWidths((currentWidths) => {
+            if (currentWidths[columnId] === nextWidth) {
+                return currentWidths;
+            }
+
+            return {
+                ...currentWidths,
+                [columnId]: nextWidth,
+            };
+        });
+    }, [columnsById]);
+
+    const stopColumnResize = React.useCallback(() => {
+        activeResizeRef.current = null;
+        document.body.classList.remove("requests-column-resizing");
+        document.removeEventListener("mousemove", handleColumnResize);
+        document.removeEventListener("mouseup", stopColumnResize);
+    }, [handleColumnResize]);
+
+    React.useEffect(() => () => {
+        document.body.classList.remove("requests-column-resizing");
+        document.removeEventListener("mousemove", handleColumnResize);
+        document.removeEventListener("mouseup", stopColumnResize);
+    }, [handleColumnResize, stopColumnResize]);
+
+    const startColumnResize = React.useCallback((columnId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const column = columnsById[columnId];
+        const headerCell = headerRefs.current[columnId];
+        if (!column || !headerCell) {
+            return;
+        }
+
+        const startWidth = getColumnWidth(
+            columnId,
+            column,
+            headerCell.getBoundingClientRect().width,
+            columnWidths,
+        );
+
+        activeResizeRef.current = {
+            columnId,
+            startWidth: startWidth || headerCell.getBoundingClientRect().width,
+            startX: e.clientX,
+        };
+
+        document.body.classList.add("requests-column-resizing");
+        document.addEventListener("mousemove", handleColumnResize);
+        document.addEventListener("mouseup", stopColumnResize);
+    }, [columnWidths, columnsById, handleColumnResize, stopColumnResize]);
+
     const visibleColumnCount = table.getVisibleLeafColumns().length;
     const rows = table.getRowModel().rows;
 
@@ -260,6 +341,17 @@ const RequestsTable = (props: IProps) => {
         <div className={className}>
             <div className="table-responsive">
                 <table className="table requests">
+                    <colgroup>
+                        {table.getVisibleLeafColumns().map((column) => (
+                            <col
+                                data-column-width={column.id}
+                                key={`${column.id}-width`}
+                                style={getWidthStyle(
+                                    getColumnWidth(column.id, column.columnDef, undefined, columnWidths)
+                                )}
+                            />
+                        ))}
+                    </colgroup>
                     <thead>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr key={headerGroup.id}>
@@ -268,7 +360,16 @@ const RequestsTable = (props: IProps) => {
                                     const canSort = header.column.getCanSort();
                                     const nextSortOrder = header.column.getNextSortingOrder();
                                     const sortState = header.column.getIsSorted();
-                                    const widthStyle = getWidthStyle(meta);
+                                    const widthStyle = getWidthStyle(
+                                        getColumnWidth(
+                                            header.column.id,
+                                            header.column.columnDef,
+                                            undefined,
+                                            columnWidths,
+                                        )
+                                    );
+                                    const canResize = !header.isPlaceholder
+                                        && header.index < headerGroup.headers.length - 1;
 
                                     return (
                                         <th
@@ -278,6 +379,9 @@ const RequestsTable = (props: IProps) => {
                                                 canSort ? "requests-sortable" : undefined
                                             )}
                                             key={header.id}
+                                            ref={(element) => {
+                                                headerRefs.current[header.column.id] = element;
+                                            }}
                                             style={widthStyle}
                                             scope="col"
                                         >
@@ -308,6 +412,14 @@ const RequestsTable = (props: IProps) => {
                                                     </button>
                                                 )}
                                             </div>
+                                            {canResize && (
+                                                <div
+                                                    className="requests-column-resizer"
+                                                    data-column-resizer={header.column.id}
+                                                    onMouseDown={startColumnResize(header.column.id)}
+                                                    role="presentation"
+                                                />
+                                            )}
                                         </th>
                                     );
                                 })}
@@ -321,7 +433,9 @@ const RequestsTable = (props: IProps) => {
                                     <th
                                         className={meta.headerClassName}
                                         key={`${column.id}-filter`}
-                                        style={getWidthStyle(meta)}
+                                        style={getWidthStyle(
+                                            getColumnWidth(column.id, column.columnDef, undefined, columnWidths)
+                                        )}
                                     >
                                         {renderFilter(column)}
                                     </th>
@@ -353,7 +467,18 @@ const RequestsTable = (props: IProps) => {
                                             const meta = getColumnMeta(cell.column.columnDef);
 
                                             return (
-                                                <td className={meta.className} key={cell.id} style={getWidthStyle(meta)}>
+                                                <td
+                                                    className={meta.className}
+                                                    key={cell.id}
+                                                    style={getWidthStyle(
+                                                        getColumnWidth(
+                                                            cell.column.id,
+                                                            cell.column.columnDef,
+                                                            undefined,
+                                                            columnWidths,
+                                                        )
+                                                    )}
+                                                >
                                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                 </td>
                                             );
@@ -507,15 +632,43 @@ function getColumnMeta(column: ColumnDef<IRequestTableRow>): IColumnMeta {
     return (column.meta as IColumnMeta | undefined) || {};
 }
 
-function getWidthStyle(meta: IColumnMeta): React.CSSProperties | undefined {
-    if (!meta.width) {
+function getWidthStyle(width?: number): React.CSSProperties | undefined {
+    if (!width) {
         return undefined;
     }
 
     return {
-        minWidth: meta.width,
-        width: meta.width,
+        minWidth: width,
+        width,
     };
+}
+
+function getMinimumColumnWidth(column: ColumnDef<IRequestTableRow>) {
+    const meta = getColumnMeta(column);
+
+    if (meta.width) {
+        return Math.min(meta.width, 100);
+    }
+
+    return 100;
+}
+
+function getColumnWidth(
+    columnId: string,
+    column: ColumnDef<IRequestTableRow>,
+    measuredWidth?: number,
+    columnWidths: Record<string, number> = {},
+) {
+    if (columnWidths[columnId]) {
+        return columnWidths[columnId];
+    }
+
+    const meta = getColumnMeta(column);
+    if (meta.width) {
+        return meta.width;
+    }
+
+    return measuredWidth;
 }
 
 function getAriaSort(

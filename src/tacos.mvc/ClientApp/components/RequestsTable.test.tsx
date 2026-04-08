@@ -230,6 +230,15 @@ describe("RequestsTable UI coverage", () => {
         return button!;
     }
 
+    function getColumnHeader(label: string): HTMLTableCellElement {
+        const header = Array.from(getHost().querySelectorAll("thead tr:first-child th")).find(
+            element => normalizeText(element.textContent).includes(label)
+        ) as HTMLTableCellElement | undefined;
+
+        expect(header).toBeDefined();
+        return header!;
+    }
+
     it("renders only non-deleted rows and decorates focused rows with request ids", async () => {
         await renderTable({
             requests: [
@@ -297,6 +306,49 @@ describe("RequestsTable UI coverage", () => {
 
         await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-3", "request-1"]);
+    });
+
+    it("renders draggable resize handles and updates the column width while dragging", async () => {
+        await renderTable({
+            requests: [
+                createRequest(1, { course: createCourse({ number: "TAC 101", name: "Alpha" }) }),
+                createRequest(2, { course: createCourse({ number: "TAC 202", name: "Bravo" }) }),
+            ]
+        });
+
+        const courseHeader = getColumnHeader("Course");
+        const resizer = getHost().querySelector(
+            "[data-column-resizer='course']"
+        ) as HTMLDivElement | null;
+        const courseColumn = getHost().querySelector(
+            "col[data-column-width='course']"
+        ) as HTMLTableColElement | null;
+
+        expect(resizer).not.toBeNull();
+        expect(courseColumn).not.toBeNull();
+
+        Object.defineProperty(courseHeader, "getBoundingClientRect", {
+            configurable: true,
+            value: () => ({
+                bottom: 40,
+                height: 40,
+                left: 0,
+                right: 240,
+                toJSON: () => ({}),
+                top: 0,
+                width: 240,
+                x: 0,
+                y: 0,
+            }),
+        });
+
+        act(() => {
+            resizer!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: 200 }));
+            document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 280 }));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 280 }));
+        });
+
+        expect(courseColumn!.style.width).toBe("320px");
     });
 
     it("keeps header help controls separate from sorting and hardens the external criteria link", async () => {
