@@ -242,6 +242,56 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(updatedText).toContain("Request Total: 0.417");
     });
 
+    it("preserves the in-progress course number input across the debounced parent update", async () => {
+        vi.useFakeTimers();
+
+        try {
+            await renderSubmission([
+                createRequest("STD", {
+                    name: "ECS 120",
+                    number: "120"
+                })
+            ]);
+
+            const courseInput = getHost().querySelector(
+                "tbody tr[data-request-row='true'] input.form-control"
+            ) as HTMLInputElement | null;
+            const valueSetter = Object.getOwnPropertyDescriptor(
+                HTMLInputElement.prototype,
+                "value"
+            )?.set;
+
+            expect(courseInput).toBeDefined();
+            expect(valueSetter).toBeDefined();
+
+            act(() => {
+                courseInput!.focus();
+                valueSetter!.call(courseInput, "TAC 1");
+                courseInput!.dispatchEvent(new Event("input", { bubbles: true }));
+                courseInput!.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+
+            expect(courseInput!.value).toBe("TAC 1");
+            expect(document.activeElement).toBe(courseInput);
+
+            act(() => {
+                vi.advanceTimersByTime(110);
+            });
+
+            const updatedInput = getHost().querySelector(
+                "tbody tr[data-request-row='true'] input.form-control"
+            ) as HTMLInputElement | null;
+
+            expect(updatedInput).toBeDefined();
+            expect(updatedInput).toBe(courseInput);
+            expect(updatedInput!.value).toBe("TAC 1");
+            expect(document.activeElement).toBe(updatedInput);
+        }
+        finally {
+            vi.useRealTimers();
+        }
+    });
+
     it("uses exception values in the rendered annualized totals once they are entered", async () => {
         await renderSubmission([
             createRequest("STD", {

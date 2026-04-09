@@ -91,19 +91,26 @@ const RequestsTable = (props: IProps) => {
             .filter((row) => !row.request.isDeleted),
     [requests]);
 
-    const requestChanged = React.useCallback(<K extends keyof IRequest>(originalIndex: number, prop: K, value: IRequest[K]) => {
-        const request = requests[originalIndex];
-
+    const requestChanged = React.useCallback(<K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => {
         const newRequest: IRequest = {
             ...request,
             [prop]: value,
         };
 
         onEdit(originalIndex, newRequest);
-    }, [onEdit, requests]);
+    }, [onEdit]);
 
-    const onCourseChange = React.useCallback((originalIndex: number, course: ICourse | undefined) => {
-        requestChanged(originalIndex, "course", course);
+    const onCourseChange = React.useCallback((
+        originalIndex: number,
+        request: IRequest,
+        course: ICourse | undefined,
+    ) => {
+        requestChanged(originalIndex, request, "course", course);
     }, [requestChanged]);
 
     const columns = React.useMemo<ColumnDef<IRequestTableRow>[]>(() => [
@@ -537,13 +544,28 @@ const RequestsTable = (props: IProps) => {
                                                 <ExceptionDetail
                                                     requestId={request.id || -1}
                                                     onExceptionAnnualCountChange={(exceptionAnnualCount) =>
-                                                        requestChanged(originalIndex, "exceptionAnnualCount", exceptionAnnualCount)
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionAnnualCount",
+                                                            exceptionAnnualCount,
+                                                        )
                                                     }
                                                     onExceptionTotalChange={(exceptionTotal) =>
-                                                        requestChanged(originalIndex, "exceptionTotal", exceptionTotal)
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionTotal",
+                                                            exceptionTotal,
+                                                        )
                                                     }
                                                     onReasonChange={(reason) =>
-                                                        requestChanged(originalIndex, "exceptionReason", reason)
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionReason",
+                                                            reason,
+                                                        )
                                                     }
                                                     onRevoke={onRevoke}
                                                     exception={request.exception}
@@ -841,7 +863,7 @@ function renderNewIndicator(row: IRequestTableRow) {
 
 function renderCourse(
     row: IRequestTableRow,
-    onCourseChange: (originalIndex: number, course: ICourse | undefined) => void,
+    onCourseChange: (originalIndex: number, request: IRequest, course: ICourse | undefined) => void,
     onCourseCreate: (i: number, defaultValues?: ICourse) => void
 ) {
     const { originalIndex, request } = row;
@@ -849,8 +871,7 @@ function renderCourse(
     return (
         <CourseNumber
             course={request.course}
-            key={`request-course-input-${originalIndex}`}
-            onChange={(course) => onCourseChange(originalIndex, course)}
+            onChange={(course) => onCourseChange(originalIndex, request, course)}
             onCourseCreate={(course) => onCourseCreate(originalIndex, course)}
         />
     );
@@ -858,14 +879,19 @@ function renderCourse(
 
 function renderCourseType(
     row: IRequestTableRow,
-    requestChanged: <K extends keyof IRequest>(originalIndex: number, prop: K, value: IRequest[K]) => void
+    requestChanged: <K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => void
 ) {
     const { originalIndex, request } = row;
 
     return (
         <CourseType
             courseType={request.courseType}
-            onChange={(courseType) => requestChanged(originalIndex, "courseType", courseType)}
+            onChange={(courseType) => requestChanged(originalIndex, request, "courseType", courseType)}
         />
     );
 }
@@ -883,13 +909,18 @@ function renderCourseTypeHeader() {
 
 function renderRequestType(
     row: IRequestTableRow,
-    requestChanged: <K extends keyof IRequest>(originalIndex: number, prop: K, value: IRequest[K]) => void
+    requestChanged: <K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => void
 ) {
     const { originalIndex, request } = row;
 
     return (
         <RequestType
-            onChange={(requestType) => requestChanged(originalIndex, "requestType", requestType)}
+            onChange={(requestType) => requestChanged(originalIndex, request, "requestType", requestType)}
             requestType={request.requestType}
         />
     );
@@ -916,14 +947,19 @@ function renderRequestTypeHeader() {
 
 function renderException(
     row: IRequestTableRow,
-    requestChanged: <K extends keyof IRequest>(originalIndex: number, prop: K, value: IRequest[K]) => void
+    requestChanged: <K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => void
 ) {
     const { originalIndex, request } = row;
 
     return (
         <Exception
             exception={request.exception}
-            onExceptionChange={(exception) => requestChanged(originalIndex, "exception", exception)}
+            onExceptionChange={(exception) => requestChanged(originalIndex, request, "exception", exception)}
         />
     );
 }

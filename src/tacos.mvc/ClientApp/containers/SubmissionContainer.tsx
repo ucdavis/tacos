@@ -134,7 +134,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     onEdit={this.requestUpdated}
                     onRemove={this.removeRequest}
                     onRevoke={this.revokeRequest}
-                    onCourseCreate={(i, c) => this.onOpenCourseCreate(i, c)}
+                    onCourseCreate={this.onOpenCourseCreate}
                 />
                 <CreateCourseModal
                     isOpen={isCourseCreateOpen}
