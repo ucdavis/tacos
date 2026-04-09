@@ -292,6 +292,48 @@ describe("SubmissionContainer formula UI coverage", () => {
         }
     });
 
+    it("inserts a newly created empty request at the top of the table", async () => {
+        await renderSubmission([
+            createRequest("STD", {
+                name: "ECS 120",
+                number: "120"
+            }, {
+                id: 101,
+            }),
+            createRequest("MAN", {
+                name: "ECS 140A",
+                number: "140A"
+            }, {
+                id: 202,
+            }),
+        ]);
+
+        const createRequestButton = Array.from(document.body.querySelectorAll("button")).find(
+            element => normalizeText(element.textContent) === "Create New Request"
+        ) as HTMLButtonElement | undefined;
+
+        expect(createRequestButton).toBeDefined();
+
+        act(() => {
+            createRequestButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        });
+
+        const requestRows = Array.from(
+            getHost().querySelectorAll("tbody tr[data-request-row='true']")
+        ) as HTMLTableRowElement[];
+
+        expect(requestRows).toHaveLength(3);
+
+        const firstRowInput = requestRows[0].querySelector("input.form-control") as HTMLInputElement | null;
+        const secondRowText = normalizeText(requestRows[1].textContent);
+        const thirdRowText = normalizeText(requestRows[2].textContent);
+
+        expect(firstRowInput).not.toBeNull();
+        expect(firstRowInput!.value).toBe("");
+        expect(secondRowText).toContain("120");
+        expect(thirdRowText).toContain("140A");
+    });
+
     it("uses exception values in the rendered annualized totals once they are entered", async () => {
         await renderSubmission([
             createRequest("STD", {

@@ -68,11 +68,11 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         }
 
         if (jsAction === "create") {
-            // check if last request is already empty
-            const lastRequest = requests[requests.length - 1];
-            if (!lastRequest || !lastRequest.course || !lastRequest.course.number) {
+            // check if first request is already empty
+            const firstRequest = requests[0];
+            if (!firstRequest || !firstRequest.course || !firstRequest.course.number) {
                 // focus request
-                this.focusRequest(requests.length - 1);
+                this.focusRequest(0);
                 return;
             }
 
@@ -371,13 +371,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.requestUpdated(i, request, false);
 
         // scroll to location
-        let duration = 3;
-        if (request.id) {
-            window.location.hash = `request-${request.id}`;
-        } else {
-            duration = 0.5;
-            window.scrollTo(0, document.body.scrollHeight);
-        }
+        const duration = request.id ? 3 : 0.5;
+        window.location.hash = request.id ? `request-${request.id}` : `request-new-${i}`;
 
         // remove focus after 0.5 s
         setTimeout(() => {
@@ -500,10 +495,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     };
 
     private onAddRequest = () => {
-        const { department } = this.props;
-
         const newRequests: IRequest[] = [
-            ...this.state.requests,
             {
                 course: undefined,
                 courseName: "",
@@ -519,13 +511,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 exceptionAnnualizedTotal: 0,
                 hasApprovedException: false,
                 isValid: true,
-            }
+            },
+            ...this.state.requests,
         ];
 
         this.setState({ requests: newRequests }, () => {
             // update isFocused to trigger ui flash
-            const index = newRequests.length - 1;
-            this.focusRequest(index);
+            this.focusRequest(0);
         });
     };
 
