@@ -45,6 +45,14 @@ interface IColumnMeta {
     width?: number;
 }
 
+interface IActiveResize {
+    leftColumnId: string;
+    rightColumnId: string;
+    startLeftWidth: number;
+    startRightWidth: number;
+    startX: number;
+}
+
 const RequestsTable = (props: IProps) => {
     const { className, courseNumberFilter, onCourseCreate, onEdit, onRemove, onRevoke, requests } = props;
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -53,7 +61,7 @@ const RequestsTable = (props: IProps) => {
     );
     const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
     const headerRefs = React.useRef<Record<string, HTMLTableCellElement | null>>({});
-    const activeResizeRef = React.useRef<{ columnId: string; startWidth: number; startX: number } | null>(null);
+    const activeResizeRef = React.useRef<IActiveResize | null>(null);
 
     React.useEffect(() => {
         setColumnFilters((currentFilters) => {
@@ -272,23 +280,41 @@ const RequestsTable = (props: IProps) => {
             return;
         }
 
-        const { columnId, startWidth, startX } = activeResize;
-        const column = columnsById[columnId];
-        if (!column) {
+        const {
+            leftColumnId,
+            rightColumnId,
+            startLeftWidth,
+            startRightWidth,
+            startX,
+        } = activeResize;
+        const leftColumn = columnsById[leftColumnId];
+        const rightColumn = columnsById[rightColumnId];
+        if (!leftColumn || !rightColumn) {
             return;
         }
 
-        const minimumWidth = getMinimumColumnWidth(column);
-        const nextWidth = Math.max(minimumWidth, Math.round(startWidth + (e.clientX - startX)));
+        const minimumLeftWidth = getMinimumColumnWidth(leftColumn);
+        const minimumRightWidth = getMinimumColumnWidth(rightColumn);
+        const totalWidth = startLeftWidth + startRightWidth;
+        const requestedLeftWidth = Math.round(startLeftWidth + (e.clientX - startX));
+        const nextLeftWidth = Math.max(
+            minimumLeftWidth,
+            Math.min(requestedLeftWidth, totalWidth - minimumRightWidth),
+        );
+        const nextRightWidth = totalWidth - nextLeftWidth;
 
         setColumnWidths((currentWidths) => {
-            if (currentWidths[columnId] === nextWidth) {
+            if (
+                currentWidths[leftColumnId] === nextLeftWidth
+                && currentWidths[rightColumnId] === nextRightWidth
+            ) {
                 return currentWidths;
             }
 
             return {
                 ...currentWidths,
-                [columnId]: nextWidth,
+                [leftColumnId]: nextLeftWidth,
+                [rightColumnId]: nextRightWidth,
             };
         });
     }, [columnsById]);
@@ -306,33 +332,49 @@ const RequestsTable = (props: IProps) => {
         document.removeEventListener("mouseup", stopColumnResize);
     }, [handleColumnResize, stopColumnResize]);
 
-    const startColumnResize = React.useCallback((columnId: string) => (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const column = columnsById[columnId];
-        const headerCell = headerRefs.current[columnId];
-        if (!column || !headerCell) {
+    const startColumnResize = React.useCallback((leftColumnId: string, rightColumnId: string, startX: number) => {
+        const leftColumn = columnsById[leftColumnId];
+        const rightColumn = columnsById[rightColumnId];
+        const leftHeaderCell = headerRefs.current[leftColumnId];
+        const rightHeaderCell = headerRefs.current[rightColumnId];
+        if (!leftColumn || !rightColumn || !leftHeaderCell || !rightHeaderCell) {
             return;
         }
 
-        const startWidth = getColumnWidth(
-            columnId,
-            column,
-            headerCell.getBoundingClientRect().width,
+        const startLeftWidth = getColumnWidth(
+            leftColumnId,
+            leftColumn,
+            leftHeaderCell.getBoundingClientRect().width,
+            columnWidths,
+        );
+        const startRightWidth = getColumnWidth(
+            rightColumnId,
+            rightColumn,
+            rightHeaderCell.getBoundingClientRect().width,
             columnWidths,
         );
 
         activeResizeRef.current = {
-            columnId,
-            startWidth: startWidth || headerCell.getBoundingClientRect().width,
-            startX: e.clientX,
+            leftColumnId,
+            rightColumnId,
+            startLeftWidth: startLeftWidth || leftHeaderCell.getBoundingClientRect().width,
+            startRightWidth: startRightWidth || rightHeaderCell.getBoundingClientRect().width,
+            startX,
         };
 
         document.body.classList.add("requests-column-resizing");
         document.addEventListener("mousemove", handleColumnResize);
         document.addEventListener("mouseup", stopColumnResize);
     }, [columnWidths, columnsById, handleColumnResize, stopColumnResize]);
+
+    const handleResizeMouseDown = React.useCallback((
+        leftColumnId: string,
+        rightColumnId: string,
+    ) => (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startColumnResize(leftColumnId, rightColumnId, e.clientX);
+    }, [startColumnResize]);
 
     const visibleColumnCount = table.getVisibleLeafColumns().length;
     const rows = table.getRowModel().rows;
@@ -368,8 +410,9 @@ const RequestsTable = (props: IProps) => {
                                             columnWidths,
                                         )
                                     );
-                                    const canResize = !header.isPlaceholder
-                                        && header.index < headerGroup.headers.length - 1;
+                                    const resizeColumnId = header.index > 0
+                                        ? headerGroup.headers[header.index - 1].column.id
+                                        : undefined;
 
                                     return (
                                         <th
@@ -387,6 +430,7 @@ const RequestsTable = (props: IProps) => {
                                         >
                                             <div
                                                 className={buildClassName(
+                                                    "requests-header-cell-content",
                                                     "d-flex align-items-center",
                                                     canSort ? "justify-content-between" : undefined
                                                 )}
@@ -412,11 +456,14 @@ const RequestsTable = (props: IProps) => {
                                                     </button>
                                                 )}
                                             </div>
-                                            {canResize && (
+                                            {resizeColumnId && !header.isPlaceholder && (
                                                 <div
                                                     className="requests-column-resizer"
-                                                    data-column-resizer={header.column.id}
-                                                    onMouseDown={startColumnResize(header.column.id)}
+                                                    data-column-resizer={resizeColumnId}
+                                                    onMouseDown={handleResizeMouseDown(
+                                                        resizeColumnId,
+                                                        header.column.id,
+                                                    )}
                                                     role="presentation"
                                                 />
                                             )}
@@ -525,13 +572,14 @@ const RequestsTable = (props: IProps) => {
             case "icon":
                 return (
                     <div className="text-center requests-filter-icon">
-                        <i className="fas fa-filter" />
+                        <i aria-hidden="true" className="fas fa-filter" />
                     </div>
                 );
             case "course":
                 return (
                     <div style={{ position: "relative" }}>
                         <input
+                            aria-label={getFilterLabel(column.id)}
                             className="form-control"
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 column.setFilterValue(e.target.value.toUpperCase())
@@ -540,6 +588,7 @@ const RequestsTable = (props: IProps) => {
                             value={currentValue.toUpperCase()}
                         />
                         <i
+                            aria-hidden="true"
                             className="fas fa-search"
                             style={{
                                 position: "absolute",
@@ -554,6 +603,7 @@ const RequestsTable = (props: IProps) => {
                 return (
                     <div className="input-group">
                         <select
+                            aria-label={getFilterLabel(column.id)}
                             className="custom-select"
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
                             value={currentValue}
@@ -571,6 +621,7 @@ const RequestsTable = (props: IProps) => {
                 return (
                     <div className="input-group">
                         <select
+                            aria-label={getFilterLabel(column.id)}
                             className="custom-select"
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
                             value={currentValue}
@@ -585,6 +636,7 @@ const RequestsTable = (props: IProps) => {
                 return (
                     <div className="input-group">
                         <select
+                            aria-label={getFilterLabel(column.id)}
                             className="custom-select"
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
                             value={currentValue}
@@ -688,6 +740,21 @@ function getAriaSort(
     }
 
     return "none";
+}
+
+function getFilterLabel(columnId: string) {
+    switch (columnId) {
+        case "course":
+            return "Filter Course";
+        case "courseType":
+            return "Filter Course Type";
+        case "requestType":
+            return "Filter Request Type";
+        case "exception":
+            return "Filter Exception";
+        default:
+            return `Filter ${columnId}`;
+    }
 }
 
 function getSortButtonLabel(

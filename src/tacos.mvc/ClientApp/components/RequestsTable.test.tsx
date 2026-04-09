@@ -264,6 +264,9 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
+        expect(getCourseFilterInput().getAttribute("aria-label")).toBe("Filter Course");
+        expect(getExceptionFilterSelect().getAttribute("aria-label")).toBe("Filter Exception");
+
         await setInputValue(getCourseFilterInput(), "biology");
         expect(getVisibleRequestIds()).toEqual(["request-2"]);
 
@@ -308,7 +311,7 @@ describe("RequestsTable UI coverage", () => {
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-3", "request-1"]);
     });
 
-    it("renders draggable resize handles and updates the column width while dragging", async () => {
+    it("resizes adjacent columns from the divider handle and keeps the divider bound to the column on the left", async () => {
         await renderTable({
             requests: [
                 createRequest(1, { course: createCourse({ number: "TAC 101", name: "Alpha" }) }),
@@ -317,38 +320,67 @@ describe("RequestsTable UI coverage", () => {
         });
 
         const courseHeader = getColumnHeader("Course");
+        const courseTypeHeader = getColumnHeader("Course Type");
         const resizer = getHost().querySelector(
             "[data-column-resizer='course']"
         ) as HTMLDivElement | null;
         const courseColumn = getHost().querySelector(
             "col[data-column-width='course']"
         ) as HTMLTableColElement | null;
+        const courseTypeColumn = getHost().querySelector(
+            "col[data-column-width='courseType']"
+        ) as HTMLTableColElement | null;
 
         expect(resizer).not.toBeNull();
         expect(courseColumn).not.toBeNull();
+        expect(courseTypeColumn).not.toBeNull();
 
         Object.defineProperty(courseHeader, "getBoundingClientRect", {
             configurable: true,
             value: () => ({
                 bottom: 40,
                 height: 40,
-                left: 0,
-                right: 240,
+                left: 45,
+                right: 285,
                 toJSON: () => ({}),
                 top: 0,
                 width: 240,
-                x: 0,
+                x: 45,
+                y: 0,
+            }),
+        });
+        Object.defineProperty(courseTypeHeader, "getBoundingClientRect", {
+            configurable: true,
+            value: () => ({
+                bottom: 40,
+                height: 40,
+                left: 285,
+                right: 425,
+                toJSON: () => ({}),
+                top: 0,
+                width: 140,
+                x: 285,
                 y: 0,
             }),
         });
 
         act(() => {
-            resizer!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: 200 }));
-            document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 280 }));
-            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 280 }));
+            courseTypeHeader.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: 330 }));
+            document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 390 }));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 390 }));
         });
 
-        expect(courseColumn!.style.width).toBe("320px");
+        expect(courseColumn!.style.width).toBe("");
+        expect(courseTypeColumn!.style.width).toBe("");
+
+        act(() => {
+            resizer!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: 289 }));
+            document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 329 }));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 329 }));
+        });
+
+        expect(courseColumn!.style.width).toBe("280px");
+        expect(courseTypeColumn!.style.width).toBe("100px");
     });
 
     it("keeps header help controls separate from sorting and hardens the external criteria link", async () => {
