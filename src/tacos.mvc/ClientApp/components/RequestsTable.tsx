@@ -1,6 +1,15 @@
 import * as React from "react";
 
-import ReactTable, { Column, CellInfo, RowInfo, Filter } from "react-table";
+import {
+    ColumnDef,
+    ColumnFiltersState,
+    SortingState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from "@tanstack/react-table";
 
 import CourseNumber from "./CourseNumber";
 import CourseType, { CourseTypeOptions } from "./CourseType";
@@ -12,530 +21,1015 @@ import UncontrolledTooltip from "./UncontrolledTooltip";
 import { ICourse } from "../models/ICourse";
 import { IRequest } from "../models/IRequest";
 
-
 interface IProps {
     className: string;
 
     requests: IRequest[];
     onEdit: (i: number, request: IRequest) => void;
     onRemove: (i: number) => void;
-    onRevoke: (id: number) => void;
+    onRevoke: (id: number) => void | Promise<void>;
     courseNumberFilter?: string;
 
     onCourseCreate: (i: number, defaultValues?: ICourse) => void;
 }
 
-interface IState {
-    filtered: Filter[];
+interface IRequestTableRow {
+    request: IRequest;
+    originalIndex: number;
 }
 
-interface ITypedCellInfo extends CellInfo {
-    original: IRequest;
+interface IColumnMeta {
+    className?: string;
+    filterVariant?: "course" | "courseType" | "exception" | "icon" | "none" | "requestType";
+    headerClassName?: string;
+    width?: number;
 }
 
-interface ITypedRowInfo extends RowInfo {
-    original: IRequest;
+interface IActiveResize {
+    leftColumnId: string;
+    rightColumnId: string;
+    startLeftWidth: number;
+    startRightWidth: number;
+    startX: number;
 }
 
-interface IFilterParam {
-    value: string;
-}
+const RequestsTable = (props: IProps) => {
+    const { className, courseNumberFilter, onCourseCreate, onEdit, onRemove, onRevoke, requests } = props;
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(() =>
+        buildInitialFilters(courseNumberFilter)
+    );
+    const [columnWidths, setColumnWidths] = React.useState<Record<string, number>>({});
+    const headerRefs = React.useRef<Record<string, HTMLTableCellElement | null>>({});
+    const activeResizeRef = React.useRef<IActiveResize | null>(null);
 
-interface IExpandedState {
-    [index: number]: true;
-}
+    React.useEffect(() => {
+        setColumnFilters((currentFilters) => {
+            const nextFilters = currentFilters.filter((filter) => filter.id !== "course");
 
-export default class RequestsTable extends React.Component<IProps, IState> {
-    private columns: Column[];
+            if (courseNumberFilter) {
+                nextFilters.push({
+                    id: "course",
+                    value: courseNumberFilter,
+                });
+            }
 
-    constructor(props: IProps) {
-        super(props);
+            if (filtersAreEqual(currentFilters, nextFilters)) {
+                return currentFilters;
+            }
 
-        // add course number filter
-        const filtered = [];
-        if (this.props.courseNumberFilter) {
-            filtered.push({
-                id: 'course',
-                value: props.courseNumberFilter,
-            });
-        }
+            return nextFilters;
+        });
+    }, [courseNumberFilter]);
 
-        this.state = {
-            filtered,
+    const tableData = React.useMemo(() =>
+        requests
+            .map((request, originalIndex) => ({
+                request,
+                originalIndex,
+            }))
+            .filter((row) => !row.request.isDeleted),
+    [requests]);
+
+    const requestChanged = React.useCallback(<K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => {
+        const newRequest: IRequest = {
+            ...request,
+            [prop]: value,
         };
 
-        this.columns = [
-            {
-                id: 'new-indicator',
-                // to show the filter icon in a 0-index column
-                Filter: this.renderNewIndicatorFilter,
-                className: "d-flex justify-content-center align-items-center",
-                headerClassName: "d-flex justify-content-center align-items-center",
-                Cell: this.renderNewIndicator,
+        onEdit(originalIndex, newRequest);
+    }, [onEdit]);
+
+    const onCourseChange = React.useCallback((
+        originalIndex: number,
+        request: IRequest,
+        course: ICourse | undefined,
+    ) => {
+        requestChanged(originalIndex, request, "course", course);
+    }, [requestChanged]);
+
+    const columns = React.useMemo<ColumnDef<IRequestTableRow>[]>(() => [
+        {
+            id: "new-indicator",
+            cell: ({ row }) => renderNewIndicator(row.original),
+            enableColumnFilter: false,
+            enableSorting: false,
+            header: () => null,
+            meta: {
+                className: "text-center align-middle",
+                filterVariant: "icon",
+                headerClassName: "text-center",
                 width: 45,
-                sortable: false,
-                filterable: true, 
-            },
-            {
-                Header: "Course",
-                Cell: this.renderCourse,
-                Filter: this.renderCourseFilter,
-                accessor: "course",
-                sortable: true,
-                sortMethod: (a: ICourse | undefined, b: ICourse | undefined, direction: boolean) => {
-                    const aNumber = a ? a.number : "";
-                    const bNumber = b ? b.number : "";
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.course,
+            cell: ({ row }) => renderCourse(row.original, onCourseChange, onCourseCreate),
+            filterFn: (row, _columnId, value) => {
+                const filterValue = String(value || "").toLowerCase();
+                const course = row.original.request.course;
 
-                    // sort by course number
-                    const sign = direction ? -1 : 1;
-                    return sign * aNumber.localeCompare(bNumber);
-                },
-                filterable: true,
-                filterMethod: (filter: IFilterParam, request: IRequest) => {
-                    const value = filter.value.toLowerCase();
+                if (!course) {
+                    return filterValue.length === 0;
+                }
 
-                    if (!request.course) {
-                        if (value) { return false; }
-                        return true;
-                    }
+                return course.number.toLowerCase().includes(filterValue)
+                    || course.name.toLowerCase().includes(filterValue);
+            },
+            header: "Course",
+            id: "course",
+            meta: {
+                filterVariant: "course",
+            } satisfies IColumnMeta,
+            sortDescFirst: false,
+            sortingFn: (rowA, rowB) => {
+                const aNumber = rowA.original.request.course ? rowA.original.request.course.number : "";
+                const bNumber = rowB.original.request.course ? rowB.original.request.course.number : "";
 
-                    // search the entire number/name for the filter value
-                    return request.course.number.toLowerCase().indexOf(value) >= 0
-                        || request.course.name.toLowerCase().indexOf(value) >= 0;
-                },
+                return aNumber.localeCompare(bNumber);
             },
-            {
-                Header: this.renderCourseTypeHeader,
-                Cell: this.renderCourseType,
-                Filter: this.renderCourseTypeFilter,
-                accessor: "courseType",
-                sortable: true,
-                filterable: true,
+        },
+        {
+            accessorFn: (row) => row.request.courseType,
+            cell: ({ row }) => renderCourseType(row.original, requestChanged),
+            filterFn: (row, columnId, value) => {
+                const filterValue = String(value || "");
+                if (filterValue === "") {
+                    return true;
+                }
+
+                return row.getValue<string>(columnId) === filterValue;
             },
-            {
-                Header: this.renderRequestTypeHeader,
-                Cell: this.renderRequestType,
-                Filter: this.renderRequestTypeFilter,
-                accessor: "requestType",
-                sortable: true,
-                filterable: true,
+            header: renderCourseTypeHeader,
+            id: "courseType",
+            meta: {
+                filterVariant: "courseType",
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.requestType,
+            cell: ({ row }) => renderRequestType(row.original, requestChanged),
+            filterFn: (row, columnId, value) => {
+                const filterValue = String(value || "");
+                if (filterValue === "") {
+                    return true;
+                }
+
+                return row.getValue<string>(columnId) === filterValue;
             },
-            {
-                Header: "TA % per course offering",
-                accessor: "calculatedTotal",
+            header: renderRequestTypeHeader,
+            id: "requestType",
+            meta: {
+                filterVariant: "requestType",
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.calculatedTotal,
+            cell: ({ row }) => (
+                <span>{row.original.request.calculatedTotal.toFixed(3)}</span>
+            ),
+            header: "TA % per course offering",
+            id: "calculatedTotal",
+            meta: {
                 className: "text-center",
-                Cell: (row: ITypedRowInfo) => row.original.calculatedTotal.toFixed(3),
-            },
-            {
-                Header: "Annualized TA FTE",
-                accessor: "annualizedTotal",
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.exception ? row.request.exceptionAnnualizedTotal : row.request.annualizedTotal,
+            cell: ({ row }) => renderAnnualizedFTE(row.original),
+            header: "Annualized TA FTE",
+            id: "annualizedTotal",
+            meta: {
                 className: "text-center",
-                Cell: this.renderAnnualizedFTE,
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.exception,
+            cell: ({ row }) => renderException(row.original, requestChanged),
+            filterFn: (row, _columnId, value) => {
+                const filterValue = String(value || "").toLowerCase();
+                if (filterValue === "") {
+                    return true;
+                }
+
+                return row.original.request.exception === (filterValue === "true");
             },
-            {
-                id: "exception",
-                Header: "Exception ?",
-                className: "d-flex justify-content-center pt-3",
-                Cell: this.renderException,
-                Filter: this.renderExceptionFilter,
+            header: "Exception ?",
+            id: "exception",
+            meta: {
+                className: "text-center align-middle",
+                filterVariant: "exception",
+                headerClassName: "text-center",
                 width: 150,
-                sortable: true,
-                filterable: true,
-                filterMethod: (filter: IFilterParam, request: IRequest) => {
-                    const value = filter.value.toLowerCase();
-                    if (value === "") {
-                        return true;
-                    }
-                    return request.exception === (value === "true");
-                },
-            },
-            {
-                id: 'isDeleted',
-                Header: "Remove",
-                className: "d-flex justify-content-center align-items-center",
-                accessor: "isDeleted",
-                Cell: this.renderRemoveButton,
+            } satisfies IColumnMeta,
+        },
+        {
+            id: "remove",
+            cell: ({ row }) => renderRemoveButton(row.original, onRemove),
+            enableColumnFilter: false,
+            enableSorting: false,
+            header: "Remove",
+            meta: {
+                className: "text-center align-middle",
+                filterVariant: "none",
+                headerClassName: "text-center",
                 width: 100,
-                sortable: false,
-                filterAll: true,
-                filterMethod: (filter: IFilterParam, rows: IRequest[]) => {
-                    // sneaky filter to remove deleted rows
-                    return rows.filter(r => !r.isDeleted);
-                },
-            },
-            {
-                id: "warning-indicator",
-                className: "d-flex justify-content-center align-items-center",
-                Cell: this.renderWarnings,
+            } satisfies IColumnMeta,
+        },
+        {
+            id: "warning-indicator",
+            cell: ({ row }) => renderWarnings(row.original),
+            enableColumnFilter: false,
+            enableSorting: false,
+            header: () => null,
+            meta: {
+                className: "text-center align-middle",
+                filterVariant: "none",
+                headerClassName: "text-center",
                 width: 45,
-                sortable: false,
-            },
-            {
-                // hidden columns for data mapping
-                // because react-table doesn't explicitly show the entire original data
-                // unless it has an accessor
-                accessor: "exception",
-                show: false,
-            },
-            {
-                // hide expander
-                expander: true,
-                show: false,
-            },
-        ];
-    }
+            } satisfies IColumnMeta,
+        },
+    ], [onCourseChange, onCourseCreate, onRemove, requestChanged]);
 
-    public componentDidUpdate(prevProps: IProps) {
-        // add course number filter
-        if (prevProps.courseNumberFilter === this.props.courseNumberFilter) {
+    const columnsById = React.useMemo(() =>
+        columns.reduce<Record<string, ColumnDef<IRequestTableRow>>>((currentColumns, column) => {
+            if (column.id) {
+                currentColumns[column.id] = column;
+            }
+
+            return currentColumns;
+        }, {}),
+    [columns]);
+
+    const table = useReactTable({
+        columns,
+        data: tableData,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getRowId: (row) => String(row.request.id ?? `new-${row.originalIndex}`),
+        getSortedRowModel: getSortedRowModel(),
+        onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setSorting,
+        state: {
+            columnFilters,
+            sorting,
+        },
+    });
+
+    const handleColumnResize = React.useCallback((e: MouseEvent) => {
+        const activeResize = activeResizeRef.current;
+        if (!activeResize) {
             return;
         }
 
-        const filtered = [];
-        if (this.props.courseNumberFilter) {
-            filtered.push({
-                id: 'course',
-                value: this.props.courseNumberFilter,
-            });
+        const {
+            leftColumnId,
+            rightColumnId,
+            startLeftWidth,
+            startRightWidth,
+            startX,
+        } = activeResize;
+        const leftColumn = columnsById[leftColumnId];
+        const rightColumn = columnsById[rightColumnId];
+        if (!leftColumn || !rightColumn) {
+            return;
         }
 
-        this.setState({
-            filtered
+        const minimumLeftWidth = getMinimumColumnWidth(leftColumn);
+        const minimumRightWidth = getMinimumColumnWidth(rightColumn);
+        const totalWidth = startLeftWidth + startRightWidth;
+        const requestedLeftWidth = Math.round(startLeftWidth + (e.clientX - startX));
+        const nextLeftWidth = Math.max(
+            minimumLeftWidth,
+            Math.min(requestedLeftWidth, totalWidth - minimumRightWidth),
+        );
+        const nextRightWidth = totalWidth - nextLeftWidth;
+
+        setColumnWidths((currentWidths) => {
+            if (
+                currentWidths[leftColumnId] === nextLeftWidth
+                && currentWidths[rightColumnId] === nextRightWidth
+            ) {
+                return currentWidths;
+            }
+
+            return {
+                ...currentWidths,
+                [leftColumnId]: nextLeftWidth,
+                [rightColumnId]: nextRightWidth,
+            };
         });
-    }
+    }, [columnsById]);
 
-    public render() {
-        const { requests } = this.props;
+    const stopColumnResize = React.useCallback(() => {
+        activeResizeRef.current = null;
+        document.body.classList.remove("requests-column-resizing");
+        document.removeEventListener("mousemove", handleColumnResize);
+        document.removeEventListener("mouseup", stopColumnResize);
+    }, [handleColumnResize]);
 
-        // expand all rows by default
-        // unfortunately we can't just expand the rows we care about
-        // ie, .exception?, because the table control treats the expanded
-        // object by it's viewIndex, which is sorted/filtered,
-        // and we have no access to that value
-        const expanded = requests.reduce((e, r, index) => {
-            e[index] = true;
-            return e;
-        }, {} as IExpandedState);
+    React.useEffect(() => () => {
+        document.body.classList.remove("requests-column-resizing");
+        document.removeEventListener("mousemove", handleColumnResize);
+        document.removeEventListener("mouseup", stopColumnResize);
+    }, [handleColumnResize, stopColumnResize]);
 
-        return (
-            <TypedReactTable
-                className={this.props.className}
-                data={requests}
-                columns={this.columns}
-                expanded={expanded}
-                SubComponent={this.renderExceptionDetail}
-                minRows={1}
-                showPagination={false}
-                pageSize={1000000}  // pick a really big size to avoid paging
-                defaultFiltered={[{id: 'isDeleted', value: false }]}
-                getTrProps={this.decorateTr}
-            />
-        );
-    }
-
-    private renderNewIndicator = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        if (!request.course || !request.course.isNew) {
-            return null
+    const startColumnResize = React.useCallback((leftColumnId: string, rightColumnId: string, startX: number) => {
+        const leftColumn = columnsById[leftColumnId];
+        const rightColumn = columnsById[rightColumnId];
+        const leftHeaderCell = headerRefs.current[leftColumnId];
+        const rightHeaderCell = headerRefs.current[rightColumnId];
+        if (!leftColumn || !rightColumn || !leftHeaderCell || !rightHeaderCell) {
+            return;
         }
 
-        return (
-            <span>
-                <i className="fas fa-plus-circle" id={`request-new-indicator-${index}`} />
-                <UncontrolledTooltip
-                    target={`request-new-indicator-${index}`}
-                    placement="left"
-                >
-                    New course will be created
-                </UncontrolledTooltip>
-            </span>
+        const startLeftWidth = getColumnWidth(
+            leftColumnId,
+            leftColumn,
+            leftHeaderCell.getBoundingClientRect().width,
+            columnWidths,
         );
-    }
-
-    private renderNewIndicatorFilter = (params: any) => {
-        return (
-            <i className="fas fa-filter" />
-        )
-    }
-
-    private renderCourse = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        // we're adding a key to force a redraw when you add a new request
-        return <CourseNumber
-            key={`request-course-input-${index}`}
-            course={request.course}
-            onChange={course => this.onCourseChange(index, course)}
-            onCourseCreate={(c) => this.props.onCourseCreate(index, c)}
-        />;
-    }
-
-    private renderCourseFilter = (params: any) => {
-        const { filter, onChange } = params;
-        const value = (filter && filter.value.toUpperCase()) || "";
-
-        return (
-            <div style={{ position: "relative" }}>
-                <input
-                    className="form-control"
-                    value={value}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value.toUpperCase())}
-                    placeholder="Search ..."
-                />
-                <i className="fas fa-search" style={{ top: "2px", right: "10px", transform: "translateY(50%)", position: "absolute" }}/>
-            </div>
-        )
-    }
-
-    private renderCourseType = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        return (
-            <CourseType
-                courseType={request.courseType}
-                onChange={courseType => this.requestChanged(index, "courseType", courseType)}
-            />
+        const startRightWidth = getColumnWidth(
+            rightColumnId,
+            rightColumn,
+            rightHeaderCell.getBoundingClientRect().width,
+            columnWidths,
         );
-    }
 
-    private renderCourseTypeHeader = () => {
-        return (
-            <div>
-                <span className="mr-3">Course Type</span>
-                <a target="_blank" href="/CAES-TA-Guidelines 2018-23.pdf">
-                    Criteria Info <i className="fas fa-external-link-alt" />
-                </a>
-            </div>
-        );
-    }
-
-    private renderCourseTypeFilter = (params: any) => {
-        const { filter, onChange } = params;
-        const value = (filter && filter.value) || "";
-        return (
-            <div className="input-group">
-                <select
-                    className="custom-select"
-                    value={value}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
-                >
-                    {CourseTypeOptions.map(c => (
-                        <option key={c[0]} value={c[0]}>{c[1]}</option>
-                    ))}
-                    <option value="">Show All</option>
-                </select>
-            </div>
-        );
-    }
-
-    private renderRequestType = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        return (
-            <RequestType
-                requestType={request.requestType}
-                onChange={requestType => this.requestChanged(index, "requestType", requestType)}
-            />
-        );
-    }
-
-    private renderRequestTypeHeader = () => {
-        return (
-            <div>
-                <span className="mr-2">Request Type</span>
-                <i className="fas fa-question-circle" id="requestTypeHeader" />
-                <UncontrolledTooltip
-                    target="requestTypeHeader"
-                    placement="right"
-                >
-                    For courses that require both TAs and Readers, select the majority position type.
-                </UncontrolledTooltip>
-            </div>
-            
-        );
-    }
-
-    private renderRequestTypeFilter = (params: any) => {
-        const { filter, onChange } = params;
-        const value = (filter && filter.value) || "";
-        return (
-            <div className="input-group">
-                <select
-                    className="custom-select"
-                    value={value}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
-                >
-                    <option value="TA">TA</option>
-                    <option value="READ">Reader</option>
-                    <option value="">Show All</option>
-                </select>
-            </div>
-        );
-    }
-
-    private renderException = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        return (
-            <Exception
-                exception={request.exception}
-                onExceptionChange={exception => this.requestChanged(index, "exception", exception)}
-            />
-        );
-    }
-
-    private renderExceptionFilter = (params: any) => {
-        const { filter, onChange } = params;
-        const value = (filter && filter.value) || "";
-        return (
-            <div className="input-group">
-                <select
-                    className="custom-select"
-                    value={value}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
-                >
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                    <option value="">Show All</option>
-                </select>
-            </div>
-        );
-    }
-
-    private renderRemoveButton = (row: ITypedCellInfo) => {
-        const index = row.index;
-
-        return (
-            <button
-                className="btn btn-danger"
-                onClick={() => this.props.onRemove(index)}
-            >
-                <i className="fa fa-trash-alt" />
-            </button>
-        );
-    }
-
-    private renderAnnualizedFTE = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-        const course = request.course;
-        const annualizedTotal = request.exception ? request.exceptionAnnualizedTotal : request.annualizedTotal;
-
-        if (course && course.isCourseTaughtOnceEveryTwoYears && !request.exception) {
-            return (
-                <>
-                    {annualizedTotal.toFixed(3)}
-                    <span style={{ paddingLeft: '.5em'}}>
-                        <i
-                            id={`request-${index}-otheryear-warning`}
-                            className="fas fa-exclamation-triangle text-warning"
-                        />
-                        <UncontrolledTooltip
-                            className=""
-                            placement="right"
-                            target={`request-${index}-otheryear-warning`}
-                        >
-                            Data shows that this course is offered every other year and {course.wasCourseTaughtInMostRecentYear ? 'WILL NOT' : 'WILL'} be offered 
-                            in the upcoming year. TA funding will not be allocated in the off year. If this is incorrect, please
-                            submit an exception request.
-                        </UncontrolledTooltip>
-                    </span>
-                </>
-            );
-        }
-        
-        return <>{annualizedTotal.toFixed(3)}</>;
-    }
-
-    private renderWarnings = (row: ITypedCellInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        if (!request.isValid) {
-            return (
-                <div>
-                    <i id={`request-${index}-error`} className="fas fa-exclamation-triangle text-danger" />
-                    <UncontrolledTooltip
-                        className=""
-                        placement="right"
-                        target={`request-${index}-error`}
-                    >
-                        {request.error}
-                    </UncontrolledTooltip>
-                </div>
-            );
-        }
-
-        return null;
-    }
-
-    private renderExceptionDetail = (row: ITypedRowInfo) => {
-        const index = row.index;
-        const request = row.original;
-
-        if (!request.exception) {
-            return null;
-        }
-        return (
-            <ExceptionDetail
-                requestId={request.id || -1} // need to ask scott.
-                onRevoke={this.props.onRevoke}
-                exception={request.exception}
-                exceptionApproved={request.hasApprovedException}
-                exceptionReason={request.exceptionReason}
-                exceptionTotal={request.exceptionTotal}
-                exceptionAnnualCount={request.exceptionAnnualCount}
-                onExceptionAnnualCountChange={(exceptionAnnualCount) =>
-                    this.requestChanged(index, "exceptionAnnualCount", exceptionAnnualCount)
-                }
-                onExceptionTotalChange={exceptionTotal =>
-                    this.requestChanged(index, "exceptionTotal", exceptionTotal)
-                }
-                onReasonChange={reason => this.requestChanged(index, "exceptionReason", reason)}
-            />
-        );
-    }
-
-    private onCourseChange = (index: number, course: ICourse | undefined) => {
-        this.requestChanged(index, "course", course);
-    }
-
-    private requestChanged = (index: number, prop: string, val: any) => {
-        const request = this.props.requests[index];
-
-        const newRequest = {
-            ...request,
-            [prop]: val
+        activeResizeRef.current = {
+            leftColumnId,
+            rightColumnId,
+            startLeftWidth: startLeftWidth || leftHeaderCell.getBoundingClientRect().width,
+            startRightWidth: startRightWidth || rightHeaderCell.getBoundingClientRect().width,
+            startX,
         };
 
-        // new request passed up
-        this.props.onEdit(index, newRequest);
+        document.body.classList.add("requests-column-resizing");
+        document.addEventListener("mousemove", handleColumnResize);
+        document.addEventListener("mouseup", stopColumnResize);
+    }, [columnWidths, columnsById, handleColumnResize, stopColumnResize]);
+
+    const handleResizeMouseDown = React.useCallback((
+        leftColumnId: string,
+        rightColumnId: string,
+    ) => (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startColumnResize(leftColumnId, rightColumnId, e.clientX);
+    }, [startColumnResize]);
+
+    const visibleColumnCount = table.getVisibleLeafColumns().length;
+    const rows = table.getRowModel().rows;
+
+    return (
+        <div className={className}>
+            <div className="table-responsive">
+                <table className="table requests">
+                    <colgroup>
+                        {table.getVisibleLeafColumns().map((column) => (
+                            <col
+                                data-column-width={column.id}
+                                key={`${column.id}-width`}
+                                style={getWidthStyle(
+                                    getColumnWidth(column.id, column.columnDef, undefined, columnWidths)
+                                )}
+                            />
+                        ))}
+                    </colgroup>
+                    <thead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <tr key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    const meta = getColumnMeta(header.column.columnDef);
+                                    const canSort = header.column.getCanSort();
+                                    const nextSortOrder = header.column.getNextSortingOrder();
+                                    const sortState = header.column.getIsSorted();
+                                    const widthStyle = getWidthStyle(
+                                        getColumnWidth(
+                                            header.column.id,
+                                            header.column.columnDef,
+                                            undefined,
+                                            columnWidths,
+                                        )
+                                    );
+                                    const resizeColumnId = header.index > 0
+                                        ? headerGroup.headers[header.index - 1].column.id
+                                        : undefined;
+
+                                    return (
+                                        <th
+                                            aria-sort={getAriaSort(canSort, sortState)}
+                                            className={buildClassName(
+                                                meta.headerClassName,
+                                                canSort ? "requests-sortable" : undefined
+                                            )}
+                                            key={header.id}
+                                            ref={(element) => {
+                                                headerRefs.current[header.column.id] = element;
+                                            }}
+                                            style={widthStyle}
+                                            scope="col"
+                                        >
+                                            <div
+                                                className={buildClassName(
+                                                    "requests-header-cell-content",
+                                                    "d-flex align-items-center",
+                                                    canSort ? "justify-content-between" : undefined
+                                                )}
+                                            >
+                                                <div className="d-flex align-items-center">
+                                                    {header.isPlaceholder
+                                                        ? null
+                                                        : flexRender(header.column.columnDef.header, header.getContext())}
+                                                </div>
+                                                {canSort && !header.isPlaceholder && (
+                                                    <button
+                                                        aria-label={getSortButtonLabel(
+                                                            header.column.id,
+                                                            header.column.columnDef.header,
+                                                            nextSortOrder,
+                                                        )}
+                                                        className="btn btn-link btn-sm p-0 ml-2 requests-sort-button"
+                                                        data-column-sort-button={header.column.id}
+                                                        onClick={header.column.getToggleSortingHandler()}
+                                                        type="button"
+                                                    >
+                                                        {renderSortIcon(sortState)}
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {resizeColumnId && !header.isPlaceholder && (
+                                                <div
+                                                    className="requests-column-resizer"
+                                                    data-column-resizer={resizeColumnId}
+                                                    onMouseDown={handleResizeMouseDown(
+                                                        resizeColumnId,
+                                                        header.column.id,
+                                                    )}
+                                                    role="presentation"
+                                                />
+                                            )}
+                                        </th>
+                                    );
+                                })}
+                            </tr>
+                        ))}
+                        <tr className="requests-filter-row">
+                            {table.getVisibleLeafColumns().map((column) => {
+                                const meta = getColumnMeta(column.columnDef);
+
+                                return (
+                                    <th
+                                        className={meta.headerClassName}
+                                        key={`${column.id}-filter`}
+                                        style={getWidthStyle(
+                                            getColumnWidth(column.id, column.columnDef, undefined, columnWidths)
+                                        )}
+                                    >
+                                        {renderFilter(column)}
+                                    </th>
+                                );
+                            })}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.length === 0 && (
+                            <tr>
+                                <td className="requests-empty-state text-center text-muted" colSpan={visibleColumnCount}>
+                                    No requests found.
+                                </td>
+                            </tr>
+                        )}
+                        {rows.map((row) => {
+                            const { originalIndex, request } = row.original;
+                            const rowId = request.id ? `request-${request.id}` : `request-new-${originalIndex}`;
+                            const rowClassName = request.isFocused ? "target-flash" : undefined;
+
+                            return (
+                                <React.Fragment key={row.id}>
+                                    <tr
+                                        className={rowClassName}
+                                        data-request-row="true"
+                                        id={rowId}
+                                    >
+                                        {row.getVisibleCells().map((cell) => {
+                                            const meta = getColumnMeta(cell.column.columnDef);
+
+                                            return (
+                                                <td
+                                                    className={meta.className}
+                                                    key={cell.id}
+                                                    style={getWidthStyle(
+                                                        getColumnWidth(
+                                                            cell.column.id,
+                                                            cell.column.columnDef,
+                                                            undefined,
+                                                            columnWidths,
+                                                        )
+                                                    )}
+                                                >
+                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                    {request.exception && (
+                                        <tr className="requests-detail-row">
+                                            <td className="p-0" colSpan={visibleColumnCount}>
+                                                <ExceptionDetail
+                                                    requestId={request.id || -1}
+                                                    onExceptionAnnualCountChange={(exceptionAnnualCount) =>
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionAnnualCount",
+                                                            exceptionAnnualCount,
+                                                        )
+                                                    }
+                                                    onExceptionTotalChange={(exceptionTotal) =>
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionTotal",
+                                                            exceptionTotal,
+                                                        )
+                                                    }
+                                                    onReasonChange={(reason) =>
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionReason",
+                                                            reason,
+                                                        )
+                                                    }
+                                                    onRevoke={onRevoke}
+                                                    exception={request.exception}
+                                                    exceptionAnnualCount={request.exceptionAnnualCount}
+                                                    exceptionApproved={request.hasApprovedException}
+                                                    exceptionReason={request.exceptionReason}
+                                                    exceptionTotal={request.exceptionTotal}
+                                                />
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+
+    function renderFilter(column: ReturnType<typeof table.getVisibleLeafColumns>[number]) {
+        const meta = getColumnMeta(column.columnDef);
+        const currentValue = String(column.getFilterValue() || "");
+
+        switch (meta.filterVariant) {
+            case "icon":
+                return (
+                    <div className="text-center requests-filter-icon">
+                        <i aria-hidden="true" className="fas fa-filter" />
+                    </div>
+                );
+            case "course":
+                return (
+                    <div style={{ position: "relative" }}>
+                        <input
+                            aria-label={getFilterLabel(column.id)}
+                            className="form-control"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                column.setFilterValue(e.target.value.toUpperCase())
+                            }
+                            placeholder="Search ..."
+                            value={currentValue.toUpperCase()}
+                        />
+                        <i
+                            aria-hidden="true"
+                            className="fas fa-search"
+                            style={{
+                                position: "absolute",
+                                right: "10px",
+                                top: "2px",
+                                transform: "translateY(50%)",
+                            }}
+                        />
+                    </div>
+                );
+            case "courseType":
+                return (
+                    <div className="input-group">
+                        <select
+                            aria-label={getFilterLabel(column.id)}
+                            className="custom-select"
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
+                            value={currentValue}
+                        >
+                            {CourseTypeOptions.map((courseTypeOption) => (
+                                <option key={courseTypeOption[0]} value={courseTypeOption[0]}>
+                                    {courseTypeOption[1]}
+                                </option>
+                            ))}
+                            <option value="">Show All</option>
+                        </select>
+                    </div>
+                );
+            case "requestType":
+                return (
+                    <div className="input-group">
+                        <select
+                            aria-label={getFilterLabel(column.id)}
+                            className="custom-select"
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
+                            value={currentValue}
+                        >
+                            <option value="TA">TA</option>
+                            <option value="READ">Reader</option>
+                            <option value="">Show All</option>
+                        </select>
+                    </div>
+                );
+            case "exception":
+                return (
+                    <div className="input-group">
+                        <select
+                            aria-label={getFilterLabel(column.id)}
+                            className="custom-select"
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
+                            value={currentValue}
+                        >
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                            <option value="">Show All</option>
+                        </select>
+                    </div>
+                );
+            case "none":
+            default:
+                return null;
+        }
+    }
+};
+
+function buildClassName(...classNames: Array<string | undefined>) {
+    return classNames.filter(Boolean).join(" ");
+}
+
+function buildInitialFilters(courseNumberFilter?: string): ColumnFiltersState {
+    if (!courseNumberFilter) {
+        return [];
     }
 
-    private decorateTr = (state: any, row: ITypedRowInfo | undefined) => {
-        if (!row) {
-            return {};
-        }
-        
-        const request = row.original;
-        const result: any = {
-            id: `request-${request.id}`,
-        }
+    return [{
+        id: "course",
+        value: courseNumberFilter,
+    }];
+}
 
-        if (request.isFocused) {
-            result.className = 'target-flash';
-        }
+function filtersAreEqual(left: ColumnFiltersState, right: ColumnFiltersState) {
+    if (left.length !== right.length) {
+        return false;
+    }
 
-        return result;
+    return left.every((filter, index) =>
+        filter.id === right[index].id
+        && filter.value === right[index].value
+    );
+}
+
+function getColumnMeta(column: ColumnDef<IRequestTableRow>): IColumnMeta {
+    return (column.meta as IColumnMeta | undefined) || {};
+}
+
+function getWidthStyle(width?: number): React.CSSProperties | undefined {
+    if (!width) {
+        return undefined;
+    }
+
+    return {
+        minWidth: width,
+        width,
+    };
+}
+
+function getMinimumColumnWidth(column: ColumnDef<IRequestTableRow>) {
+    const meta = getColumnMeta(column);
+
+    if (meta.width) {
+        return Math.min(meta.width, 100);
+    }
+
+    return 100;
+}
+
+function getColumnWidth(
+    columnId: string,
+    column: ColumnDef<IRequestTableRow>,
+    measuredWidth?: number,
+    columnWidths: Record<string, number> = {},
+) {
+    if (columnWidths[columnId]) {
+        return columnWidths[columnId];
+    }
+
+    const meta = getColumnMeta(column);
+    if (meta.width) {
+        return meta.width;
+    }
+
+    return measuredWidth;
+}
+
+function getAriaSort(
+    canSort: boolean,
+    sortState: false | "asc" | "desc",
+): React.AriaAttributes["aria-sort"] | undefined {
+    if (!canSort) {
+        return undefined;
+    }
+
+    if (sortState === "asc") {
+        return "ascending";
+    }
+
+    if (sortState === "desc") {
+        return "descending";
+    }
+
+    return "none";
+}
+
+function getFilterLabel(columnId: string) {
+    switch (columnId) {
+        case "course":
+            return "Filter Course";
+        case "courseType":
+            return "Filter Course Type";
+        case "requestType":
+            return "Filter Request Type";
+        case "exception":
+            return "Filter Exception";
+        default:
+            return `Filter ${columnId}`;
     }
 }
 
+function getSortButtonLabel(
+    columnId: string,
+    header: ColumnDef<IRequestTableRow>["header"],
+    nextSortOrder: false | "asc" | "desc",
+) {
+    const headerLabel = getSortableHeaderLabel(columnId, header);
 
-// tslint:disable-next-line:max-classes-per-file
-class TypedReactTable extends ReactTable<IRequest>{ };
+    if (nextSortOrder === "asc") {
+        return `Sort ${headerLabel} ascending`;
+    }
+
+    if (nextSortOrder === "desc") {
+        return `Sort ${headerLabel} descending`;
+    }
+
+    return `Clear ${headerLabel} sorting`;
+}
+
+function getSortableHeaderLabel(columnId: string, header: ColumnDef<IRequestTableRow>["header"]) {
+    if (typeof header === "string") {
+        return header;
+    }
+
+    switch (columnId) {
+        case "courseType":
+            return "Course Type";
+        case "requestType":
+            return "Request Type";
+        default:
+            return columnId;
+    }
+}
+
+function renderSortIcon(sortState: false | "asc" | "desc") {
+    if (sortState === "asc") {
+        return <span aria-hidden="true">▲</span>;
+    }
+
+    if (sortState === "desc") {
+        return <span aria-hidden="true">▼</span>;
+    }
+
+    return <span aria-hidden="true">↕</span>;
+}
+
+function renderIconTrigger(id: string, label: string, iconClassName: string) {
+    return (
+        <button
+            aria-label={label}
+            className="btn p-0 border-0 bg-transparent align-baseline requests-icon-button"
+            id={id}
+            type="button"
+        >
+            <i aria-hidden="true" className={iconClassName} />
+        </button>
+    );
+}
+
+function renderNewIndicator(row: IRequestTableRow) {
+    const { originalIndex, request } = row;
+
+    if (!request.course || !request.course.isNew) {
+        return null;
+    }
+
+    return (
+        <span>
+            {renderIconTrigger(
+                `request-new-indicator-${originalIndex}`,
+                "New course details",
+                "fas fa-plus-circle",
+            )}
+            <UncontrolledTooltip
+                placement="left"
+                target={`request-new-indicator-${originalIndex}`}
+            >
+                New course will be created
+            </UncontrolledTooltip>
+        </span>
+    );
+}
+
+function renderCourse(
+    row: IRequestTableRow,
+    onCourseChange: (originalIndex: number, request: IRequest, course: ICourse | undefined) => void,
+    onCourseCreate: (i: number, defaultValues?: ICourse) => void
+) {
+    const { originalIndex, request } = row;
+
+    return (
+        <CourseNumber
+            course={request.course}
+            onChange={(course) => onCourseChange(originalIndex, request, course)}
+            onCourseCreate={(course) => onCourseCreate(originalIndex, course)}
+        />
+    );
+}
+
+function renderCourseType(
+    row: IRequestTableRow,
+    requestChanged: <K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => void
+) {
+    const { originalIndex, request } = row;
+
+    return (
+        <CourseType
+            courseType={request.courseType}
+            onChange={(courseType) => requestChanged(originalIndex, request, "courseType", courseType)}
+        />
+    );
+}
+
+function renderCourseTypeHeader() {
+    return (
+        <div>
+            <span className="mr-3">Course Type</span>
+            <a href="/CAES-TA-Guidelines 2018-23.pdf" rel="noopener noreferrer" target="_blank">
+                Criteria Info <i className="fas fa-external-link-alt" />
+            </a>
+        </div>
+    );
+}
+
+function renderRequestType(
+    row: IRequestTableRow,
+    requestChanged: <K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => void
+) {
+    const { originalIndex, request } = row;
+
+    return (
+        <RequestType
+            onChange={(requestType) => requestChanged(originalIndex, request, "requestType", requestType)}
+            requestType={request.requestType}
+        />
+    );
+}
+
+function renderRequestTypeHeader() {
+    return (
+        <div>
+            <span className="mr-2">Request Type</span>
+            {renderIconTrigger(
+                "requestTypeHeader",
+                "Request type help",
+                "fas fa-question-circle",
+            )}
+            <UncontrolledTooltip
+                placement="right"
+                target="requestTypeHeader"
+            >
+                For courses that require both TAs and Readers, select the majority position type.
+            </UncontrolledTooltip>
+        </div>
+    );
+}
+
+function renderException(
+    row: IRequestTableRow,
+    requestChanged: <K extends keyof IRequest>(
+        originalIndex: number,
+        request: IRequest,
+        prop: K,
+        value: IRequest[K],
+    ) => void
+) {
+    const { originalIndex, request } = row;
+
+    return (
+        <Exception
+            exception={request.exception}
+            onExceptionChange={(exception) => requestChanged(originalIndex, request, "exception", exception)}
+        />
+    );
+}
+
+function renderRemoveButton(row: IRequestTableRow, onRemove: (i: number) => void) {
+    return (
+        <button
+            aria-label="Remove request"
+            className="btn btn-danger"
+            type="button"
+            onClick={() => onRemove(row.originalIndex)}
+        >
+            <i aria-hidden="true" className="fa fa-trash-alt" />
+        </button>
+    );
+}
+
+function renderAnnualizedFTE(row: IRequestTableRow) {
+    const { originalIndex, request } = row;
+    const course = request.course;
+    const annualizedTotal = request.exception ? request.exceptionAnnualizedTotal : request.annualizedTotal;
+
+    if (course && course.isCourseTaughtOnceEveryTwoYears && !request.exception) {
+        return (
+            <>
+                {annualizedTotal.toFixed(3)}
+                <span style={{ paddingLeft: ".5em" }}>
+                    {renderIconTrigger(
+                        `request-${originalIndex}-otheryear-warning`,
+                        "Every-other-year course warning",
+                        "fas fa-exclamation-triangle text-warning",
+                    )}
+                    <UncontrolledTooltip
+                        className=""
+                        placement="right"
+                        target={`request-${originalIndex}-otheryear-warning`}
+                    >
+                        Data shows that this course is offered every other year and {course.wasCourseTaughtInMostRecentYear ? "WILL NOT" : "WILL"} be offered in the upcoming year. TA funding will not be allocated in the off year. If this is incorrect, please submit an exception request.
+                    </UncontrolledTooltip>
+                </span>
+            </>
+        );
+    }
+
+    return <>{annualizedTotal.toFixed(3)}</>;
+}
+
+function renderWarnings(row: IRequestTableRow) {
+    const { originalIndex, request } = row;
+
+    if (!request.isValid) {
+        return (
+            <div>
+                {renderIconTrigger(
+                    `request-${originalIndex}-error`,
+                    "Request validation warning",
+                    "fas fa-exclamation-triangle text-danger",
+                )}
+                <UncontrolledTooltip
+                    className=""
+                    placement="right"
+                    target={`request-${originalIndex}-error`}
+                >
+                    {request.error}
+                </UncontrolledTooltip>
+            </div>
+        );
+    }
+
+    return null;
+}
+
+export default RequestsTable;

@@ -49,10 +49,10 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
     <Message Importance="high" Text="Restoring client dependencies using 'npm install'. This may take several minutes..." />
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install --legacy-peer-deps" />
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install" />
   </Target>
   <Target Name="PublishRunClientBuild" AfterTargets="ComputeFilesToPublish">
-    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install --legacy-peer-deps" />
+    <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm install" />
     <Exec WorkingDirectory="$(MSBuildProjectDirectory)" Command="npm run build" />
     <ItemGroup>
       <DistFiles Include="$(SpaRoot)build\**" />

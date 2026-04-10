@@ -116,7 +116,7 @@ function normalizeText(value: string | null | undefined): string {
 }
 
 describe("SubmissionContainer formula UI coverage", () => {
-    let host: HTMLDivElement;
+    let host: HTMLDivElement | undefined;
     let root: Root | undefined;
 
     afterEach(async () => {
@@ -147,6 +147,15 @@ describe("SubmissionContainer formula UI coverage", () => {
         });
     }
 
+    // just a simple wrapper to eliminate a bunch of TS warnings about potential uninitialized variable
+    function getHost(): HTMLDivElement {
+        if (!host) {
+            throw new Error("Test host has not been initialized.");
+        }
+
+        return host;
+    }
+
     function getButton(label: string): HTMLButtonElement {
         const button = Array.from(document.body.querySelectorAll("button")).find(
             element => normalizeText(element.textContent) === label
@@ -165,17 +174,17 @@ describe("SubmissionContainer formula UI coverage", () => {
         return input!;
     }
 
-    async function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
+    function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
         if (checkbox.checked === checked) {
             return;
         }
 
-        await act(async () => {
+        act(() => {
             checkbox.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
 
-    async function setInputValue(input: HTMLInputElement, value: string) {
+    function setInputValue(input: HTMLInputElement, value: string) {
         const valueSetter = Object.getOwnPropertyDescriptor(
             HTMLInputElement.prototype,
             "value"
@@ -183,7 +192,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(valueSetter).toBeDefined();
 
-        await act(async () => {
+        act(() => {
             valueSetter!.call(input, value);
             input.dispatchEvent(new Event("input", { bubbles: true }));
             input.dispatchEvent(new Event("change", { bubbles: true }));
@@ -196,7 +205,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         async ({ courseType, course, expectedPerOffering, expectedAnnualized }) => {
             await renderSubmission([createRequest(courseType, course)]);
 
-            const text = normalizeText(host.textContent);
+            const text = normalizeText(getHost().textContent);
 
             expect(text).toContain(expectedPerOffering);
             expect(text).toContain(`Request Total: ${expectedAnnualized}`);
@@ -212,23 +221,117 @@ describe("SubmissionContainer formula UI coverage", () => {
             })
         ]);
 
-        expect(normalizeText(host.textContent)).toContain("Request Total: 0.833");
+        const currentHost = getHost();
 
-        const courseTypeSelect = Array.from(host.querySelectorAll("select")).find(
+        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 0.833");
+
+        const courseTypeSelect = Array.from(currentHost.querySelectorAll("select")).find(
             element => (element as HTMLSelectElement).value === "STD"
         ) as HTMLSelectElement | undefined;
 
         expect(courseTypeSelect).toBeDefined();
 
-        await act(async () => {
+        act(() => {
             courseTypeSelect!.value = "MAN";
             courseTypeSelect!.dispatchEvent(new Event("change", { bubbles: true }));
         });
 
-        const updatedText = normalizeText(host.textContent);
+        const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).toContain("1.250");
         expect(updatedText).toContain("Request Total: 0.417");
+    });
+
+    it("preserves the in-progress course number input across the debounced parent update", async () => {
+        vi.useFakeTimers();
+
+        try {
+            await renderSubmission([
+                createRequest("STD", {
+                    name: "ECS 120",
+                    number: "120"
+                })
+            ]);
+
+            const courseInput = getHost().querySelector(
+                "tbody tr[data-request-row='true'] input.form-control"
+            ) as HTMLInputElement | null;
+            const valueSetter = Object.getOwnPropertyDescriptor(
+                HTMLInputElement.prototype,
+                "value"
+            )?.set;
+
+            expect(courseInput).toBeDefined();
+            expect(valueSetter).toBeDefined();
+
+            act(() => {
+                courseInput!.focus();
+                valueSetter!.call(courseInput, "TAC 1");
+                courseInput!.dispatchEvent(new Event("input", { bubbles: true }));
+                courseInput!.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+
+            expect(courseInput!.value).toBe("TAC 1");
+            expect(document.activeElement).toBe(courseInput);
+
+            act(() => {
+                vi.advanceTimersByTime(110);
+            });
+
+            const updatedInput = getHost().querySelector(
+                "tbody tr[data-request-row='true'] input.form-control"
+            ) as HTMLInputElement | null;
+
+            expect(updatedInput).toBeDefined();
+            expect(updatedInput).toBe(courseInput);
+            expect(updatedInput!.value).toBe("TAC 1");
+            expect(document.activeElement).toBe(updatedInput);
+        }
+        finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("inserts a newly created empty request at the top of the table", async () => {
+        await renderSubmission([
+            createRequest("STD", {
+                name: "ECS 120",
+                number: "120"
+            }, {
+                id: 101,
+            }),
+            createRequest("MAN", {
+                name: "ECS 140A",
+                number: "140A"
+            }, {
+                id: 202,
+            }),
+        ]);
+
+        const createRequestButton = Array.from(document.body.querySelectorAll("button")).find(
+            element => normalizeText(element.textContent) === "Create New Request"
+        ) as HTMLButtonElement | undefined;
+
+        expect(createRequestButton).toBeDefined();
+
+        act(() => {
+            createRequestButton!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        });
+
+        const requestRows = Array.from(
+            getHost().querySelectorAll("tbody tr[data-request-row='true']")
+        ) as HTMLTableRowElement[];
+
+        expect(requestRows).toHaveLength(3);
+
+        const firstRowInput = requestRows[0].querySelector("input.form-control") as HTMLInputElement | null;
+        const secondRowText = normalizeText(requestRows[1].textContent);
+        const thirdRowText = normalizeText(requestRows[2].textContent);
+
+        expect(firstRowInput).not.toBeNull();
+        expect(firstRowInput!.value).toBe("");
+        expect(secondRowText).toContain("120");
+        expect(thirdRowText).toContain("140A");
     });
 
     it("uses exception values in the rendered annualized totals once they are entered", async () => {
@@ -240,9 +343,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             })
         ]);
 
-        expect(normalizeText(host.textContent)).toContain("Request Total: 0.333");
+        const currentHost = getHost();
 
-        const exceptionCheckbox = host.querySelector(
+        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 0.333");
+
+        const exceptionCheckbox = currentHost.querySelector(
             "input[type=\"checkbox\"]"
         ) as HTMLInputElement | null;
 
@@ -250,14 +355,14 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         await setCheckboxValue(exceptionCheckbox!, true);
 
-        expect(normalizeText(host.textContent)).toContain("Proposed TA % per course offering");
+        expect(normalizeText(getHost().textContent)).toContain("Proposed TA % per course offering");
         expect(getButton("Save Changes").disabled).toBe(true);
         expect(getButton("Submit for Approval").disabled).toBe(true);
 
         await setInputValue(getInputByPlaceholder("Total FTE requested"), "1.50");
         await setInputValue(getInputByPlaceholder("Annual offerings requested"), "3");
 
-        const updatedText = normalizeText(host.textContent);
+        const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).toContain("Request Total: 1.500");
         expect(updatedText).toContain("1.500");
@@ -282,9 +387,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             )
         ]);
 
-        expect(normalizeText(host.textContent)).toContain("Request Total: 1.500");
+        const currentHost = getHost();
 
-        const exceptionCheckbox = host.querySelector(
+        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 1.500");
+
+        const exceptionCheckbox = currentHost.querySelector(
             "input[type=\"checkbox\"]"
         ) as HTMLInputElement | null;
 
@@ -292,7 +399,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         await setCheckboxValue(exceptionCheckbox!, false);
 
-        const updatedText = normalizeText(host.textContent);
+        const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).not.toContain("Proposed TA % per course offering");
         expect(updatedText).toContain("Request Total: 0.333");
@@ -317,10 +424,11 @@ describe("SubmissionContainer formula UI coverage", () => {
             )
         ]);
 
-        const text = normalizeText(host.textContent);
+        const currentHost = getHost();
+        const text = normalizeText(currentHost.textContent);
 
         expect(text).toContain("approved for the above course");
         expect(text).toContain("Request Total: 1.500");
-        expect(host.querySelector("#revoke-button")).not.toBeNull();
+        expect(currentHost.querySelector("#revoke-button")).not.toBeNull();
     });
 });

@@ -1,3 +1,5 @@
+@use "depends" as *;
+
 // datatable styles
 .dataTables_wrapper {
     padding-left: 0;
@@ -12,16 +14,54 @@
     }
 }
 
-// react table styles
-.ReactTable {
-  .rt-noData {
-    top: 80%;
+// requests table styles
+table.requests {
+  .requests-empty-state {
     padding: 5px;
   }
 
-  // put the dropdown arrows back
-  .rt-thead.-filters select.custom-select {
-      background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
-      background-size: 8px 10px;
+  .requests-filter-row {
+    input.form-control,
+    select.custom-select {
+      font-family: inherit;
+      font-size: inherit;
+      height: calc(1.5em + 0.65rem + 2px);
+      margin: 0;
+      padding-top: 0.3rem;
+      padding-bottom: 0.3rem;
+    }
+
+    .fa-search {
+      color: $tertiary-font;
+    }
+  }
+
+  .requests-filter-icon {
+    align-items: center;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    min-height: calc(1.5em + 0.65rem + 2px);
+  }
+
+  .requests-filter-row select.custom-select {
+    background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+    background-size: 8px 10px;
+  }
+
+  .requests-filter-row th {
+    vertical-align: top;
+  }
+
+  .requests-filter-row .input-group,
+  .requests-filter-row > th > div {
+    width: 100%;
+  }
+
+  td .form-control,
+  td .custom-select,
+  td textarea.form-control {
+    font-family: inherit;
+    font-size: inherit;
   }
 }

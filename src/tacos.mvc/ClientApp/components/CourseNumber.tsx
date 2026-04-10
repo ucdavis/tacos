@@ -14,6 +14,7 @@ interface IProps {
 
 interface IState {
     courseNumber: string;
+    syncedCourseNumber: string | undefined;
 
     querying: boolean;
     notFound: boolean;
@@ -24,13 +25,18 @@ export default class CourseNumber extends React.Component<IProps, IState> {
 
     public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
         const nextState: Partial<IState> = {};
+        const nextCourseNumber = nextProps.course ? nextProps.course.number : undefined;
         
         if (nextProps.course) {
             nextState.notFound = false;
         }
 
-        if (nextProps.course && prevState.courseNumber !== nextProps.course.number) {
-            nextState.courseNumber = nextProps.course.number;
+        if (nextCourseNumber !== prevState.syncedCourseNumber) {
+            nextState.syncedCourseNumber = nextCourseNumber;
+
+            if (nextCourseNumber !== undefined) {
+                nextState.courseNumber = nextCourseNumber;
+            }
         }
 
         return nextState;
@@ -41,6 +47,7 @@ export default class CourseNumber extends React.Component<IProps, IState> {
 
         this.state = {
             courseNumber: props.course ? props.course.number : "",
+            syncedCourseNumber: props.course ? props.course.number : undefined,
             querying: false,
             notFound: false,
         };

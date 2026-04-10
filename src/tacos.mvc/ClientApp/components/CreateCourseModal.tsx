@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import Modal, { ModalHeader, ModalBody, ModalFooter } from "./Modal";
 
 import { ICourse } from "../models/ICourse";
 
@@ -44,7 +44,7 @@ export default class CreateCourseModal extends React.PureComponent<IProps, IStat
         const { courseNumber, courseName } = this.state;
 
         return (
-            <Modal isOpen={isOpen} onClosed={onClose} centered={true}>
+            <Modal isOpen={isOpen} onClose={onClose} centered={true}>
                 <ModalHeader>Create Course</ModalHeader>
                 <ModalBody>
                     <div className="form-group">
@@ -57,8 +57,8 @@ export default class CreateCourseModal extends React.PureComponent<IProps, IStat
                     </div>
                 </ModalBody>
                 <ModalFooter className="d-flex justify-content-between">
-                    <button className="btn btn-secondary">Cancel</button>
-                    <button className="btn btn-primary" onClick={this.onSubmit}>Submit</button>
+                    <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
+                    <button type="button" className="btn btn-primary" onClick={this.onSubmit}>Submit</button>
                 </ModalFooter>
             </Modal>
         );

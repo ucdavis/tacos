@@ -3,25 +3,6 @@ import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRoot, Root } from "react-dom/client";
 
-vi.mock("reactstrap", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("reactstrap")>();
-
-    return {
-        ...actual,
-        Tooltip: () => null,
-        Modal: ({ children, isOpen }: { children: React.ReactNode; isOpen?: boolean }) => isOpen ? <div>{children}</div> : null,
-        ModalHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        ModalBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        ModalFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-        Button: ({
-            children,
-            onClick,
-            ...props
-        }: React.ButtonHTMLAttributes<HTMLButtonElement>) => <button onClick={onClick} {...props}>{children}</button>,
-        NavLink: ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props}>{children}</a>,
-    };
-});
-
 import RequestsTable from "./RequestsTable";
 
 import type { ICourse } from "../models/ICourse";
@@ -119,20 +100,30 @@ describe("RequestsTable UI coverage", () => {
             };
         }
 
-        props = {
+        const nextProps: RequestsTableProps = {
             ...props,
             ...overrideProps,
         };
+        props = nextProps;
 
         await act(async () => {
-            root!.render(<RequestsTable {...props} />);
+            root!.render(<RequestsTable {...nextProps} />);
         });
 
-        return props;
+        return nextProps;
     }
 
-    function getVisibleRequestRows(): HTMLDivElement[] {
-        return Array.from(host!.querySelectorAll("div.rt-tr[id^='request-']")) as HTMLDivElement[];
+    // just a simple wrapper to eliminate a bunch of TS warnings about potential uninitialized variable
+    function getHost(): HTMLDivElement {
+        if (!host) {
+            throw new Error("Test host has not been initialized.");
+        }
+
+        return host;
+    }
+
+    function getVisibleRequestRows(): HTMLTableRowElement[] {
+        return Array.from(getHost().querySelectorAll("tr[data-request-row='true'][id^='request-']")) as HTMLTableRowElement[];
     }
 
     function getVisibleRequestIds(): string[] {
@@ -140,14 +131,14 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getCourseFilterInput(): HTMLInputElement {
-        const input = host!.querySelector("input[placeholder='Search ...']") as HTMLInputElement | null;
+        const input = getHost().querySelector("input[placeholder='Search ...']") as HTMLInputElement | null;
 
         expect(input).not.toBeNull();
         return input!;
     }
 
-    function getCourseTypeCellSelect(): HTMLSelectElement {
-        const select = Array.from(host!.querySelectorAll("select")).find(element => {
+    function getCourseTypeCellSelect(scope: ParentNode = getHost()): HTMLSelectElement {
+        const select = Array.from(scope.querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.includes("STD") && values.includes("MAN") && !values.includes("");
         }) as HTMLSelectElement | undefined;
@@ -156,8 +147,8 @@ describe("RequestsTable UI coverage", () => {
         return select!;
     }
 
-    function getRequestTypeCellSelect(): HTMLSelectElement {
-        const select = Array.from(host!.querySelectorAll("select")).find(element => {
+    function getRequestTypeCellSelect(scope: ParentNode = getHost()): HTMLSelectElement {
+        const select = Array.from(scope.querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.length === 2 && values[0] === "TA" && values[1] === "READ";
         }) as HTMLSelectElement | undefined;
@@ -167,7 +158,7 @@ describe("RequestsTable UI coverage", () => {
     }
 
     function getExceptionFilterSelect(): HTMLSelectElement {
-        const select = Array.from(host!.querySelectorAll("select")).find(element => {
+        const select = Array.from(getHost().querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.length === 3 && values[0] === "false" && values[1] === "true" && values[2] === "";
         }) as HTMLSelectElement | undefined;
@@ -176,8 +167,15 @@ describe("RequestsTable UI coverage", () => {
         return select!;
     }
 
-    function getButtonByText(label: string): HTMLButtonElement {
-        const button = Array.from(document.body.querySelectorAll("button")).find(
+    function getExceptionCheckbox(scope: ParentNode = getHost()): HTMLInputElement {
+        const checkbox = scope.querySelector("input[type='checkbox']") as HTMLInputElement | null;
+
+        expect(checkbox).not.toBeNull();
+        return checkbox!;
+    }
+
+    function getButtonByText(label: string, scope: ParentNode = document.body): HTMLButtonElement {
+        const button = Array.from(scope.querySelectorAll("button")).find(
             element => normalizeText(element.textContent) === label
         ) as HTMLButtonElement | undefined;
 
@@ -185,36 +183,36 @@ describe("RequestsTable UI coverage", () => {
         return button!;
     }
 
-    async function click(element: Element) {
-        await act(async () => {
+    function click(element: Element) {
+        act(() => {
             element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
 
-    async function setSelectValue(select: HTMLSelectElement, value: string) {
-        await act(async () => {
+    function setSelectValue(select: HTMLSelectElement, value: string) {
+        act(() => {
             select.value = value;
             select.dispatchEvent(new Event("change", { bubbles: true }));
         });
     }
 
-    async function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
+    function setCheckboxValue(checkbox: HTMLInputElement, checked: boolean) {
         if (checkbox.checked === checked) {
             return;
         }
 
-        await act(async () => {
+        act(() => {
             checkbox.dispatchEvent(new MouseEvent("click", { bubbles: true }));
         });
     }
 
-    async function setInputValue(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
+    function setInputValue(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
         const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
         const valueSetter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
 
         expect(valueSetter).toBeDefined();
 
-        await act(async () => {
+        act(() => {
             valueSetter!.call(input, value);
             input.dispatchEvent(new Event("input", { bubbles: true }));
             input.dispatchEvent(new Event("change", { bubbles: true }));
@@ -223,10 +221,19 @@ describe("RequestsTable UI coverage", () => {
         });
     }
 
-    function getCourseHeader(): HTMLElement {
-        const header = Array.from(host!.querySelectorAll(".rt-th")).find(
-            element => normalizeText(element.textContent) === "Course"
-        ) as HTMLElement | undefined;
+    function getSortButton(columnId: string): HTMLButtonElement {
+        const button = getHost().querySelector(
+            `button[data-column-sort-button="${columnId}"]`
+        ) as HTMLButtonElement | null;
+
+        expect(button).not.toBeNull();
+        return button!;
+    }
+
+    function getColumnHeader(label: string): HTMLTableCellElement {
+        const header = Array.from(getHost().querySelectorAll("thead tr:first-child th")).find(
+            element => normalizeText(element.textContent).includes(label)
+        ) as HTMLTableCellElement | undefined;
 
         expect(header).toBeDefined();
         return header!;
@@ -241,10 +248,11 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
+        const currentHost = getHost();
         expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
-        expect(host.querySelector("#request-1")?.className).not.toContain("target-flash");
-        expect(host.querySelector("#request-2")?.className).toContain("target-flash");
-        expect(normalizeText(host.textContent)).not.toContain("Charlie");
+        expect(currentHost.querySelector("#request-1")?.className).not.toContain("target-flash");
+        expect(currentHost.querySelector("#request-2")?.className).toContain("target-flash");
+        expect(normalizeText(currentHost.textContent)).not.toContain("Charlie");
     });
 
     it("filters rows through the course search input by number or name without case sensitivity", async () => {
@@ -256,6 +264,9 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
+        expect(getCourseFilterInput().getAttribute("aria-label")).toBe("Filter Course");
+        expect(getExceptionFilterSelect().getAttribute("aria-label")).toBe("Filter Exception");
+
         await setInputValue(getCourseFilterInput(), "biology");
         expect(getVisibleRequestIds()).toEqual(["request-2"]);
 
@@ -266,18 +277,21 @@ describe("RequestsTable UI coverage", () => {
         expect(getVisibleRequestIds()).toEqual(["request-1", "request-2", "request-3"]);
     });
 
-    it("calls onRemove with the rendered row index when the remove button is clicked", async () => {
+    it("calls onRemove with the original request index when the visible row order changes", async () => {
         const onRemove = vi.fn();
 
         await renderTable({
             onRemove,
             requests: [
-                createRequest(1, { course: createCourse({ number: "ECS 020", name: "Algorithms" }) }),
-                createRequest(2, { course: createCourse({ number: "MAT 030", name: "Matrix Methods" }) }),
+                createRequest(1, { course: createCourse({ number: "MAT 030", name: "Matrix Methods" }) }),
+                createRequest(2, { course: createCourse({ number: "ECS 020", name: "Algorithms" }) }),
             ]
         });
 
-        const secondRowRemoveButton = host!.querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
+        await click(getSortButton("course"));
+        expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
+
+        const secondRowRemoveButton = getHost().querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
         expect(secondRowRemoveButton).not.toBeNull();
 
         await click(secondRowRemoveButton!);
@@ -293,10 +307,105 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        const header = getCourseHeader();
-
-        await click(header);
+        await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-3", "request-1"]);
+    });
+
+    it("resizes adjacent columns from the divider handle and keeps the divider bound to the column on the left", async () => {
+        await renderTable({
+            requests: [
+                createRequest(1, { course: createCourse({ number: "TAC 101", name: "Alpha" }) }),
+                createRequest(2, { course: createCourse({ number: "TAC 202", name: "Bravo" }) }),
+            ]
+        });
+
+        const courseHeader = getColumnHeader("Course");
+        const courseTypeHeader = getColumnHeader("Course Type");
+        const resizer = getHost().querySelector(
+            "[data-column-resizer='course']"
+        ) as HTMLDivElement | null;
+        const courseColumn = getHost().querySelector(
+            "col[data-column-width='course']"
+        ) as HTMLTableColElement | null;
+        const courseTypeColumn = getHost().querySelector(
+            "col[data-column-width='courseType']"
+        ) as HTMLTableColElement | null;
+
+        expect(resizer).not.toBeNull();
+        expect(courseColumn).not.toBeNull();
+        expect(courseTypeColumn).not.toBeNull();
+
+        Object.defineProperty(courseHeader, "getBoundingClientRect", {
+            configurable: true,
+            value: () => ({
+                bottom: 40,
+                height: 40,
+                left: 45,
+                right: 285,
+                toJSON: () => ({}),
+                top: 0,
+                width: 240,
+                x: 45,
+                y: 0,
+            }),
+        });
+        Object.defineProperty(courseTypeHeader, "getBoundingClientRect", {
+            configurable: true,
+            value: () => ({
+                bottom: 40,
+                height: 40,
+                left: 285,
+                right: 425,
+                toJSON: () => ({}),
+                top: 0,
+                width: 140,
+                x: 285,
+                y: 0,
+            }),
+        });
+
+        act(() => {
+            courseTypeHeader.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: 330 }));
+            document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 390 }));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 390 }));
+        });
+
+        expect(courseColumn!.style.width).toBe("");
+        expect(courseTypeColumn!.style.width).toBe("");
+
+        act(() => {
+            resizer!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, clientX: 289 }));
+            document.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: 329 }));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 329 }));
+        });
+
+        expect(courseColumn!.style.width).toBe("280px");
+        expect(courseTypeColumn!.style.width).toBe("100px");
+    });
+
+    it("keeps header help controls separate from sorting and hardens the external criteria link", async () => {
+        await renderTable({
+            requests: [
+                createRequest(1, { requestType: "READ" }),
+                createRequest(2, { requestType: "TA" }),
+            ]
+        });
+
+        const requestTypeHelpButton = getHost().querySelector("#requestTypeHeader") as HTMLButtonElement | null;
+        const criteriaInfoLink = Array.from(getHost().querySelectorAll("a")).find(
+            element => normalizeText(element.textContent).includes("Criteria Info")
+        ) as HTMLAnchorElement | undefined;
+
+        expect(requestTypeHelpButton).not.toBeNull();
+        expect(requestTypeHelpButton!.tagName).toBe("BUTTON");
+        expect(requestTypeHelpButton!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+
+        expect(criteriaInfoLink).toBeDefined();
+        expect(criteriaInfoLink!.getAttribute("rel")).toBe("noopener noreferrer");
+
+        expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
+        await click(requestTypeHelpButton!);
+        expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
     });
 
     it("filters rows with the exception dropdown and preserves the expanded exception detail", async () => {
@@ -313,40 +422,46 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        expect(host.querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
 
         await setSelectValue(getExceptionFilterSelect(), "true");
         expect(getVisibleRequestIds()).toEqual(["request-2"]);
-        expect(host.querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
 
         await setSelectValue(getExceptionFilterSelect(), "false");
         expect(getVisibleRequestIds()).toEqual(["request-1"]);
-        expect(host.querySelector("input[placeholder='Total FTE requested']")).toBeNull();
+        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).toBeNull();
     });
 
-    it("emits onEdit with updated request values from the row controls", async () => {
+    it("emits onEdit with updated request values from the original request index after sorting", async () => {
         const onEdit = vi.fn();
 
-        const request = createRequest(1, {
+        const firstRequest = createRequest(1, {
+            course: createCourse({ number: "TAC 250", name: "Later Row" }),
+        });
+        const secondRequest = createRequest(2, {
             course: createCourse({ number: "TAC 150", name: "Editable Row" }),
         });
 
         await renderTable({
-            requests: [request],
+            requests: [firstRequest, secondRequest],
             onEdit,
         });
 
-        await setSelectValue(getCourseTypeCellSelect(), "MAN");
-        await setSelectValue(getRequestTypeCellSelect(), "READ");
+        await click(getSortButton("course"));
+        expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
-        const exceptionCheckbox = host.querySelector("input[type='checkbox']") as HTMLInputElement | null;
-        expect(exceptionCheckbox).not.toBeNull();
+        const sortedRow = getHost().querySelector("#request-2") as HTMLTableRowElement | null;
+        expect(sortedRow).not.toBeNull();
 
-        await setCheckboxValue(exceptionCheckbox!, true);
+        await setSelectValue(getCourseTypeCellSelect(sortedRow!), "MAN");
+        await setSelectValue(getRequestTypeCellSelect(sortedRow!), "READ");
 
-        expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, courseType: "MAN" });
-        expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, requestType: "READ" });
-        expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exception: true });
+        await setCheckboxValue(getExceptionCheckbox(sortedRow!), true);
+
+        expect(onEdit).toHaveBeenNthCalledWith(1, 1, { ...secondRequest, courseType: "MAN" });
+        expect(onEdit).toHaveBeenNthCalledWith(2, 1, { ...secondRequest, requestType: "READ" });
+        expect(onEdit).toHaveBeenNthCalledWith(3, 1, { ...secondRequest, exception: true });
     });
 
     it("forwards numeric edits from the expanded exception detail inputs and renders the reason field", async () => {
@@ -363,9 +478,10 @@ describe("RequestsTable UI coverage", () => {
             onEdit,
         });
 
-        const totalInput = host.querySelector("input[placeholder='Total FTE requested']") as HTMLInputElement | null;
-        const annualCountInput = host.querySelector("input[placeholder='Annual offerings requested']") as HTMLInputElement | null;
-        const reasonInput = host.querySelector(
+        const currentHost = getHost();
+        const totalInput = currentHost.querySelector("input[placeholder='Total FTE requested']") as HTMLInputElement | null;
+        const annualCountInput = currentHost.querySelector("input[placeholder='Annual offerings requested']") as HTMLInputElement | null;
+        const reasonInput = currentHost.querySelector(
             "textarea[placeholder='Reason for exceptioning the course request']"
         ) as HTMLTextAreaElement | null;
 
@@ -403,10 +519,23 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        expect(host.querySelector("#request-new-indicator-0")).not.toBeNull();
-        expect(host.querySelector("#request-1-error")).not.toBeNull();
-        expect(host.querySelector("#request-2-otheryear-warning")).not.toBeNull();
-        expect(normalizeText(host.textContent)).toContain("0.500");
+        const currentHost = getHost();
+        const newIndicator = currentHost.querySelector("#request-new-indicator-0") as HTMLButtonElement | null;
+        const validationWarning = currentHost.querySelector("#request-1-error") as HTMLButtonElement | null;
+        const alternatingWarning = currentHost.querySelector("#request-2-otheryear-warning") as HTMLButtonElement | null;
+
+        expect(newIndicator).not.toBeNull();
+        expect(newIndicator!.tagName).toBe("BUTTON");
+        expect(newIndicator!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+
+        expect(validationWarning).not.toBeNull();
+        expect(validationWarning!.tagName).toBe("BUTTON");
+        expect(validationWarning!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+
+        expect(alternatingWarning).not.toBeNull();
+        expect(alternatingWarning!.tagName).toBe("BUTTON");
+        expect(alternatingWarning!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
+        expect(normalizeText(currentHost.textContent)).toContain("0.500");
     });
 
     it("uses exception annualized totals for approved exceptions and forwards revoke actions", async () => {
@@ -432,19 +561,61 @@ describe("RequestsTable UI coverage", () => {
             ]
         });
 
-        const text = normalizeText(host.textContent);
+        const currentHost = getHost();
+        const text = normalizeText(currentHost.textContent);
 
         expect(text).toContain("approved for the above course");
         expect(text).toContain("1.500");
-        expect(host.querySelector("#request-0-otheryear-warning")).toBeNull();
+        expect(currentHost.querySelector("#request-0-otheryear-warning")).toBeNull();
 
-        const revokeLink = host.querySelector("#revoke-button") as HTMLAnchorElement | null;
+        const revokeLink = currentHost.querySelector("#revoke-button") as HTMLButtonElement | null;
         expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
+        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        expect(modal).not.toBeNull();
         expect(normalizeText(document.body.textContent)).toContain("Please confirm");
 
-        await click(getButtonByText("Revoke Approval"));
+        await click(getButtonByText("Revoke Approval", modal!));
         expect(onRevoke).toHaveBeenCalledWith(42);
+    });
+
+    it("restores the revoke button after an async revoke attempt settles", async () => {
+        let resolveRevoke: (() => void) | undefined;
+        const revokePromise = new Promise<void>((resolve) => {
+            resolveRevoke = resolve;
+        });
+        const onRevoke = vi.fn(() => revokePromise);
+
+        await renderTable({
+            onRevoke,
+            requests: [
+                createRequest(42, {
+                    course: createCourse({ number: "TAC 420", name: "Approved Exception" }),
+                    exception: true,
+                    exceptionTotal: 1.5,
+                    exceptionAnnualCount: 3,
+                    exceptionAnnualizedTotal: 1.5,
+                    hasApprovedException: true
+                }),
+            ]
+        });
+
+        const revokeLink = getHost().querySelector("#revoke-button") as HTMLButtonElement | null;
+        expect(revokeLink).not.toBeNull();
+
+        await click(revokeLink!);
+        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        expect(modal).not.toBeNull();
+
+        await click(getButtonByText("Revoke Approval", modal!));
+        expect(normalizeText(modal!.textContent)).toContain("Revoking...");
+
+        await act(async () => {
+            resolveRevoke!();
+            await revokePromise;
+        });
+
+        expect(normalizeText(modal!.textContent)).toContain("Revoke Approval");
     });
 });

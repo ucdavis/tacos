@@ -39,7 +39,7 @@ stages:
       displayName: 'Install Npm Packages'
       inputs:
         command: 'custom'
-        customCommand: 'install --legacy-peer-deps'
+        customCommand: 'install'
         workingDir: './src/tacos.mvc'
 
     - task: UseDotNet@2

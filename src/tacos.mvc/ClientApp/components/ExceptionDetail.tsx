@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button, NavLink } from "reactstrap";
 import NumberInput from "./NumberInput";
+import Modal, { ModalHeader, ModalBody, ModalFooter } from "./Modal";
 
 interface IProps {
     requestId: number;
-    onRevoke: (id: number) => void;
+    onRevoke: (id: number) => void | Promise<void>;
     exception: boolean;
     exceptionApproved?: boolean;
     exceptionReason: string;
@@ -23,6 +23,8 @@ interface IState {
 
 // render a textbox for inputing course number, or show course info if already selected
 export default class ExceptionDetail extends React.PureComponent<IProps, IState> {
+    private isMountedFlag = false;
+
     public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
         if (nextProps.exceptionReason !== prevState.exceptionReason) {
             return {
@@ -41,6 +43,14 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
             revoked: false,
             isRevoking: false,
         };
+    }
+
+    public componentDidMount() {
+        this.isMountedFlag = true;
+    }
+
+    public componentWillUnmount() {
+        this.isMountedFlag = false;
     }
 
     public render() {
@@ -85,9 +95,14 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                         Your exception request for {this.props.exceptionTotal} TA% per course has
                         been approved for the above course (see review page for approved totals).
                     </b>
-                    <a className=" revokeLink ml-2" id="revoke-button" onClick={this.revokedToggle}>
+                    <button
+                        type="button"
+                        className="btn btn-link revokeLink ml-2 p-0 align-baseline"
+                        id="revoke-button"
+                        onClick={this.revokedToggle}
+                    >
                         Revoke Approval
-                    </a>
+                    </button>
                 </p>
 
                 {this.renderRevokedModel()}
@@ -105,7 +120,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         if (this.state.revoked) {
             return (
                 <div>
-                    <Modal isOpen={true}>
+                    <Modal isOpen={true} onClose={this.revokedToggle}>
                         <ModalHeader>Please confirm</ModalHeader>
                         <ModalBody className="d-flex justify-content-center taco-animation-container">
                             Clicking the revoke approval button will reset this approved exception
@@ -114,7 +129,13 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                         </ModalBody>
                         <ModalFooter>
                             {this.renderRevokeButton()}
-                            <Button onClick={this.revokedToggle}>Cancel</Button>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={this.revokedToggle}
+                            >
+                                Cancel
+                            </button>
                         </ModalFooter>
                     </Modal>
                 </div>
@@ -125,22 +146,20 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     private renderRevokeButton = () => {
         if (this.state.isRevoking) {
             return (
-                <Button>
+                <button type="button" className="btn btn-secondary" disabled={true}>
                     <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
                     Revoking...
-                </Button>
+                </button>
             );
         } else {
             return (
-                <Button
-                    color="primary"
-                    onClick={() => {
-                        this.setState({ isRevoking: true });
-                        return this.props.onRevoke(this.props.requestId);
-                    }}
+                <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={this.onRevokeClick}
                 >
                     Revoke Approval
-                </Button>
+                </button>
             );
         }
     };
@@ -211,5 +230,17 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         this.setState({
             exceptionReason: e.target.value,
         });
+    };
+
+    private onRevokeClick = async () => {
+        this.setState({ isRevoking: true });
+
+        try {
+            await this.props.onRevoke(this.props.requestId);
+        } finally {
+            if (this.isMountedFlag) {
+                this.setState({ isRevoking: false });
+            }
+        }
     };
 }
