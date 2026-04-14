@@ -7,41 +7,43 @@
     var departmentSelectItems = departments.Select(d => new SelectListItem() { Text = d.Name, Value = d.Id.ToString() });
 }
 
-<div class="container">
+<div class="mx-auto max-w-screen-xl space-y-6 px-4 py-6">
 
     <h2>Manage Department Roles</h2>
 
-    <table id="departmentRolesTable" class="table table-striped">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Code</th>
-            <th>Department</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var row in Model.DepartmentRoles)
-        {
+    <div class="overflow-x-auto">
+        <table id="departmentRolesTable" class="table table-zebra w-full">
+            <thead>
             <tr>
-                <td>
-                    <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
-                        <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i></button>
-                    </form>
-                </td>
-                <td>@row.Department.Code</td>
-                <td>@row.Department.Name</td>
-                <td>@row.User.Name</td>
-                <td>@row.User.Email</td>
-                <td>@row.Role</td>
+                <th></th>
+                <th>Code</th>
+                <th>Department</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.DepartmentRoles)
+            {
+                <tr>
+                    <td>
+                        <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
+                            <button class="tacos-btn tacos-btn--danger tacos-btn--icon-only" type="submit"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+                    <td>@row.Department.Code</td>
+                    <td>@row.Department.Name</td>
+                    <td>@row.User.Name</td>
+                    <td>@row.User.Email</td>
+                    <td>@row.Role</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 
-    <button type="button" class="btn btn-primary" onclick="document.getElementById('addUserToDepartmentRoleModal').showModal()">
+    <button type="button" class="tacos-btn tacos-btn--primary" onclick="document.getElementById('addUserToDepartmentRoleModal').showModal()">
         Add User to Department
     </button>
 

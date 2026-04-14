@@ -317,30 +317,262 @@ form .form-control.focus {
   color: #dc3545;
 }
 
-// DaisyUI also defines a `.navbar` component. Isolate the UCD banner so its
-// pseudo-element background stays behind the logo instead of falling behind the page.
+.tacos-text-muted {
+  color: $secondary-font;
+}
+
+// DaisyUI also defines a `.navbar` component. Keep the React summary bar's
+// pseudo-element background in the correct stacking context while the summary
+// bar still uses the UCD navbar naming.
 .navbar.navbar-default .navbar-banner,
 .navbar.navbar-inverted .navbar-banner {
   isolation: isolate;
 }
 
-body > nav.navbar.navbar-default,
-body > nav.navbar.navbar-inverted {
-  min-height: 0;
+.tacos-site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
 }
 
-body > nav.navbar.navbar-default .navbar-banner,
-body > nav.navbar.navbar-inverted .navbar-banner {
+.tacos-site-nav__banner {
+  position: relative;
   display: flex;
   align-items: flex-end;
-  padding-top: 0.75em;
-  padding-bottom: 0.49em;
+  flex-basis: 100%;
+  padding: 0.75rem 1rem 0.49rem;
+  font-size: 1.25rem;
+  color: #fff;
+  isolation: isolate;
 }
 
-body > nav.navbar.navbar-default .navbar-banner .navbar-brand,
-body > nav.navbar.navbar-inverted .navbar-banner .navbar-brand {
-  position: relative;
-  top: 0;
+.tacos-site-nav__banner::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
+    linear-gradient(to right, #183357, #d9b337);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.tacos-site-nav__brand {
+  display: block;
+  max-width: 10em;
+  font-size: inherit;
+}
+
+.tacos-site-nav__brand img {
+  display: block;
+  max-width: 100%;
+}
+
+.tacos-site-nav__toggle {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.tacos-site-nav__toggle:hover,
+.tacos-site-nav__toggle:focus,
+.tacos-site-nav__toggle:focus-visible,
+.tacos-site-nav__toggle:active {
+  color: #fff;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tacos-site-nav__panel {
+  display: none;
+  width: 100%;
+  color: $primary-color;
+  background-color: #fff;
+  box-shadow: 0 2px 1px rgba(0, 40, 85, 0.15);
+}
+
+.tacos-site-nav__panel.is-open {
+  display: block;
+}
+
+.tacos-site-nav__inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.tacos-site-nav__links {
+  width: 100%;
+}
+
+.tacos-site-nav__link {
+  display: block;
+  padding: 1em 1.5em;
+  color: $primary-color;
+  border-radius: 0;
+  text-decoration: none;
+}
+
+.tacos-site-nav__link:hover,
+.tacos-site-nav__link:focus,
+.tacos-site-nav__link:focus-visible,
+.tacos-site-nav__link:active {
+  color: $primary-color;
+  background-color: $legacy-secondary-color;
+  text-decoration: none;
+}
+
+.tacos-site-nav__link--active {
+  background-color: #f5e0a1;
+}
+
+.tacos-site-nav__user {
+  padding: 0 1.5rem 1rem;
+  color: $primary-color;
+  white-space: nowrap;
+}
+
+@media (min-width: 992px) {
+  .tacos-site-nav__toggle {
+    display: none;
+  }
+
+  .tacos-site-nav__panel {
+    display: block;
+  }
+
+  .tacos-site-nav__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+
+  .tacos-site-nav__links {
+    width: auto;
+    flex: 1 1 auto;
+  }
+
+  .tacos-site-nav__user {
+    padding: 0;
+    margin-left: 1rem;
+    text-align: right;
+    flex: 0 0 auto;
+  }
+}
+
+.tacos-home-panel {
+  background-color: #eef1f6;
+  padding: 5.5rem 1rem 6rem;
+}
+
+.tacos-home-panel__content {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.tacos-home-panel__intro {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.tacos-home-panel__title {
+  color: #002f6c;
+  font-size: clamp(3.5rem, 6vw, 4.75rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+}
+
+.tacos-home-panel__subtitle {
+  color: #4d4d4d;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.tacos-home-panel__body {
+  max-width: 70rem;
+  margin: 0 auto;
+  color: $primary-font;
+  font-size: 1.15rem;
+  line-height: 1.75;
+}
+
+.tacos-home-panel__body p {
+  margin: 0 0 1.25rem;
+}
+
+.tacos-home-panel__section-title {
+  color: #0b3262;
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+
+.tacos-home-panel__section-title--link a {
+  color: #0f6ddf;
+  text-decoration: none;
+}
+
+.tacos-home-panel__section-title--link a:hover,
+.tacos-home-panel__section-title--link a:focus,
+.tacos-home-panel__section-title--link a:focus-visible {
+  color: #0f6ddf;
+  text-decoration: underline;
+}
+
+.tacos-home-panel__timeline {
+  list-style: none;
+  margin: 0 0 1.75rem;
+  padding: 0;
+}
+
+.tacos-home-panel__timeline li {
+  margin-bottom: 0.15rem;
+}
+
+.tacos-home-panel__actions {
+  margin-top: 2.25rem;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .tacos-home-panel {
+    padding-top: 3rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .tacos-home-panel__intro {
+    margin-bottom: 2rem;
+  }
+
+  .tacos-home-panel__subtitle {
+    font-size: 1.4rem;
+  }
+
+  .tacos-home-panel__body {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .tacos-home-panel__section-title {
+    font-size: 1.8rem;
+  }
 }
 
 body.tacos-modal-open {

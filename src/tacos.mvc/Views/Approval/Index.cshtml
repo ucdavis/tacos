@@ -1,74 +1,78 @@
 @using tacos.core.Resources
 @model tacos.core.Data.Request[]
 
-<div class="container-fluid py-4">
-    <table class="table table-bordered" id="requestTable">
-        <thead>
-            <tr>
-                <th>Submission</th>
-                <th>Department</th>
-                <th>Submitter</th>
-                <th>Date</th>
-                <th>Course</th>
-                <th>Course Type</th>
-                <th>Average Sections</th>
-                <th>Average Enrollment</th>
-                <th>Request Type</th>
-                <th>Exception Reason</th>
-                <th>Exception TA % per course</th>
-                <th>Exception Annual Count</th>
-                <th>Approved TA % per course</th>
-                <th>Approved Annualized TA FTE</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var request in Model)
-            {
-                <tr data-id="@request.Id">
-                    <td>@request.Id</td>
-                    <td>@request.Department.Code</td>
-                    <td>@request.UpdatedBy</td>
-                    <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
-                    <td>@request.CourseNumber</td>
-                    <td>@CourseInfo.Types[request.CourseType]</td>
-                    <td>@request.Course.AverageSectionsPerCourse</td>
-                    <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
-                    <td>@CourseInfo.Requests[request.RequestType]</td>
-                    <td>@request.ExceptionReason</td>
-                    <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
-                    <td>@(request.Exception ? request.ExceptionAnnualCount.ToString("f3"): "")</td>
-                    <td>@request.ApprovedTotal.ToString("f3")</td>
-                    <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
-                    <td>
-                        @if (!request.Approved.HasValue)
-                        {
-                            <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
-                                <input type="hidden" name="approved" value="true" />
-                                <button type="submit" class="btn btn-primary mb-2 approval-form-submit" onclick="document.getElementById('approvalModal').showModal()">
-                                    <span class="approval-form-submit-text">Approve</span>
-                                    <span class="approval-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
-                                </button>
-                            </form>
-                            <button type="button" class="btn btn-primary mb-2" data-denial-dialog-trigger="true" onclick="document.getElementById('denialModal').showModal()">
-                                Deny
-                            </button>
-                        }
-                    </td>
+<div class="mx-auto max-w-screen-2xl px-4 py-6">
+    <div class="overflow-x-auto">
+        <table class="table w-full" id="requestTable">
+            <thead>
+                <tr>
+                    <th>Submission</th>
+                    <th>Department</th>
+                    <th>Submitter</th>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Course Type</th>
+                    <th>Average Sections</th>
+                    <th>Average Enrollment</th>
+                    <th>Request Type</th>
+                    <th>Exception Reason</th>
+                    <th>Exception TA % per course</th>
+                    <th>Exception Annual Count</th>
+                    <th>Approved TA % per course</th>
+                    <th>Approved Annualized TA FTE</th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-        <tfoot>
-            <tr class="table-info">
-                <td colspan="12"></td>
-                <td>Total:</td>
-                <td>
-                    @Model.Sum(r => r.ApprovedAnnualizedTotal).ToString("f3")
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-        </tfoot>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var request in Model)
+                {
+                    <tr data-id="@request.Id">
+                        <td>@request.Id</td>
+                        <td>@request.Department.Code</td>
+                        <td>@request.UpdatedBy</td>
+                        <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
+                        <td>@request.CourseNumber</td>
+                        <td>@CourseInfo.Types[request.CourseType]</td>
+                        <td>@request.Course.AverageSectionsPerCourse</td>
+                        <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
+                        <td>@CourseInfo.Requests[request.RequestType]</td>
+                        <td>@request.ExceptionReason</td>
+                        <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
+                        <td>@(request.Exception ? request.ExceptionAnnualCount.ToString("f3"): "")</td>
+                        <td>@request.ApprovedTotal.ToString("f3")</td>
+                        <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
+                        <td>
+                            @if (!request.Approved.HasValue)
+                            {
+                                <div class="flex flex-col items-start gap-2">
+                                    <form asp-action="Edit" asp-route-id="@request.Id" method="POST">
+                                        <input type="hidden" name="approved" value="true" />
+                                        <button type="submit" class="tacos-btn tacos-btn--primary approval-form-submit" onclick="document.getElementById('approvalModal').showModal()">
+                                            <span class="approval-form-submit-text">Approve</span>
+                                            <span class="approval-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
+                                        </button>
+                                    </form>
+                                    <button type="button" class="tacos-btn tacos-btn--primary" data-denial-dialog-trigger="true" onclick="document.getElementById('denialModal').showModal()">
+                                        Deny
+                                    </button>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="bg-base-200">
+                    <td colspan="12"></td>
+                    <td>Total:</td>
+                    <td>
+                        @Model.Sum(r => r.ApprovedAnnualizedTotal).ToString("f3")
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
 <dialog id="denialModal" class="modal modal-top tacos-dialog" aria-labelledby="denialModalTitle">
@@ -121,7 +125,7 @@
         </button>
       </div>
       <div class="tacos-modal__body taco-animation-container tacos-modal-body-centered">
-        <img class="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
+        <img class="w-3/4 max-w-xs" src="tacoAnimation.gif" alt="taco animation gif"/>
       </div>
   </div>
   <form method="dialog" class="modal-backdrop">

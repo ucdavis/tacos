@@ -2,41 +2,41 @@
     ViewData["Title"] = "Home Page";
 }
 
-<section class="jumbotron jumbotron-fluid">
-    <div class="container">
-        <h1 class="jumbotron-heading text-center">TA Calculation App</h1>
-        <p class="lead text-center">CA&ES TA funding request system</p>
-        <h4>
-            <a href="https://tacos.ucdavis.edu/CAES-TA-Guidelines%202018-23.pdf">
-                CA&ES Criteria for TA Funding
-            </a>
-        </h4>
-        <p>
-        Criteria for central TA Funding are updated every 3 years by a committee of CA&ES Faculty.
-        </p>
-        <p>
-        Requests for additional TA or Reader support for courses with unusually special circumstances will be considered using the exception request process.
-        </p>
-        <h4>
-            Annual Timeline
-        </h4>
-        <ul class="list-unstyled">
-            <li>
-                March – Annual data refresh
-            </li>
-            <li>
-                April – Call for departments to begin reviewing and entering annual TA submissions 
-            </li>
-            <li>
-                August – Deadline for departments to review and finalize annual TA submissions
-            </li>
-            <li>
-                September-October – Dean’s Office plans to allocate annual TA funding to departments
-            </li>
-        </ul>
-        <p>Ad-hoc exception requests for changed circumstances (example: adding a new section to reduce waitlist) may be submitted throughout the year and funding will be allocated upon approval.</p>
-        <p class="text-center">
-            <a asp-controller="Requests" asp-action="index" class="btn btn-secondary my-2">View My Existing Requests</a>
-        </p>
+<section class="tacos-home-panel">
+    <div class="tacos-home-panel__content">
+        <div class="tacos-home-panel__intro">
+            <h1 class="tacos-home-panel__title">TA Calculation App</h1>
+            <p class="tacos-home-panel__subtitle">CA&amp;ES TA funding request system</p>
+        </div>
+
+        <div class="tacos-home-panel__body">
+            <h4 class="tacos-home-panel__section-title tacos-home-panel__section-title--link">
+                <a href="https://tacos.ucdavis.edu/CAES-TA-Guidelines%202018-23.pdf">
+                    CA&amp;ES Criteria for TA Funding
+                </a>
+            </h4>
+            <p>
+                Criteria for central TA Funding are updated every 3 years by a committee of CA&amp;ES Faculty.
+            </p>
+            <p>
+                Requests for additional TA or Reader support for courses with unusually special circumstances will be considered using the exception request process.
+            </p>
+
+            <h4 class="tacos-home-panel__section-title">Annual Timeline</h4>
+            <ul class="tacos-home-panel__timeline">
+                <li>March – Annual data refresh</li>
+                <li>April – Call for departments to begin reviewing and entering annual TA submissions</li>
+                <li>August – Deadline for departments to review and finalize annual TA submissions</li>
+                <li>September-October – Dean’s Office plans to allocate annual TA funding to departments</li>
+            </ul>
+
+            <p>
+                Ad-hoc exception requests for changed circumstances (example: adding a new section to reduce waitlist) may be submitted throughout the year and funding will be allocated upon approval.
+            </p>
+
+            <div class="tacos-home-panel__actions">
+                <a asp-controller="Requests" asp-action="index" class="tacos-btn tacos-btn--secondary">View My Existing Requests</a>
+            </div>
+        </div>
     </div>
 </section>

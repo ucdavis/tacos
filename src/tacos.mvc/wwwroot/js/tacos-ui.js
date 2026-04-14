@@ -14,7 +14,7 @@
             return;
         }
 
-        var isExpanded = target.classList.toggle("show");
+        var isExpanded = target.classList.toggle("is-open");
         button.setAttribute("aria-expanded", isExpanded ? "true" : "false");
     }
 
