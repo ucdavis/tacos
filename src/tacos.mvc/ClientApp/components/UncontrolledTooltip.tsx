@@ -211,31 +211,32 @@ const UncontrolledTooltip = ({
     }
 
     const tooltipClassName = [
-        "tooltip",
-        `bs-tooltip-${placement}`,
-        isOpen ? "show" : undefined,
+        "tacos-tooltip",
+        isOpen && isPositioned ? "tacos-tooltip--visible" : undefined,
         className,
     ].filter(Boolean).join(" ");
 
     const style: React.CSSProperties = {
         left,
+        opacity: isOpen && isPositioned ? 1 : 0,
         pointerEvents: "none",
         position: "fixed",
         top,
         visibility: isOpen && isPositioned ? "visible" : "hidden",
+        zIndex: 1080,
     };
 
     return createPortal(
         <div
             aria-hidden={!isOpen}
             className={tooltipClassName}
+            data-placement={placement}
             id={tooltipId}
             ref={tooltipRef}
             role="tooltip"
             style={style}
         >
-            <div className="arrow" />
-            <div className="tooltip-inner">{children}</div>
+            <div className="tacos-tooltip__content">{children}</div>
         </div>,
         document.body,
     );

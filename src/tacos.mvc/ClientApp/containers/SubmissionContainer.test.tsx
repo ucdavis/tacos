@@ -254,7 +254,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             ]);
 
             const courseInput = getHost().querySelector(
-                "tbody tr[data-request-row='true'] input.form-control"
+                "tbody tr[data-request-row='true'] input[data-course-number-input='true']"
             ) as HTMLInputElement | null;
             const valueSetter = Object.getOwnPropertyDescriptor(
                 HTMLInputElement.prototype,
@@ -279,7 +279,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             });
 
             const updatedInput = getHost().querySelector(
-                "tbody tr[data-request-row='true'] input.form-control"
+                "tbody tr[data-request-row='true'] input[data-course-number-input='true']"
             ) as HTMLInputElement | null;
 
             expect(updatedInput).toBeDefined();
@@ -324,7 +324,9 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(requestRows).toHaveLength(3);
 
-        const firstRowInput = requestRows[0].querySelector("input.form-control") as HTMLInputElement | null;
+        const firstRowInput = requestRows[0].querySelector(
+            "input[data-course-number-input='true']"
+        ) as HTMLInputElement | null;
         const secondRowText = normalizeText(requestRows[1].textContent);
         const thirdRowText = normalizeText(requestRows[2].textContent);
 

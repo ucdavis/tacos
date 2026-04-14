@@ -63,7 +63,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         }
 
         return (
-            <div className="exceptionRow mb-4">
+            <div className="exceptionRow">
                 <p>
                     <b>Proposed TA % per course offering</b>
                 </p>
@@ -89,7 +89,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         }
 
         return (
-            <div className="exceptionRow mb-4 d-flex ">
+            <div className="exceptionRow exceptionRow--approved">
                 <p>
                     <b>
                         Your exception request for {this.props.exceptionTotal} TA% per course has
@@ -97,7 +97,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                     </b>
                     <button
                         type="button"
-                        className="btn btn-link revokeLink ml-2 p-0 align-baseline"
+                        className="tacos-link-button revokeLink exceptionRow__revoke"
                         id="revoke-button"
                         onClick={this.revokedToggle}
                     >
@@ -122,7 +122,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                 <div>
                     <Modal isOpen={true} onClose={this.revokedToggle}>
                         <ModalHeader>Please confirm</ModalHeader>
-                        <ModalBody className="d-flex justify-content-center taco-animation-container">
+                        <ModalBody className="taco-animation-container tacos-modal-body-centered">
                             Clicking the revoke approval button will reset this approved exception
                             to un-submitted status. If you have unsaved changes on this page, please
                             cancel and save them before proceeding.
@@ -131,7 +131,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                             {this.renderRevokeButton()}
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className="tacos-btn tacos-btn--secondary"
                                 onClick={this.revokedToggle}
                             >
                                 Cancel
@@ -146,8 +146,8 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     private renderRevokeButton = () => {
         if (this.state.isRevoking) {
             return (
-                <button type="button" className="btn btn-secondary" disabled={true}>
-                    <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                <button type="button" className="tacos-btn tacos-btn--secondary" disabled={true}>
+                    <i className="fas fa-spinner fa-pulse fa-lg tacos-inline-icon-start" />
                     Revoking...
                 </button>
             );
@@ -155,7 +155,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
             return (
                 <button
                     type="button"
-                    className="btn btn-primary"
+                    className="tacos-btn tacos-btn--primary"
                     onClick={this.onRevokeClick}
                 >
                     Revoke Approval
@@ -167,7 +167,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     private renderExceptionTotal = () => {
         return (
             <NumberInput
-                className="form-control"
+                className="tacos-input"
                 min={0}
                 step={0.25}
                 placeholder="Total FTE requested"
@@ -181,7 +181,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     private renderExceptionAnnualCount = () => {
         return (
             <NumberInput
-                className="form-control"
+                className="tacos-input"
                 min={0}
                 step={0.25}
                 placeholder="Annual offerings requested"
@@ -204,7 +204,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         const { exceptionReason } = this.state;
         return (
             <textarea
-                className="form-control"
+                className="tacos-textarea"
                 placeholder="Reason for exceptioning the course request"
                 rows={3}
                 value={exceptionReason}

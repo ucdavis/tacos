@@ -64,16 +64,17 @@ export default class CourseNumber extends React.Component<IProps, IState> {
 
         return (
             <div>
-                <div className="input-group">
+                <div className="tacos-input-group">
                     <input
+                        data-course-number-input="true"
                         type="text"
-                        className="form-control"
+                        className="tacos-input"
                         value={courseNumber}
                         onChange={this.onCourseNumberChange}
                     />
-                    <div className="input-group-append">
+                    <div className="tacos-input-group__addon">
                         <span
-                            className="input-group-text"
+                            className="tacos-input-group__status"
                             id="basic-addon2"
                             style={{ color: isValid ? "green" : "red" }}
                         >
@@ -82,16 +83,16 @@ export default class CourseNumber extends React.Component<IProps, IState> {
                     </div>
                 </div>
                 { notFound && (
-                    <small className="form-text pl-2">
-                        <span className="mr-3">Course Not Found!</span>
-                        <button className="btn-link p-0 border-0" style={{ cursor: "pointer" }} onClick={this.onCourseCreate}>
+                    <small className="tacos-form-help">
+                        <span className="tacos-form-help__message">Course Not Found!</span>
+                        <button className="tacos-link-button" type="button" onClick={this.onCourseCreate}>
                             Add new course?
                         </button>
                     </small>
                 )}
                 { isValid && (
-                    <small className="form-text text-muted pl-2">
-                        <span className="d-block text-truncate" title={courseName}>{ courseName }</span>
+                    <small className="tacos-form-help tacos-form-help--muted">
+                        <span className="tacos-truncate" title={courseName}>{ courseName }</span>
                     </small>
                 )}
             </div>
@@ -111,7 +112,7 @@ export default class CourseNumber extends React.Component<IProps, IState> {
 
         if (isValid && isNew) {
             return (
-                <button className="btn-link p-0 border-0" style={{ cursor: "pointer" }} onClick={this.onCourseCreate}>
+                <button className="tacos-link-button tacos-link-button--icon" type="button" onClick={this.onCourseCreate}>
                     <i className="far fa-fw fa-edit" />
                 </button>
             );

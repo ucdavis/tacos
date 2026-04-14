@@ -9,17 +9,15 @@ interface IProps {
 export default class CourseType extends React.PureComponent<IProps, {}> {
     public render() {
         return (
-            <div className="input-group">
-                <select
-                    className="custom-select"
-                    value={this.props.courseType}
-                    onChange={this.onChange}
-                >
-                    {CourseTypeOptions.map(c => (
-                        <option key={c[0]} value={c[0]}>{c[1]}</option>
-                    ))}
-                </select>
-            </div>
+            <select
+                className="tacos-select"
+                value={this.props.courseType}
+                onChange={this.onChange}
+            >
+                {CourseTypeOptions.map(c => (
+                    <option key={c[0]} value={c[0]}>{c[1]}</option>
+                ))}
+            </select>
         );
     }
 

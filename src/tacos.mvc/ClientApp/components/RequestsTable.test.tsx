@@ -291,7 +291,9 @@ describe("RequestsTable UI coverage", () => {
         await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
-        const secondRowRemoveButton = getHost().querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
+        const secondRowRemoveButton = getHost().querySelector(
+            "#request-2 [data-remove-request-button='true']"
+        ) as HTMLButtonElement | null;
         expect(secondRowRemoveButton).not.toBeNull();
 
         await click(secondRowRemoveButton!);
@@ -572,7 +574,7 @@ describe("RequestsTable UI coverage", () => {
         expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
-        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        const modal = document.body.querySelector("[data-tacos-modal-dialog='true']") as HTMLElement | null;
         expect(modal).not.toBeNull();
         expect(normalizeText(document.body.textContent)).toContain("Please confirm");
 
@@ -605,7 +607,7 @@ describe("RequestsTable UI coverage", () => {
         expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
-        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        const modal = document.body.querySelector("[data-tacos-modal-dialog='true']") as HTMLElement | null;
         expect(modal).not.toBeNull();
 
         await click(getButtonByText("Revoke Approval", modal!));

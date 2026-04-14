@@ -41,38 +41,39 @@
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserToDepartmentRoleModal">
+    <button type="button" class="btn btn-primary" onclick="document.getElementById('addUserToDepartmentRoleModal').showModal()">
         Add User to Department
     </button>
 
-    <form method="post" asp-action="AddUserToDepartmentRole">
-        <div id="addUserToDepartmentRoleModal" class="modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+    <dialog id="addUserToDepartmentRoleModal" class="modal modal-top tacos-dialog" aria-labelledby="addUserToDepartmentRoleModalTitle">
+        <div class="modal-box tacos-modal__content" role="document">
+            <div class="tacos-modal__header">
+                <h5 class="tacos-modal__title" id="addUserToDepartmentRoleModalTitle">Add User to Department</h5>
+                <button type="button" class="tacos-modal__close" aria-label="Close" onclick="this.closest('dialog').close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="AddUserToDepartmentRole">
+                <div class="tacos-modal__body">
+                    <div class="tacos-form-field">
+                        <label class="tacos-form-label">Department</label>
+                        <select name="departmentId" class="tacos-select" asp-items="departmentSelectItems" autofocus></select>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="control-label">Department</label>
-                            <select name="departmentId" class="form-control" asp-items="departmentSelectItems"></select>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label">User</label>
-                            <input name="userId" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add User</button>
+                    <div class="tacos-form-field">
+                        <label class="tacos-form-label">User</label>
+                        <input name="userId" class="tacos-input" />
                     </div>
                 </div>
-            </div>
+                <div class="tacos-modal__footer">
+                    <button type="button" class="tacos-btn tacos-btn--secondary" onclick="this.closest('dialog').close()">Close</button>
+                    <button type="submit" class="tacos-btn tacos-btn--primary">Add User</button>
+                </div>
+            </form>
         </div>
-    </form>
+        <form method="dialog" class="modal-backdrop">
+            <button aria-label="Close dialog">close</button>
+        </form>
+    </dialog>
 
 </div>
 
@@ -86,7 +87,8 @@
                         "targets": [0],
                         "sortable": false
                     }],
-                "order": [[1, "desc"]]
+                "order": [[1, "desc"]],
+                "dom": window.TacosDataTables.dom.standard
             });
         });
 </script>

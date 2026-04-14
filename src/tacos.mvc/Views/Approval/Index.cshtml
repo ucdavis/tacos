@@ -45,12 +45,14 @@
                         {
                             <form class="form-inline" asp-action="Edit" asp-route-id="@request.Id" method="POST">
                                 <input type="hidden" name="approved" value="true" />
-                                <button type="submit" class="btn btn-primary mb-2 approval-form-submit" data-toggle="modal" data-target="#ApprovalModal">
+                                <button type="submit" class="btn btn-primary mb-2 approval-form-submit" onclick="document.getElementById('approvalModal').showModal()">
                                     <span class="approval-form-submit-text">Approve</span>
                                     <span class="approval-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
                                 </button>
                             </form>
-                            <button class="btn btn-primary mb-2" data-toggle="modal" data-target="#denialModal">Deny</button>
+                            <button type="button" class="btn btn-primary mb-2" data-denial-dialog-trigger="true" onclick="document.getElementById('denialModal').showModal()">
+                                Deny
+                            </button>
                         }
                     </td>
                 </tr>
@@ -69,63 +71,63 @@
     </table>
 </div>
 
-<form id="denialForm" asp-action="Edit" asp-route-id="0" method="post">
-    <input type="hidden" name="approved" value="false" />
-
-    <div class="modal fade" id="denialModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Deny Exception?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+<dialog id="denialModal" class="modal modal-top tacos-dialog" aria-labelledby="denialModalTitle">
+    <div class="modal-box tacos-modal__content" role="document">
+        <form id="denialForm" asp-action="Edit" asp-route-id="0" method="post">
+            <input type="hidden" name="approved" value="false" />
+            <div class="tacos-modal__header">
+                <h5 class="tacos-modal__title" id="denialModalTitle">Deny Exception?</h5>
+                <button type="button" class="tacos-modal__close" aria-label="Close" onclick="this.closest('dialog').close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="tacos-modal__body">
+                <div class="tacos-form-field">
+                    <select id="denialFormSelect" class="tacos-select" name="comment" autofocus>
+                        <option value="">Please indicate reason for denial...</option>
+                        <option value="Exception doesn’t meet criteria">Exception doesn’t meet criteria.</option>
+                        <option value="Please review/reclassify course type.">Please review/reclassify course type.</option>
+                        <option value="Other">Other:</option>
+                    </select>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <select id="denialFormSelect" class="form-control" name="comment">
-                            <option value="">Please indicate reason for denial...</option>
-                            <option value="Exception doesn’t meet criteria">Exception doesn’t meet criteria.</option>
-                            <option value="Please review/reclassify course type.">Please review/reclassify course type.</option>
-                            <option value="Other">Other:</option>
-                        </select>
-                    </div>
-                    <div id="denialFormCommentContainer" class="form-group" style="display:none;">
-                        <textarea id="denialFormComment" class="form-control" name="commentOther" placeholder="Comment on denial..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary deny-form-submit">
-                        <span class="deny-form-submit-text">Deny Exception</span>
-                        <span class="deny-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
-                    </button>
+                <div id="denialFormCommentContainer" class="tacos-form-field" style="display:none;">
+                    <textarea id="denialFormComment" class="tacos-textarea" name="commentOther" placeholder="Comment on denial..."></textarea>
                 </div>
             </div>
-        </div>
+            <div class="tacos-modal__footer">
+                <button type="button" class="tacos-btn tacos-btn--secondary" onclick="this.closest('dialog').close()">Cancel</button>
+                <button type="submit" class="tacos-btn tacos-btn--primary deny-form-submit">
+                    <span class="deny-form-submit-text">Deny Exception</span>
+                    <span class="deny-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
+                </button>
+            </div>
+        </form>
     </div>
+    <form method="dialog" class="modal-backdrop">
+        <button aria-label="Close dialog">close</button>
+    </form>
+</dialog>
 
-</form>
-
-<!-- ApprovelModal -->
-<div class="modal fade" id="ApprovalModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">
-        <i class=" mr-3 fas fa-spinner fa-pulse fa-lg"></i>
-            <span>Approving...</span>
+<!-- ApprovalModal -->
+<dialog id="approvalModal" class="modal modal-middle tacos-dialog" aria-labelledby="approvalModalTitle">
+  <div class="modal-box tacos-modal__content" role="document">
+      <div class="tacos-modal__header">
+        <h5 class="tacos-modal__title" id="approvalModalTitle">
+          <i class="fas fa-spinner fa-pulse fa-lg tacos-inline-icon-start"></i>
+          <span>Approving...</span>
         </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="tacos-modal__close" aria-label="Close" onclick="this.closest('dialog').close()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body d-flex justify-content-center taco-animation-container">
+      <div class="tacos-modal__body taco-animation-container tacos-modal-body-centered">
         <img class="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
       </div>
-    </div>
   </div>
-</div>
+  <form method="dialog" class="modal-backdrop">
+      <button aria-label="Close dialog">close</button>
+  </form>
+</dialog>
 
 @section scripts {
     <script>
@@ -141,10 +143,7 @@
                     }
                 ],
                 "fixedHeader": true,
-                "dom":
-                    "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex justify-content-end align-items-baseline'fB>>" +
-                        "<'row'<'col-sm-12'tr>>" +
-                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                "dom": window.TacosDataTables.dom.withButtons,
                 "buttons": [
                     "excel"
                 ]
@@ -152,19 +151,34 @@
         });
 
         var editUrl = '@Url.Action("Edit", new {id = "00000"})';
+        var denialModal = document.getElementById('denialModal');
+        var denialForm = document.getElementById('denialForm');
+        var denialFormSelect = document.getElementById('denialFormSelect');
+        var denialFormComment = document.getElementById('denialFormComment');
+        var denialFormCommentContainer = document.getElementById('denialFormCommentContainer');
+        var denyButtons = document.querySelectorAll("[data-denial-dialog-trigger='true']");
 
-        $('#denialModal').on('show.bs.modal',
-            function(e) {
-                var trigger = $(e.relatedTarget);
-                var id = trigger.parents('tr').data('id');
-                var url = editUrl.replace('00000', id);
-
-                // reset form
-                $('#denialFormComment').val('');
-
-                // update url with id
-                $('#denialForm').attr('action', url);
+        if (denialModal && denialForm && denialFormSelect && denialFormComment && denialFormCommentContainer) {
+            denialModal.addEventListener('close', function () {
+                denialFormCommentContainer.style.display = 'none';
             });
+
+            denyButtons.forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                    var trigger = event.currentTarget;
+                    var row = trigger ? trigger.closest('tr') : null;
+                    var id = row ? row.getAttribute('data-id') : null;
+
+                    denialFormSelect.value = '';
+                    denialFormComment.value = '';
+                    denialFormCommentContainer.style.display = 'none';
+
+                    if (id) {
+                        denialForm.setAttribute('action', editUrl.replace('00000', id));
+                    }
+                });
+            });
+        }
 
         $('.approval-form-submit').click(function () {
             // TODO: figure out a better way to disable after click, since this blocks submit
@@ -183,6 +197,15 @@
             $(this).find('.deny-form-submit-text').hide();
             $(this).find('.deny-form-submit-loading-icon').show();
         });
+
+        var approvalModal = document.getElementById('approvalModal');
+
+        if (approvalModal) {
+            approvalModal.addEventListener('close', function () {
+                $('.approval-form-submit-text').show();
+                $('.approval-form-submit-loading-icon').hide();
+            });
+        }
 
         // manage dropdown with extra comments
         $('#denialFormSelect').change(function () {

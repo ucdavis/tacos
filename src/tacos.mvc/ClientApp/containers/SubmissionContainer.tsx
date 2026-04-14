@@ -115,21 +115,20 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         const canSubmit = isValid;
 
         return (
-            <div className="pb-4">
-                <div className="row mb-4">
-                    <div className="col d-flex justify-content-end">
-                        <button
-                            className="btn btn-primary"
-                            id="submit-button"
-                            onClick={this.onAddRequest}
-                        >
-                            Create New Request
-                            <i className="fas fa-plus-circle ml-2" />
-                        </button>
-                    </div>
+            <div className="tacos-page-with-summary">
+                <div className="tacos-action-row tacos-action-row--end">
+                    <button
+                        className="tacos-btn tacos-btn--primary"
+                        id="submit-button"
+                        onClick={this.onAddRequest}
+                        type="button"
+                    >
+                        Create New Request
+                        <i className="fas fa-plus-circle tacos-btn__icon" />
+                    </button>
                 </div>
                 <RequestsTable
-                    className="mb-4"
+                    className="tacos-section-gap"
                     requests={requests}
                     onEdit={this.requestUpdated}
                     onRemove={this.removeRequest}
@@ -142,17 +141,16 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                     course={createCourseModel}
                     onCourseCreate={this.onCourseCreate}
                 />
-                <div className="row mb-4">
-                    <div className="col d-flex">
-                        <button
-                            className="btn btn-primary"
-                            id="submit-button"
-                            onClick={this.onAddRequest}
-                        >
-                            Create New Request
-                            <i className="fas fa-plus-circle ml-2" />
-                        </button>
-                    </div>
+                <div className="tacos-action-row">
+                    <button
+                        className="tacos-btn tacos-btn--primary"
+                        id="submit-button"
+                        onClick={this.onAddRequest}
+                        type="button"
+                    >
+                        Create New Request
+                        <i className="fas fa-plus-circle tacos-btn__icon" />
+                    </button>
                 </div>
                 <Summary
                     canSave={canSave}
@@ -178,10 +176,10 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 <div>
                     <Modal isOpen={true} centered={true}>
                         <ModalHeader>
-                            <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                            <i className="fas fa-spinner fa-pulse fa-lg tacos-inline-icon-start" />
                             Saving...
                         </ModalHeader>
-                        <ModalBody className="d-flex justify-content-center taco-animation-container">
+                        <ModalBody className="taco-animation-container tacos-modal-body-centered">
                             <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>
@@ -196,10 +194,10 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 <div>
                     <Modal isOpen={true} centered={true}>
                         <ModalHeader>
-                            <i className=" mr-3 fas fa-spinner fa-pulse fa-lg" />
+                            <i className="fas fa-spinner fa-pulse fa-lg tacos-inline-icon-start" />
                             Submitting...
                         </ModalHeader>
-                        <ModalBody className="d-flex justify-content-center taco-animation-container">
+                        <ModalBody className="taco-animation-container tacos-modal-body-centered">
                         <img className="w-75" src="tacoAnimation.gif" alt="taco animation gif"/>
                         </ModalBody>
                     </Modal>

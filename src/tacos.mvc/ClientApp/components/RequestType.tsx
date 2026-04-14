@@ -9,16 +9,14 @@ interface IProps {
 export default class RequestType extends React.PureComponent<IProps, {}> {
     public render() {
         return (
-            <div className="input-group">
-                <select
-                    className="custom-select"
-                    value={this.props.requestType}
-                    onChange={this.onChange}
-                >
-                    <option value="TA">TA</option>
-                    <option value="READ">Reader</option>
-                </select>
-            </div>
+            <select
+                className="tacos-select"
+                value={this.props.requestType}
+                onChange={this.onChange}
+            >
+                <option value="TA">TA</option>
+                <option value="READ">Reader</option>
+            </select>
         );
     }
 

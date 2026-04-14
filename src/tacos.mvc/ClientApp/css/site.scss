@@ -11,59 +11,629 @@ html {
   scroll-behavior: smooth;
 }
 
-// // fonts
-@font-face {
-  font-family: "proxima-nova-r";
-  src: url("../media/proximanova-regular-webfont.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "proxima-nova-i";
-  src: url("../media/proximanova-regularit-webfont.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
-@font-face {
-  font-family: "proxima-nova-b";
-  src: url("../media/proximanova-bold-webfont.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
+// Proxima Nova font faces are provided by the Gunrock import in `main.css`.
+// Duplicating them here with local relative URLs causes dev font requests to
+// fall through to the ASP.NET SPA proxy.
 
 
 
 // fix stupid ucdavis styles
 .btn {
+  border-radius: 0;
+  box-shadow: none;
+  height: auto;
+  min-height: 0;
+  padding: 0.5rem 1rem;
+  line-height: 1.5;
+
   &.btn-link {
     border: none;
   }
+
+  &:hover,
+  &:active,
+  &:focus,
+  &:focus-visible {
+    box-shadow: none;
+  }
+}
+
+.tacos-section-gap {
+  margin-bottom: 1.5rem;
+}
+
+.tacos-page-with-summary {
+  padding-bottom: 6rem;
+}
+
+.tacos-action-row {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.tacos-action-row--end {
+  justify-content: flex-end;
+}
+
+.tacos-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.5;
+  min-height: 0;
+  padding: 0.5em 1em;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover,
+  &:focus,
+  &:focus-visible,
+  &:active {
+    box-shadow: none;
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 123, 255, 0.25);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}
+
+.tacos-btn--primary {
+  background-color: $primary-color;
+  border-color: $primary-color;
+  color: #fff;
+
+  &:hover,
+  &:active {
+    background-color: #2f5b8c;
+    border-color: #2f5b8c;
+    color: #fff;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: $primary-color;
+    color: $primary-color;
+    opacity: 1;
+  }
+}
+
+.tacos-btn--secondary {
+  background-color: #f5e0a1;
+  border-color: transparent;
+  color: #004088;
+
+  &:hover,
+  &:active {
+    background-color: #faefce;
+    border-color: transparent;
+    color: #004088;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: #f5e0a1;
+    color: #004088;
+    opacity: 1;
+  }
+}
+
+.tacos-btn--danger {
+  background-color: #ba0c2f;
+  border-color: #ba0c2f;
+  color: #fff;
+
+  &:hover,
+  &:active {
+    background-color: #f60334;
+    border-color: #f60334;
+    color: #fff;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    border-color: #ba0c2f;
+    color: #ba0c2f;
+    opacity: 1;
+  }
+}
+
+.tacos-btn--icon-only {
+  padding-top: 0.82em;
+  padding-bottom: 0.82em;
+  padding-left: 1.065em;
+  padding-right: 1.065em;
+
+  > .fa,
+  > .far,
+  > .fas {
+    font-size: 1rem;
+    line-height: 1;
+  }
+}
+
+.tacos-btn__icon {
+  margin-left: 0.5rem;
+}
+
+.tacos-inline-icon-start {
+  margin-right: 0.75rem;
+}
+
+.tacos-form-field {
+  margin-bottom: 1rem;
+}
+
+.tacos-form-label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.tacos-input,
+.tacos-select,
+.tacos-textarea {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.375rem 0.75rem;
+  color: $primary-font;
+  font: inherit;
+  line-height: 1.5;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    border-color: $legacy-secondary-color;
+    outline: 0;
+    box-shadow: 0 0.02rem 0 0.1rem $legacy-secondary-focus-shadow;
+  }
+}
+
+form .form-control:focus,
+form .form-control.focus {
+  border-color: $legacy-secondary-color;
+  box-shadow: 0 0.02rem 0 0.1rem $legacy-secondary-focus-shadow;
+}
+
+.tacos-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 8px 10px;
+  cursor: pointer;
+  padding-right: 2rem;
+}
+
+.tacos-textarea {
+  min-height: calc(1.5em * 3 + 0.75rem + 2px);
+  resize: vertical;
+}
+
+.tacos-input-group {
+  display: flex;
+  width: 100%;
+
+  > .tacos-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.tacos-input-group__addon {
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  background-color: $accent;
+  border: 1px solid #ced4da;
+  border-left: 0;
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.tacos-input-group__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1rem;
+}
+
+.tacos-form-help {
+  display: block;
+  margin-top: 0.25rem;
+  padding-left: 0.5rem;
+}
+
+.tacos-form-help--muted {
+  color: $secondary-font;
+}
+
+.tacos-form-help__message {
+  margin-right: 0.75rem;
+}
+
+.tacos-link-button {
+  padding: 0;
+  color: $a-link;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  font: inherit;
+  line-height: inherit;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus,
+  &:focus-visible,
+  &:active {
+    color: $a-link;
+    box-shadow: none;
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 123, 255, 0.25);
+    outline-offset: 2px;
+  }
+}
+
+.tacos-link-button--icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tacos-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tacos-text-warning {
+  color: #856404;
+}
+
+.tacos-text-danger {
+  color: #dc3545;
+}
+
+// DaisyUI also defines a `.navbar` component. Isolate the UCD banner so its
+// pseudo-element background stays behind the logo instead of falling behind the page.
+.navbar.navbar-default .navbar-banner,
+.navbar.navbar-inverted .navbar-banner {
+  isolation: isolate;
+}
+
+body > nav.navbar.navbar-default,
+body > nav.navbar.navbar-inverted {
+  min-height: 0;
+}
+
+body > nav.navbar.navbar-default .navbar-banner,
+body > nav.navbar.navbar-inverted .navbar-banner {
+  display: flex;
+  align-items: flex-end;
+  padding-top: 0.75em;
+  padding-bottom: 0.49em;
+}
+
+body > nav.navbar.navbar-default .navbar-banner .navbar-brand,
+body > nav.navbar.navbar-inverted .navbar-banner .navbar-brand {
+  position: relative;
+  top: 0;
+}
+
+body.tacos-modal-open {
+  overflow: hidden;
+}
+
+dialog.tacos-dialog {
+  pointer-events: none;
+  visibility: hidden;
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: grid;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 1.75rem 0.5rem;
+  overflow: clip;
+  background: transparent;
+  background-color: transparent !important;
+  border: 0;
+  place-items: center;
+}
+
+dialog.tacos-dialog[open] {
+  pointer-events: auto;
+  visibility: visible;
+  background: transparent;
+  background-color: transparent !important;
+}
+
+dialog.tacos-dialog::backdrop {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.45);
+}
+
+dialog.tacos-dialog.modal-top {
+  align-items: center;
+  justify-items: center;
+}
+
+dialog.tacos-dialog.modal-middle {
+  align-items: center;
+  justify-items: center;
+}
+
+dialog.tacos-dialog .modal-box.tacos-modal__content {
+  width: 100%;
+  max-width: 500px;
+  padding: 0;
+  opacity: 1;
+  translate: 0;
+  scale: 1;
+}
+
+dialog.tacos-dialog .modal-backdrop {
+  background: transparent;
+  color: transparent;
+  z-index: -1;
+  grid-row-start: 1;
+  grid-column-start: 1;
+  place-self: stretch;
+  display: grid;
+}
+
+dialog.tacos-dialog .modal-backdrop button {
+  cursor: pointer;
+}
+
+.tacos-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1.75rem 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.tacos-modal[hidden] {
+  display: none !important;
+}
+
+.tacos-modal--centered {
+  align-items: center;
+}
+
+.tacos-modal__dialog {
+  width: 100%;
+  max-width: 500px;
+  outline: none;
+}
+
+.tacos-modal__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.3rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.tacos-modal__header,
+.tacos-modal__body,
+.tacos-modal__footer {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.tacos-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tacos-modal__title {
+  margin: 0;
+  color: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.tacos-modal__body {
+  position: relative;
+  flex: 1 1 auto;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.tacos-modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.tacos-modal__close {
+  flex-shrink: 0;
+  padding: 0;
+  color: #000;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  cursor: pointer;
+  opacity: 0.5;
+
+  &:hover,
+  &:focus,
+  &:focus-visible,
+  &:active {
+    color: #000;
+    box-shadow: none;
+    opacity: 0.75;
+    text-decoration: none;
+  }
+}
+
+.tacos-modal-footer--split {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tacos-modal-body-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tacos-tooltip {
+  max-width: 16rem;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.tacos-alert__close {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  cursor: pointer;
+  opacity: 0.65;
+
+  &:hover,
+  &:focus,
+  &:focus-visible,
+  &:active {
+    box-shadow: none;
+    opacity: 1;
+  }
+}
+
+.tacos-tooltip__content {
+  position: relative;
+  width: max-content;
+  max-width: 100%;
+  padding: 0.25rem 0.5rem;
+  color: #fff;
+  text-align: center;
+  white-space: normal;
+  background-color: rgba(0, 0, 0, 0.85);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.18);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.tacos-tooltip__content::after {
+  content: "";
+  position: absolute;
+  width: 0.625rem;
+  height: 0.625rem;
+  background-color: inherit;
+  transform: rotate(45deg);
+}
+
+.tacos-tooltip[data-placement="top"] .tacos-tooltip__content::after {
+  left: 50%;
+  bottom: -0.3125rem;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tacos-tooltip[data-placement="right"] .tacos-tooltip__content::after {
+  top: 50%;
+  left: -0.3125rem;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.tacos-tooltip[data-placement="bottom"] .tacos-tooltip__content::after {
+  left: 50%;
+  top: -0.3125rem;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.tacos-tooltip[data-placement="left"] .tacos-tooltip__content::after {
+  top: 50%;
+  right: -0.3125rem;
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .table {
+    font-size: 1rem;
     margin-top: 3rem;
     margin-bottom: 5rem;
+    border-radius: 0;
 
+    thead,
+    tbody,
+    tfoot {
+        font-size: inherit;
+        color: $primary-font;
+    }
+
+    th,
     td {
+        font-size: inherit;
         vertical-align: baseline;
     }
+}
+
+dt {
+  font-size: 0.965rem;
+}
+
+dd {
+  margin-bottom: 0.5rem;
 }
 
 .target-flash {
   animation: background-flash 1000ms 2 ease 1000ms;
 }
 
-.input-group-text{
-background-color: $accent;
-}
-
- 
-#submit-button{
-margin-left: 4px;
-}
-
 .exceptionRow {
   background-color: $accent;
+  margin-bottom: 1.5rem;
   padding: 0.75rem;
 
   p {
@@ -73,8 +643,55 @@ margin-left: 4px;
   }
 }
 
+.exceptionRow--approved {
+  display: flex;
+  align-items: flex-start;
+}
+
+.exceptionRow__revoke {
+  margin-left: 0.5rem;
+}
+
 .exceptionRowComponents {
   margin-top: 2px;
+}
+
+.tacos-summary-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 0;
+  z-index: 1030;
+}
+
+.tacos-summary-bar__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.tacos-summary-bar__title {
+  margin-right: auto;
+}
+
+.tacos-summary-bar__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.tacos-summary-bar__actions .tacos-btn {
+  font-size: 1rem;
+}
+
+.requests-table-scroll {
+  overflow-x: auto;
 }
 
 
@@ -96,7 +713,7 @@ table.requests {
 
   thead th {
     background-color: #fff;
-    color: inherit;
+    color: $primary-font;
     font-family: inherit;
     font-size: inherit;
     font-weight: 400;
@@ -153,6 +770,12 @@ table.requests {
     justify-self: center;
   }
 
+  thead tr:first-child th > .requests-header-cell-content > .requests-header-cell-label {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+  }
+
   thead tr:first-child th > .requests-header-cell-content > .requests-sort-button {
     grid-column: 3;
     justify-self: end;
@@ -173,6 +796,15 @@ table.requests {
     border-top: 1px solid rgba($primary-color, 0.08);
   }
 
+  tbody td.requests-cell--center,
+  thead th.requests-header-cell--center {
+    text-align: center;
+  }
+
+  tbody td.requests-cell--middle {
+    vertical-align: middle;
+  }
+
   tbody tr:first-child td {
     border-top: 0;
   }
@@ -187,13 +819,23 @@ table.requests {
   }
 
   .requests-sort-button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
     color: $secondary-font;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
+    font-size: inherit;
+    height: auto;
     justify-content: center;
+    margin: 0;
+    min-height: 0;
     position: relative;
     min-width: 1.25rem;
     line-height: 1;
+    padding: 0;
     text-decoration: none;
     vertical-align: top;
     z-index: 5;
@@ -225,15 +867,24 @@ table.requests {
   }
 
   .requests-icon-button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
     color: inherit;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
+    font-size: inherit;
+    height: auto;
     justify-content: center;
     line-height: 1;
-    min-height: 1rem;
+    margin: 0;
+    min-height: 0;
     min-width: 1rem;
-    padding-top: 1px;
+    padding: 0;
     text-decoration: none;
+    vertical-align: baseline;
 
     &:hover {
       color: inherit;
@@ -250,6 +901,10 @@ table.requests {
     }
   }
 
+  thead th a {
+    color: $a-link;
+  }
+
   .requests-detail-row td {
     background-color: transparent;
     border-top: 0;
@@ -257,8 +912,45 @@ table.requests {
     vertical-align: top;
   }
 
+  .requests-detail-cell {
+    padding: 0 !important;
+  }
+
   .requests-empty-state {
     padding: 0.55rem 5px;
+  }
+
+  .requests-empty-state--muted {
+    color: $secondary-font;
+    text-align: center;
+  }
+
+  .requests-header-inline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .requests-filter-control {
+    width: 100%;
+  }
+
+  .requests-search-filter {
+    position: relative;
+  }
+
+  .requests-search-filter__icon {
+    color: $tertiary-font;
+    pointer-events: none;
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .requests-filter-input {
+    padding-right: 2rem;
   }
 
   a {

@@ -78,8 +78,9 @@ describe("Modal", () => {
 
         click(launchButton!);
 
-        const dialog = document.body.querySelector(".modal-dialog[role='dialog']") as HTMLDivElement | null;
-        const title = document.body.querySelector(".modal-title") as HTMLElement | null;
+        const dialog = document.body.querySelector("[data-tacos-modal-dialog='true'][role='dialog']") as HTMLDivElement | null;
+        const titleId = dialog?.getAttribute("aria-labelledby") || "";
+        const title = titleId ? document.getElementById(titleId) : null;
 
         expect(dialog).not.toBeNull();
         expect(title).not.toBeNull();
@@ -88,7 +89,7 @@ describe("Modal", () => {
 
         pressEscape();
 
-        expect(document.body.querySelector(".modal")).toBeNull();
+        expect(document.body.querySelector("[data-tacos-modal-root='true']")).toBeNull();
         expect(document.activeElement).toBe(launchButton);
     });
 
