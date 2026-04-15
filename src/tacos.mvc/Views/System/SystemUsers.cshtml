@@ -5,11 +5,11 @@
     ViewBag.Title = "Manage User Roles";
 }
 
-<div class="mx-auto max-w-screen-xl px-4 py-6">
-    <h2>Manage System Roles</h2>
+<div class="tacos-page-shell">
+    <h2 class="tacos-page-heading">Manage System Roles</h2>
 
-    <div class="overflow-x-auto">
-        <table id="table" class="table table-zebra w-full">
+    <div>
+        <table id="table" class="table tacos-admin-roles-table tacos-system-roles-table w-full">
             <thead>
                 <tr>
                     <th></th>
@@ -24,7 +24,7 @@
                 {
                     <tr>
                         <td>
-                            <div class="flex flex-col items-start gap-2">
+                            <div class="tacos-system-roles-table__actions">
                                 @if (row.IsAdmin)
                                 {
                                     <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Admin asp-route-add="false" asp-antiforgery="true">
@@ -37,7 +37,7 @@
                                         <button class="tacos-btn tacos-btn--primary" type="submit"><i class="fas fa-plus tacos-inline-icon-start"></i>Admin</button>
                                     </form>
                                 }
-                                <div class="h-px w-full bg-base-300"></div>
+                                <div class="tacos-system-roles-table__actions-divider"></div>
                                 @if (row.IsReviewer)
                                 {
                                     <form method="post" asp-action="RemoveUserFromRole" asp-route-userId="@row.User.Id" asp-route-role=@RoleCodes.Reviewer asp-route-add="false" asp-antiforgery="true">

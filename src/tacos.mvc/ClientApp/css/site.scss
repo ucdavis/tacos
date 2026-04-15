@@ -321,14 +321,6 @@ form .form-control.focus {
   color: $secondary-font;
 }
 
-// DaisyUI also defines a `.navbar` component. Keep the React summary bar's
-// pseudo-element background in the correct stacking context while the summary
-// bar still uses the UCD navbar naming.
-.navbar.navbar-default .navbar-banner,
-.navbar.navbar-inverted .navbar-banner {
-  isolation: isolate;
-}
-
 .tacos-site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -340,7 +332,7 @@ form .form-control.focus {
   display: flex;
   align-items: flex-end;
   flex-basis: 100%;
-  padding: 0.75rem 1rem 0.49rem;
+  padding: 1.25rem 1.25rem 0.95rem;
   font-size: 1.25rem;
   color: #fff;
   isolation: isolate;
@@ -400,7 +392,8 @@ form .form-control.focus {
   width: 100%;
   color: $primary-color;
   background-color: #fff;
-  box-shadow: 0 2px 1px rgba(0, 40, 85, 0.15);
+  border-bottom: 1px solid #d3dbe5;
+  box-shadow: none;
 }
 
 .tacos-site-nav__panel.is-open {
@@ -418,8 +411,10 @@ form .form-control.focus {
 
 .tacos-site-nav__link {
   display: block;
-  padding: 1em 1.5em;
+  padding: 1rem 1.5rem;
   color: $primary-color;
+  font-size: 0.965rem;
+  line-height: 1.55;
   border-radius: 0;
   text-decoration: none;
 }
@@ -434,12 +429,14 @@ form .form-control.focus {
 }
 
 .tacos-site-nav__link--active {
-  background-color: #f5e0a1;
+  background-color: transparent;
 }
 
 .tacos-site-nav__user {
   padding: 0 1.5rem 1rem;
   color: $primary-color;
+  font-size: 1rem;
+  line-height: 1.55;
   white-space: nowrap;
 }
 
@@ -551,6 +548,221 @@ form .form-control.focus {
   text-align: center;
 }
 
+hr {
+  border: 0;
+  border-top: 1px solid #d3dbe5;
+  margin: 0;
+}
+
+.tacos-page-shell {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 2.75rem 1rem 1.5rem;
+}
+
+.tacos-page-shell--full {
+  max-width: none;
+}
+
+.tacos-page-shell--flash {
+  padding-top: 1rem;
+  padding-bottom: 0;
+}
+
+.tacos-page-stack > * + * {
+  margin-top: 1.5rem;
+}
+
+.tacos-page-stack > .tacos-page-divider + * {
+  margin-top: 0.75rem;
+}
+
+.tacos-page-divider {
+  border-top-color: #d3dbe5;
+}
+
+.tacos-page-form-field {
+  width: 100%;
+}
+
+.tacos-page-form-field .tacos-select {
+  width: 100%;
+}
+
+.tacos-page-heading {
+  margin: 0;
+  color: #0b3262;
+  font-size: 2.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tacos-page-meta {
+  margin: 0;
+  color: $primary-font;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.tacos-link-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.tacos-link-list li + li {
+  margin-top: 0.35rem;
+}
+
+.tacos-link-list a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.tacos-link-list a:hover,
+.tacos-link-list a:focus,
+.tacos-link-list a:focus-visible {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.tacos-page-table {
+  width: 100%;
+  margin-bottom: 0;
+  background-color: #fff;
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1rem;
+}
+
+.tacos-page-table-frame {
+  overflow-x: auto;
+  background-color: #fff;
+  border: 1px solid #d3dbe5;
+}
+
+.tacos-page-table-frame > .tacos-page-table {
+  min-width: 100%;
+}
+
+.tacos-page-table thead,
+.tacos-page-table tbody,
+.tacos-page-table tfoot {
+  color: $primary-font;
+}
+
+.tacos-page-table th,
+.tacos-page-table td {
+  padding: 0.9rem 0.8rem;
+  font-size: inherit;
+  vertical-align: middle;
+  border-right: 1px solid #d3dbe5;
+}
+
+.tacos-page-table th:last-child,
+.tacos-page-table td:last-child {
+  border-right: 0;
+}
+
+.tacos-page-table thead th {
+  font-weight: 700;
+  background-color: #fff;
+  border-bottom: 0;
+}
+
+.tacos-page-table tbody td {
+  border-top: 1px solid #d3dbe5;
+  border-bottom: 0;
+}
+
+.tacos-page-table tfoot td {
+  font-weight: 700;
+  background-color: #f6f8fb;
+  border-top: 1px solid #d3dbe5;
+  border-bottom: 0;
+}
+
+.tacos-page-table__summary td {
+  background-color: #f6f8fb;
+}
+
+.tacos-page-table tfoot .tacos-page-table__summary--info td {
+  background-color: #bee5eb;
+}
+
+.tacos-page-table a:not(.tacos-btn) {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.tacos-page-table a:not(.tacos-btn):hover,
+.tacos-page-table a:not(.tacos-btn):focus,
+.tacos-page-table a:not(.tacos-btn):focus-visible {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.tacos-page-table__actions {
+  text-align: center;
+}
+
+.tacos-admin-roles-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 1rem;
+}
+
+.tacos-admin-roles-table thead th,
+.tacos-admin-roles-table tbody td {
+  padding: 0.9rem 0.8rem;
+  font-size: inherit;
+}
+
+.tacos-admin-roles-table thead th {
+  font-weight: 700;
+  background-color: #fff;
+  border-right: 0;
+  border-bottom: 2px solid $legacy-secondary-color;
+  vertical-align: bottom;
+}
+
+.tacos-admin-roles-table tbody tr:nth-child(odd) {
+  background-color: #f3f3f0;
+}
+
+.tacos-admin-roles-table tbody td {
+  border-top: 1px solid #d3dbe5;
+  border-right: 0;
+}
+
+.tacos-admin-roles-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+.tacos-system-roles-table tbody td {
+  vertical-align: top;
+}
+
+.tacos-system-roles-table__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.tacos-system-roles-table__actions-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #d3dbe5;
+}
+
+.tacos-department-roles-table tbody td {
+  vertical-align: middle;
+}
+
 @media (max-width: 767px) {
   .tacos-home-panel {
     padding-top: 3rem;
@@ -611,17 +823,17 @@ dialog.tacos-dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.45);
 }
 
-dialog.tacos-dialog.modal-top {
+dialog.tacos-dialog--top {
   align-items: center;
   justify-items: center;
 }
 
-dialog.tacos-dialog.modal-middle {
+dialog.tacos-dialog--middle {
   align-items: center;
   justify-items: center;
 }
 
-dialog.tacos-dialog .modal-box.tacos-modal__content {
+dialog.tacos-dialog .tacos-dialog__panel.tacos-modal__content {
   width: 100%;
   max-width: 500px;
   padding: 0;
@@ -630,7 +842,7 @@ dialog.tacos-dialog .modal-box.tacos-modal__content {
   scale: 1;
 }
 
-dialog.tacos-dialog .modal-backdrop {
+dialog.tacos-dialog .tacos-dialog__backdrop {
   background: transparent;
   color: transparent;
   z-index: -1;
@@ -640,7 +852,7 @@ dialog.tacos-dialog .modal-backdrop {
   display: grid;
 }
 
-dialog.tacos-dialog .modal-backdrop button {
+dialog.tacos-dialog .tacos-dialog__backdrop button {
   cursor: pointer;
 }
 
@@ -853,6 +1065,7 @@ dialog.tacos-dialog .modal-backdrop button {
 
 dt {
   font-size: 0.965rem;
+  font-weight: 700;
 }
 
 dd {
@@ -897,17 +1110,37 @@ dd {
   z-index: 1030;
 }
 
+.tacos-summary-bar__banner {
+  font-size: 1.25rem;
+  padding: 0.5em 1em;
+  position: relative;
+  color: #fff;
+  isolation: isolate;
+}
+
+.tacos-summary-bar__banner::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
+    linear-gradient(to right, #183357, #d9b337);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .tacos-summary-bar__content {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 
 .tacos-summary-bar__title {
   margin-right: auto;
+  color: inherit;
+  font-size: inherit;
+  line-height: 1.2;
 }
 
 .tacos-summary-bar__actions {

@@ -51,13 +51,13 @@ export default class Summary extends React.PureComponent<IProps, {}> {
 
     public render() {
         return (
-            <div className="navbar navbar-default tacos-summary-bar" role="navigation">
-                <div className="navbar-banner">
+            <div className="tacos-summary-bar" role="navigation">
+                <div className="tacos-summary-bar__banner">
                     <div className="tacos-summary-bar__content">
-                        <a className="navbar-brand tacos-summary-bar__title" href="#">
+                        <div className="tacos-summary-bar__title">
                             Request Total:{" "}
                             {this.props.total > 0 ? this.props.total.toFixed(3) : "---"}
-                        </a>
+                        </div>
                         <div className="tacos-summary-bar__actions">
                             <button
                                 disabled={this.props.isProcessing}

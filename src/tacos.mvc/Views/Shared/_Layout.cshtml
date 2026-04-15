@@ -66,7 +66,7 @@
         
     @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
     {
-        <div class="mx-auto max-w-screen-2xl px-4 pt-4">
+        <div class="tacos-page-shell tacos-page-shell--flash">
             <div class="alert alert-error rounded-none shadow-sm">
                 <span>@TempData["ErrorMessage"]</span>
                 <button type="button" class="btn btn-ghost btn-square btn-sm ml-auto" data-tacos-dismiss="alert" aria-label="Dismiss error message">×</button>
@@ -76,7 +76,7 @@
 
     @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
     {
-        <div class="mx-auto max-w-screen-2xl px-4 pt-4">
+        <div class="tacos-page-shell tacos-page-shell--flash">
             <div class="alert alert-info rounded-none shadow-sm">
                 <span>@TempData["Message"]</span>
                 <button type="button" class="btn btn-ghost btn-square btn-sm ml-auto" data-tacos-dismiss="alert" aria-label="Dismiss message">×</button>

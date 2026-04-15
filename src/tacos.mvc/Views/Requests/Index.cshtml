@@ -7,7 +7,7 @@
     var departments = ViewBag.Departments as IList<Department>;
 }
 
-<div class="mx-auto max-w-screen-xl space-y-6 px-4 py-6">
+<div class="tacos-page-shell tacos-page-stack">
 
     @{
         var departmentSelectItems = departments.Select(d => new SelectListItem()
@@ -18,28 +18,28 @@
         });
     }
 
-    <div class="max-w-md space-y-2">
+    <div class="tacos-page-form-field space-y-2">
         <label class="block font-semibold" for="departmentSelect">Selected department:</label>
         <select class="tacos-select" id="departmentSelect" asp-items="departmentSelectItems"></select>
     </div>
     
-    <hr />
+    <hr class="tacos-page-divider" />
 
     <div class="space-y-3">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-                <h4>@department.Name</h4>
+                <h4 class="tacos-page-heading">@department.Name</h4>
             </div>
             <div>
                 <a class="tacos-btn tacos-btn--primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Create New Submission</a>
             </div>
         </div>
         
-        <p class="text-sm opacity-70">@Model.Count total requests. (@Model.Count(r => !r.Submitted) unsubmitted requests)</p>
+        <p class="tacos-page-meta">@Model.Count total requests. (@Model.Count(r => !r.Submitted) unsubmitted requests)</p>
     </div>
 
-    <div class="overflow-x-auto">
-        <table id="requestTable" class="table w-full">
+    <div>
+        <table id="requestTable" class="table tacos-page-table w-full">
             <thead>
                 <tr>
                     <th>Course Number</th>
@@ -63,7 +63,7 @@
                         <td data-order="@request.UpdatedOn.Ticks">
                             @request.SubmittedOn?.ToString("d")
                         </td>
-                        <td class="text-center">
+                        <td class="tacos-page-table__actions">
                             <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="tacos-btn tacos-btn--primary">
                                 <i class="fas fa-edit tacos-inline-icon-start"></i> Edit
                             </a>

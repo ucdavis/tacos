@@ -7,12 +7,12 @@
     var departmentSelectItems = departments.Select(d => new SelectListItem() { Text = d.Name, Value = d.Id.ToString() });
 }
 
-<div class="mx-auto max-w-screen-xl space-y-6 px-4 py-6">
+<div class="tacos-page-shell tacos-page-stack">
 
-    <h2>Manage Department Roles</h2>
+    <h2 class="tacos-page-heading">Manage Department Roles</h2>
 
-    <div class="overflow-x-auto">
-        <table id="departmentRolesTable" class="table table-zebra w-full">
+    <div>
+        <table id="departmentRolesTable" class="table tacos-admin-roles-table tacos-department-roles-table w-full">
             <thead>
             <tr>
                 <th></th>
@@ -47,8 +47,8 @@
         Add User to Department
     </button>
 
-    <dialog id="addUserToDepartmentRoleModal" class="modal modal-top tacos-dialog" aria-labelledby="addUserToDepartmentRoleModalTitle">
-        <div class="modal-box tacos-modal__content" role="document">
+    <dialog id="addUserToDepartmentRoleModal" class="tacos-dialog tacos-dialog--top" aria-labelledby="addUserToDepartmentRoleModalTitle">
+        <div class="tacos-dialog__panel tacos-modal__content" role="document">
             <div class="tacos-modal__header">
                 <h5 class="tacos-modal__title" id="addUserToDepartmentRoleModalTitle">Add User to Department</h5>
                 <button type="button" class="tacos-modal__close" aria-label="Close" onclick="this.closest('dialog').close()">
@@ -72,7 +72,7 @@
                 </div>
             </form>
         </div>
-        <form method="dialog" class="modal-backdrop">
+        <form method="dialog" class="tacos-dialog__backdrop">
             <button aria-label="Close dialog">close</button>
         </form>
     </dialog>

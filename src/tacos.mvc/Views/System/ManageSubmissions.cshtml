@@ -2,17 +2,13 @@
     ViewBag.Title = "Manage Submissions";
 }
 
-<div class="mx-auto max-w-3xl px-4 py-6">
-    <div class="card rounded-none border border-base-300 bg-base-100 shadow-sm">
-        <div class="card-body space-y-4">
-            <h2 class="card-title text-2xl">Reset All Submissions</h2>
-            <p>
-                Warning: Clicking "Reset" will remove all exceptions and place every submission back in an "unsubmitted status".
-                You probably only want to do this once a year when you are ready to start over with fresh data.
-            </p>
-            <form method="post" asp-action="ResetSubmissions" asp-antiforgery="true">
-                <button class="tacos-btn tacos-btn--danger" type="submit">Reset All Submissions <i class="fas fa-trash tacos-btn__icon"></i></button>
-            </form>
-        </div>
-    </div>
+<div class="tacos-page-shell">
+    <form method="post" asp-action="ResetSubmissions" asp-antiforgery="true">
+        <h2 class="tacos-page-heading">Reset All Submissions</h2>
+        <p class="mt-6 mb-4">
+            Warning: Clicking "Reset" will remove all exceptions and place every submission back in an "unsubmitted status".
+            You probably only want to do this once a year when you are ready to start over with fresh data.
+        </p>
+        <button class="tacos-btn tacos-btn--danger" type="submit">Reset All Submissions <i class="fas fa-trash tacos-btn__icon"></i></button>
+    </form>
 </div>

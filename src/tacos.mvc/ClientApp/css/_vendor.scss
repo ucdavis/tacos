@@ -36,6 +36,12 @@
       margin-bottom: 1rem;
     }
 
+    .tacos-datatable-table {
+      overflow-x: auto;
+      background-color: #fff;
+      border: 1px solid #d3dbe5;
+    }
+
     .tacos-datatable-footer {
       margin-top: 1rem;
     }
@@ -113,12 +119,12 @@
     .dt-button,
     .dt-button:visited {
       align-items: center;
-      background-color: $primary-color !important;
+      background-color: #f5e0a1 !important;
       background-image: none !important;
-      border: 1px solid $primary-color !important;
+      border: 1px solid #f5e0a1 !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      color: #fff !important;
+      color: $primary-color !important;
       cursor: pointer;
       display: inline-flex;
       font: inherit;
@@ -135,11 +141,11 @@
     .dt-button:focus,
     .dt-button:focus-visible,
     .dt-button:active {
-      background-color: #2f5b8c !important;
+      background-color: #faefce !important;
       background-image: none !important;
-      border-color: #2f5b8c !important;
+      border-color: #faefce !important;
       box-shadow: none !important;
-      color: #fff !important;
+      color: $primary-color !important;
       outline: 0;
       text-decoration: none !important;
     }
@@ -353,8 +359,8 @@
           font-size: 0.875rem;
           line-height: 1;
           position: absolute;
-          right: 0.5rem;
-          bottom: 0.55rem;
+          right: 0.75rem;
+          bottom: 0.95rem;
         }
 
         &.sorting::after,
@@ -371,6 +377,55 @@
           content: "▼";
         }
       }
+    }
+
+    table.dataTable.tacos-page-table,
+    table.dataTable.tacos-page-table.no-footer {
+      border: 0 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+    }
+
+    table.dataTable.tacos-page-table tbody td,
+    table.dataTable.tacos-page-table tfoot td {
+      border-right: 1px solid #d3dbe5 !important;
+    }
+
+    table.dataTable.tacos-page-table thead th {
+      border-right: 0 !important;
+    }
+
+    table.dataTable.tacos-page-table tbody td:last-child,
+    table.dataTable.tacos-page-table tfoot td:last-child {
+      border-right: 0 !important;
+    }
+
+    table.dataTable.tacos-page-table thead th {
+      border-bottom: 0 !important;
+    }
+
+    table.dataTable.tacos-page-table tbody td,
+    table.dataTable.tacos-page-table tfoot td {
+      border-top: 1px solid #d3dbe5 !important;
+      border-bottom: 0 !important;
+    }
+
+    table.dataTable.tacos-admin-roles-table,
+    table.dataTable.tacos-admin-roles-table.no-footer {
+      border: 0 !important;
+      border-collapse: collapse !important;
+      border-spacing: 0 !important;
+    }
+
+    table.dataTable.tacos-admin-roles-table thead th {
+      border-right: 0 !important;
+      border-bottom: 2px solid $legacy-secondary-color !important;
+    }
+
+    table.dataTable.tacos-admin-roles-table tbody td {
+      border-top: 1px solid #d3dbe5 !important;
+      border-right: 0 !important;
+      border-bottom: 0 !important;
     }
   
     @media (max-width: 767px) {

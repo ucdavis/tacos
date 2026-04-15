@@ -1,9 +1,9 @@
 @using tacos.core.Resources
 @model tacos.core.Data.Request[]
 
-<div class="mx-auto max-w-screen-2xl px-4 py-6">
-    <div class="overflow-x-auto">
-        <table class="table w-full" id="requestTable">
+<div class="tacos-page-shell tacos-page-shell--full">
+    <div>
+        <table class="table tacos-page-table w-full" id="requestTable">
             <thead>
                 <tr>
                     <th>Submission</th>
@@ -62,7 +62,7 @@
                 }
             </tbody>
             <tfoot>
-                <tr class="bg-base-200">
+                <tr class="tacos-page-table__summary tacos-page-table__summary--info">
                     <td colspan="12"></td>
                     <td>Total:</td>
                     <td>
@@ -75,8 +75,8 @@
     </div>
 </div>
 
-<dialog id="denialModal" class="modal modal-top tacos-dialog" aria-labelledby="denialModalTitle">
-    <div class="modal-box tacos-modal__content" role="document">
+<dialog id="denialModal" class="tacos-dialog tacos-dialog--top" aria-labelledby="denialModalTitle">
+    <div class="tacos-dialog__panel tacos-modal__content" role="document">
         <form id="denialForm" asp-action="Edit" asp-route-id="0" method="post">
             <input type="hidden" name="approved" value="false" />
             <div class="tacos-modal__header">
@@ -107,14 +107,14 @@
             </div>
         </form>
     </div>
-    <form method="dialog" class="modal-backdrop">
+    <form method="dialog" class="tacos-dialog__backdrop">
         <button aria-label="Close dialog">close</button>
     </form>
 </dialog>
 
 <!-- ApprovalModal -->
-<dialog id="approvalModal" class="modal modal-middle tacos-dialog" aria-labelledby="approvalModalTitle">
-  <div class="modal-box tacos-modal__content" role="document">
+<dialog id="approvalModal" class="tacos-dialog tacos-dialog--middle" aria-labelledby="approvalModalTitle">
+  <div class="tacos-dialog__panel tacos-modal__content" role="document">
       <div class="tacos-modal__header">
         <h5 class="tacos-modal__title" id="approvalModalTitle">
           <i class="fas fa-spinner fa-pulse fa-lg tacos-inline-icon-start"></i>
@@ -128,7 +128,7 @@
         <img class="w-3/4 max-w-xs" src="tacoAnimation.gif" alt="taco animation gif"/>
       </div>
   </div>
-  <form method="dialog" class="modal-backdrop">
+  <form method="dialog" class="tacos-dialog__backdrop">
       <button aria-label="Close dialog">close</button>
   </form>
 </dialog>

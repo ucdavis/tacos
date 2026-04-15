@@ -1,9 +1,9 @@
 @using tacos.core.Resources
 @model tacos.core.Data.Request[]
 
-<div class="mx-auto max-w-screen-2xl px-4 py-6">
-    <div class="overflow-x-auto">
-        <table class="table w-full" id="requestTable">
+<div class="tacos-page-shell tacos-page-shell--full">
+    <div>
+        <table class="table tacos-page-table w-full" id="requestTable">
             <thead>
                 <tr>
                     <th>Department</th>
@@ -42,7 +42,7 @@
             }
             </tbody>
             <tfoot>
-            <tr class="bg-base-200">
+            <tr class="tacos-page-table__summary">
                 <td colspan="11"></td>
                 <td>Total:</td>
                 <td>
