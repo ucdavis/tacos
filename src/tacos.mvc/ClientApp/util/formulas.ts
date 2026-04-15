@@ -42,7 +42,7 @@ const writingLectureFormula: IFormula = {
         }
 
         // "Discussion sections average 20-25 students
-        // Half-time TA is responsible for 2 discussion sections, i.e. 40 students"
+        // Half-time TA is responsible for 2 discussion sections, i.e. 40 students"
         return roundTo((sectionsPerCourse / 2.0) * 0.5, 0.5);
     }
 };
@@ -57,8 +57,8 @@ const labFormula: IFormula = {
         }
 
         // "Lab/studio sections average 15-20 students
-        // Half-time TA is responsible for 2 lab/studio sections, i.e. 25-30 students
-        // Alternative: 10-15 students per section if room size, equipment, or safety concerns require"
+        // Half-time TA is responsible for 2 lab/studio sections, i.e. 25-30 students
+        // Alternative: 10-15 students per section if room size, equipment, or safety concerns require"
         return roundTo((course.averageEnrollment / 30.0) * 0.5, 0.5);
     }
 };
@@ -118,8 +118,8 @@ const lectureModerateWritingFormula: IFormula = {
     }
 };
 
-// "Lecture-only classes, writing-intensive or substantial project
-// (No sections; GE writing or ≥10 page papers: ' substantial project’ is a project that comprises at least 25% of the total course grade and requires input from faculty/TA’s over more than one class meeting for organization, planning, implementation, and/or evaluation/grading of student work"
+// "Lecture-only classes, writing-intensive or substantial project
+// (No sections; GE writing or >=10 page papers: 'substantial project' is a project that comprises at least 25% of the total course grade and requires input from faculty/TA's over more than one class meeting for organization, planning, implementation, and/or evaluation/grading of student work"
 const lectureIntensiveFormula: IFormula = {
     calculate: (course: ICourse) => {
         // 25% TA or Reader per 40 students for courses with 40 or more students

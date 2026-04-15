@@ -9,8 +9,8 @@ import { IRequest } from "../models/IRequest";
 import "../main.css";
 import "../css/site.scss";
 
-declare var department: IDepartment;
-declare var model: IRequest[];
+declare const department: IDepartment;
+declare const model: IRequest[];
 
 function renderApp() {
     const appElement = document.getElementById("react-app");

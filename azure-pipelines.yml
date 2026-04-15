@@ -56,6 +56,13 @@ stages:
         arguments: '--configuration $(buildConfiguration)'
 
     - task: Npm@1
+      displayName: 'Run Client Lint'
+      inputs:
+        command: 'custom'
+        workingDir: './src/tacos.mvc'
+        customCommand: 'run lint'
+
+    - task: Npm@1
       displayName: 'Run Client Tests'
       inputs:
         command: 'custom'
