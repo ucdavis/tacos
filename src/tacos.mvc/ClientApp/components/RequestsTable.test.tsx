@@ -291,7 +291,9 @@ describe("RequestsTable UI coverage", () => {
         await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-1"]);
 
-        const secondRowRemoveButton = getHost().querySelector("#request-2 .btn-danger") as HTMLButtonElement | null;
+        const secondRowRemoveButton = getHost().querySelector(
+            "#request-2 [data-remove-request-button='true']"
+        ) as HTMLButtonElement | null;
         expect(secondRowRemoveButton).not.toBeNull();
 
         await click(secondRowRemoveButton!);
@@ -309,6 +311,39 @@ describe("RequestsTable UI coverage", () => {
 
         await click(getSortButton("course"));
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-3", "request-1"]);
+    });
+
+    it("keeps unsaved rows at the bottom in insertion order when sorting", async () => {
+        await renderTable({
+            requests: [
+                createRequest(1, { course: createCourse({ number: "TAC 300", name: "Saved Three Hundred" }) }),
+                createRequest(2, { course: createCourse({ number: "TAC 020", name: "Saved Twenty" }) }),
+                createRequest(3, {
+                    course: createCourse({ number: "TAC 100", name: "Unsaved One Hundred" }),
+                    id: undefined,
+                }),
+                createRequest(4, {
+                    course: createCourse({ number: "TAC 050", name: "Unsaved Fifty" }),
+                    id: undefined,
+                }),
+            ]
+        });
+
+        await click(getSortButton("course"));
+        expect(getVisibleRequestIds()).toEqual([
+            "request-2",
+            "request-1",
+            "request-new-2",
+            "request-new-3",
+        ]);
+
+        await click(getSortButton("course"));
+        expect(getVisibleRequestIds()).toEqual([
+            "request-1",
+            "request-2",
+            "request-new-2",
+            "request-new-3",
+        ]);
     });
 
     it("resizes adjacent columns from the divider handle and keeps the divider bound to the column on the left", async () => {
@@ -464,7 +499,7 @@ describe("RequestsTable UI coverage", () => {
         expect(onEdit).toHaveBeenNthCalledWith(3, 1, { ...secondRequest, exception: true });
     });
 
-    it("forwards numeric edits from the expanded exception detail inputs and renders the reason field", async () => {
+    it("forwards numeric edits from the expanded exception detail inputs and preserves textarea typing until blur saves it", async () => {
         const onEdit = vi.fn();
 
         const request = createRequest(7, {
@@ -491,9 +526,33 @@ describe("RequestsTable UI coverage", () => {
 
         await setInputValue(totalInput!, "2.25");
         await setInputValue(annualCountInput!, "3");
+
+        const textareaValueSetter = Object.getOwnPropertyDescriptor(
+            HTMLTextAreaElement.prototype,
+            "value",
+        )?.set;
+
+        expect(textareaValueSetter).toBeDefined();
+
+        act(() => {
+            reasonInput!.focus();
+            textareaValueSetter!.call(reasonInput!, "Updated justification");
+            reasonInput!.dispatchEvent(new Event("input", { bubbles: true }));
+            reasonInput!.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+
         expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, exceptionTotal: 2.25 });
         expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, exceptionAnnualCount: 3 });
-        expect(reasonInput!.value).toBe("Existing justification");
+        expect(onEdit).toHaveBeenCalledTimes(2);
+        expect(reasonInput!.value).toBe("Updated justification");
+
+        act(() => {
+            reasonInput!.blur();
+            reasonInput!.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+        });
+
+        expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exceptionReason: "Updated justification" });
+        expect(reasonInput!.value).toBe("Updated justification");
     });
 
     it("renders new-course, validation, and every-other-year warning indicators", async () => {
@@ -572,7 +631,7 @@ describe("RequestsTable UI coverage", () => {
         expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
-        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        const modal = document.body.querySelector("[data-tacos-modal-dialog='true']") as HTMLElement | null;
         expect(modal).not.toBeNull();
         expect(normalizeText(document.body.textContent)).toContain("Please confirm");
 
@@ -605,7 +664,7 @@ describe("RequestsTable UI coverage", () => {
         expect(revokeLink).not.toBeNull();
 
         await click(revokeLink!);
-        const modal = document.body.querySelector(".modal") as HTMLElement | null;
+        const modal = document.body.querySelector("[data-tacos-modal-dialog='true']") as HTMLElement | null;
         expect(modal).not.toBeNull();
 
         await click(getButtonByText("Revoke Approval", modal!));

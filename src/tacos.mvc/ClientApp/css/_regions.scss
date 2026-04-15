@@ -1,11 +1,12 @@
 @use "depends" as *;
 
 .edit-requests {
-    &.container {
-        max-width: 80%;
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 2.95rem;
 
-        @include breakpoint(tablet) {
-            max-width: 100%;
-        }
+    @include breakpoint(tablet) {
+        max-width: 100%;
     }
 }

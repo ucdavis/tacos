@@ -121,9 +121,9 @@ const RequestsTable = (props: IProps) => {
             enableSorting: false,
             header: () => null,
             meta: {
-                className: "text-center align-middle",
+                className: "requests-cell--center requests-cell--middle",
                 filterVariant: "icon",
-                headerClassName: "text-center",
+                headerClassName: "requests-header-cell--center",
                 width: 45,
             } satisfies IColumnMeta,
         },
@@ -196,7 +196,7 @@ const RequestsTable = (props: IProps) => {
             header: "TA % per course offering",
             id: "calculatedTotal",
             meta: {
-                className: "text-center",
+                className: "requests-cell--center",
             } satisfies IColumnMeta,
         },
         {
@@ -205,7 +205,7 @@ const RequestsTable = (props: IProps) => {
             header: "Annualized TA FTE",
             id: "annualizedTotal",
             meta: {
-                className: "text-center",
+                className: "requests-cell--center",
             } satisfies IColumnMeta,
         },
         {
@@ -222,9 +222,9 @@ const RequestsTable = (props: IProps) => {
             header: "Exception ?",
             id: "exception",
             meta: {
-                className: "text-center align-middle",
+                className: "requests-cell--center requests-cell--middle",
                 filterVariant: "exception",
-                headerClassName: "text-center",
+                headerClassName: "requests-header-cell--center",
                 width: 150,
             } satisfies IColumnMeta,
         },
@@ -235,9 +235,9 @@ const RequestsTable = (props: IProps) => {
             enableSorting: false,
             header: "Remove",
             meta: {
-                className: "text-center align-middle",
+                className: "requests-cell--center requests-cell--middle",
                 filterVariant: "none",
-                headerClassName: "text-center",
+                headerClassName: "requests-header-cell--center",
                 width: 100,
             } satisfies IColumnMeta,
         },
@@ -248,9 +248,9 @@ const RequestsTable = (props: IProps) => {
             enableSorting: false,
             header: () => null,
             meta: {
-                className: "text-center align-middle",
+                className: "requests-cell--center requests-cell--middle",
                 filterVariant: "none",
-                headerClassName: "text-center",
+                headerClassName: "requests-header-cell--center",
                 width: 45,
             } satisfies IColumnMeta,
         },
@@ -384,12 +384,24 @@ const RequestsTable = (props: IProps) => {
     }, [startColumnResize]);
 
     const visibleColumnCount = table.getVisibleLeafColumns().length;
-    const rows = table.getRowModel().rows;
+    const rowModel = table.getRowModel();
+    const rows = React.useMemo(() => {
+        const persistedRows = rowModel.rows.filter((row) => row.original.request.id);
+        const unsavedRows = rowModel.rows
+            .filter((row) => !row.original.request.id)
+            .sort((leftRow, rightRow) => leftRow.original.originalIndex - rightRow.original.originalIndex);
+
+        if (unsavedRows.length === 0) {
+            return rowModel.rows;
+        }
+
+        return [...persistedRows, ...unsavedRows];
+    }, [rowModel.rows]);
 
     return (
         <div className={className}>
-            <div className="table-responsive">
-                <table className="table requests">
+            <div className="requests-table-scroll">
+                <table className="requests">
                     <colgroup>
                         {table.getVisibleLeafColumns().map((column) => (
                             <col
@@ -437,12 +449,10 @@ const RequestsTable = (props: IProps) => {
                                         >
                                             <div
                                                 className={buildClassName(
-                                                    "requests-header-cell-content",
-                                                    "d-flex align-items-center",
-                                                    canSort ? "justify-content-between" : undefined
+                                                    "requests-header-cell-content"
                                                 )}
                                             >
-                                                <div className="d-flex align-items-center">
+                                                <div className="requests-header-cell-label">
                                                     {header.isPlaceholder
                                                         ? null
                                                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -454,7 +464,7 @@ const RequestsTable = (props: IProps) => {
                                                             header.column.columnDef.header,
                                                             nextSortOrder,
                                                         )}
-                                                        className="btn btn-link btn-sm p-0 ml-2 requests-sort-button"
+                                                        className="requests-sort-button"
                                                         data-column-sort-button={header.column.id}
                                                         onClick={header.column.getToggleSortingHandler()}
                                                         type="button"
@@ -500,7 +510,7 @@ const RequestsTable = (props: IProps) => {
                     <tbody>
                         {rows.length === 0 && (
                             <tr>
-                                <td className="requests-empty-state text-center text-muted" colSpan={visibleColumnCount}>
+                                <td className="requests-empty-state requests-empty-state--muted" colSpan={visibleColumnCount}>
                                     No requests found.
                                 </td>
                             </tr>
@@ -540,7 +550,7 @@ const RequestsTable = (props: IProps) => {
                                     </tr>
                                     {request.exception && (
                                         <tr className="requests-detail-row">
-                                            <td className="p-0" colSpan={visibleColumnCount}>
+                                            <td className="requests-detail-cell" colSpan={visibleColumnCount}>
                                                 <ExceptionDetail
                                                     requestId={request.id || -1}
                                                     onExceptionAnnualCountChange={(exceptionAnnualCount) =>
@@ -593,16 +603,16 @@ const RequestsTable = (props: IProps) => {
         switch (meta.filterVariant) {
             case "icon":
                 return (
-                    <div className="text-center requests-filter-icon">
+                    <div className="requests-filter-icon">
                         <i aria-hidden="true" className="fas fa-filter" />
                     </div>
                 );
             case "course":
                 return (
-                    <div style={{ position: "relative" }}>
+                    <div className="requests-filter-control requests-search-filter">
                         <input
                             aria-label={getFilterLabel(column.id)}
-                            className="form-control"
+                            className="tacos-input requests-filter-input"
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 column.setFilterValue(e.target.value.toUpperCase())
                             }
@@ -611,22 +621,16 @@ const RequestsTable = (props: IProps) => {
                         />
                         <i
                             aria-hidden="true"
-                            className="fas fa-search"
-                            style={{
-                                position: "absolute",
-                                right: "10px",
-                                top: "2px",
-                                transform: "translateY(50%)",
-                            }}
+                            className="fas fa-search requests-search-filter__icon"
                         />
                     </div>
                 );
             case "courseType":
                 return (
-                    <div className="input-group">
+                    <div className="requests-filter-control">
                         <select
                             aria-label={getFilterLabel(column.id)}
-                            className="custom-select"
+                            className="tacos-select requests-filter-select"
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
                             value={currentValue}
                         >
@@ -641,10 +645,10 @@ const RequestsTable = (props: IProps) => {
                 );
             case "requestType":
                 return (
-                    <div className="input-group">
+                    <div className="requests-filter-control">
                         <select
                             aria-label={getFilterLabel(column.id)}
-                            className="custom-select"
+                            className="tacos-select requests-filter-select"
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
                             value={currentValue}
                         >
@@ -656,10 +660,10 @@ const RequestsTable = (props: IProps) => {
                 );
             case "exception":
                 return (
-                    <div className="input-group">
+                    <div className="requests-filter-control">
                         <select
                             aria-label={getFilterLabel(column.id)}
-                            className="custom-select"
+                            className="tacos-select requests-filter-select"
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
                             value={currentValue}
                         >
@@ -828,7 +832,7 @@ function renderIconTrigger(id: string, label: string, iconClassName: string) {
     return (
         <button
             aria-label={label}
-            className="btn p-0 border-0 bg-transparent align-baseline requests-icon-button"
+            className="requests-icon-button"
             id={id}
             type="button"
         >
@@ -898,8 +902,8 @@ function renderCourseType(
 
 function renderCourseTypeHeader() {
     return (
-        <div>
-            <span className="mr-3">Course Type</span>
+        <div className="requests-header-inline">
+            <span className="requests-header-label">Course Type</span>
             <a href="/CAES-TA-Guidelines 2018-23.pdf" rel="noopener noreferrer" target="_blank">
                 Criteria Info <i className="fas fa-external-link-alt" />
             </a>
@@ -928,8 +932,8 @@ function renderRequestType(
 
 function renderRequestTypeHeader() {
     return (
-        <div>
-            <span className="mr-2">Request Type</span>
+        <div className="requests-header-inline">
+            <span className="requests-header-label">Request Type</span>
             {renderIconTrigger(
                 "requestTypeHeader",
                 "Request type help",
@@ -968,7 +972,8 @@ function renderRemoveButton(row: IRequestTableRow, onRemove: (i: number) => void
     return (
         <button
             aria-label="Remove request"
-            className="btn btn-danger"
+            className="tacos-btn tacos-btn--danger tacos-btn--icon-only"
+            data-remove-request-button="true"
             type="button"
             onClick={() => onRemove(row.originalIndex)}
         >
@@ -990,7 +995,7 @@ function renderAnnualizedFTE(row: IRequestTableRow) {
                     {renderIconTrigger(
                         `request-${originalIndex}-otheryear-warning`,
                         "Every-other-year course warning",
-                        "fas fa-exclamation-triangle text-warning",
+                        "fas fa-exclamation-triangle tacos-text-warning",
                     )}
                     <UncontrolledTooltip
                         className=""
@@ -1016,7 +1021,7 @@ function renderWarnings(row: IRequestTableRow) {
                 {renderIconTrigger(
                     `request-${originalIndex}-error`,
                     "Request validation warning",
-                    "fas fa-exclamation-triangle text-danger",
+                    "fas fa-exclamation-triangle tacos-text-danger",
                 )}
                 <UncontrolledTooltip
                     className=""

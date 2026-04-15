@@ -3,6 +3,12 @@
 }
 
 <header>
-    <h2 class="text-danger">@ViewData["Title"]</h2>
-    <p class="text-danger">This account has been locked out, please try again later.</p>
+    <div class="mx-auto max-w-3xl px-4 py-10">
+        <div class="alert alert-error rounded-none shadow-sm">
+            <div>
+                <h2 class="text-xl font-semibold">@ViewData["Title"]</h2>
+                <p>This account has been locked out, please try again later.</p>
+            </div>
+        </div>
+    </div>
 </header>

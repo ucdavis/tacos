@@ -4,23 +4,24 @@
     ViewData["Title"] = "Recovery code verification";
 }
 
-<h2>@ViewData["Title"]</h2>
-<hr />
-<p>
-    You have requested to login with a recovery code. This login will not be remembered until you provide
-    an authenticator app code at login or disable 2FA and login again.
-</p>
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="RecoveryCode"></label>
-                <input asp-for="RecoveryCode" class="form-control" autocomplete="off" />
-                <span asp-validation-for="RecoveryCode" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-default">Log in</button>
-        </form>
+<div class="mx-auto max-w-xl px-4 py-10">
+    <div class="card rounded-none border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body space-y-4">
+            <h2 class="card-title text-2xl">@ViewData["Title"]</h2>
+            <p>
+                You have requested to login with a recovery code. This login will not be remembered until you provide
+                an authenticator app code at login or disable 2FA and login again.
+            </p>
+            <form class="space-y-4" method="post">
+                <div asp-validation-summary="All" class="tacos-text-danger text-sm"></div>
+                <div class="tacos-form-field">
+                    <label asp-for="RecoveryCode" class="block font-semibold"></label>
+                    <input asp-for="RecoveryCode" class="tacos-input" autocomplete="off" />
+                    <span asp-validation-for="RecoveryCode" class="block pt-1 text-sm tacos-text-danger"></span>
+                </div>
+                <button type="submit" class="tacos-btn tacos-btn--primary">Log in</button>
+            </form>
+        </div>
     </div>
 </div>
 

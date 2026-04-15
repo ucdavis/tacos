@@ -223,5 +223,7 @@ _Pvt_Extensions
 !.vscode/settings.json
 !.vscode/extensions.json
 src/tacos.mvc/npm-shrinkwrap.json
+src/tacos.mvc/MigrationPlan.md
 
 *.jfm
+**/.DS_Store

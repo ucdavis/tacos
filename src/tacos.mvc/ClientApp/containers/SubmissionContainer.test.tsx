@@ -254,7 +254,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             ]);
 
             const courseInput = getHost().querySelector(
-                "tbody tr[data-request-row='true'] input.form-control"
+                "tbody tr[data-request-row='true'] input[data-course-number-input='true']"
             ) as HTMLInputElement | null;
             const valueSetter = Object.getOwnPropertyDescriptor(
                 HTMLInputElement.prototype,
@@ -279,7 +279,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             });
 
             const updatedInput = getHost().querySelector(
-                "tbody tr[data-request-row='true'] input.form-control"
+                "tbody tr[data-request-row='true'] input[data-course-number-input='true']"
             ) as HTMLInputElement | null;
 
             expect(updatedInput).toBeDefined();
@@ -292,7 +292,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         }
     });
 
-    it("inserts a newly created empty request at the top of the table", async () => {
+    it("inserts a newly created empty request at the bottom of the table", async () => {
         await renderSubmission([
             createRequest("STD", {
                 name: "ECS 120",
@@ -324,14 +324,16 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         expect(requestRows).toHaveLength(3);
 
-        const firstRowInput = requestRows[0].querySelector("input.form-control") as HTMLInputElement | null;
+        const firstRowText = normalizeText(requestRows[0].textContent);
         const secondRowText = normalizeText(requestRows[1].textContent);
-        const thirdRowText = normalizeText(requestRows[2].textContent);
+        const thirdRowInput = requestRows[2].querySelector(
+            "input[data-course-number-input='true']"
+        ) as HTMLInputElement | null;
 
-        expect(firstRowInput).not.toBeNull();
-        expect(firstRowInput!.value).toBe("");
-        expect(secondRowText).toContain("120");
-        expect(thirdRowText).toContain("140A");
+        expect(firstRowText).toContain("120");
+        expect(secondRowText).toContain("140A");
+        expect(thirdRowInput).not.toBeNull();
+        expect(thirdRowInput!.value).toBe("");
     });
 
     it("uses exception values in the rendered annualized totals once they are entered", async () => {

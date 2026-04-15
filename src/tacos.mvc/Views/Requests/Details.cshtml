@@ -6,7 +6,7 @@
     var history = Model.History.OrderByDescending(h => h.UpdatedOn).Skip(1);
 }
 
-<div class="container">
+<div class="mx-auto max-w-6xl space-y-8 px-4 py-6">
     <h3>Course Information</h3>
 
     <dl>
@@ -16,7 +16,7 @@
         <dt>Name</dt>
         <dd>@Model.Course.Name</dd>
 
-        <dt>Course Type <span class="text-muted">(as reported in request)</span></dt>
+        <dt>Course Type <span class="tacos-text-muted">(as reported in request)</span></dt>
         <dd>@CourseInfo.Types[Model.CourseType]</dd>
 
         <dt>Average Enrollment</dt>
@@ -81,38 +81,40 @@
 
     <h3>History of this request</h3>
     
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Course Number</th>
-                <th>Course Type</th>
-                <th>Suggested Total</th>
-                <th>Requested Total</th>
-                <th>Reason</th>
-                <th>Reviewed?</th>
-                <th>Approved?</th>
-                <th>Approval Reason</th>
-                <th>Updated On</th>
-                <th>Updated By</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var h in history)
-        {
-            <tr>
-                <td>@h.CourseNumber</td>
-                <td>@CourseInfo.Types[h.CourseType]</td>
-                <td>@(h.CalculatedTotal)</td>
-                <td>@(h.Exception ? h.ExceptionTotal.ToString() : "")</td>
-                <td>@(h.Exception ? h.ExceptionReason : "")</td>
-                <td>@(h.Approved.HasValue ? "Yes" : "No")</td>
-                <td>@(h.Approved.HasValue ? (h.Approved.Value ? "Yes" : "No") : "")</td>
-                <td>@(h.Exception ? h.ApprovedComment : "")</td>
-                <td>@h.UpdatedOn.ToString("G")</td>
-                <td>@h.UpdatedBy</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <div class="tacos-page-table-frame">
+        <table class="table tacos-page-table w-full">
+            <thead>
+                <tr>
+                    <th>Course Number</th>
+                    <th>Course Type</th>
+                    <th>Suggested Total</th>
+                    <th>Requested Total</th>
+                    <th>Reason</th>
+                    <th>Reviewed?</th>
+                    <th>Approved?</th>
+                    <th>Approval Reason</th>
+                    <th>Updated On</th>
+                    <th>Updated By</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var h in history)
+            {
+                <tr>
+                    <td>@h.CourseNumber</td>
+                    <td>@CourseInfo.Types[h.CourseType]</td>
+                    <td>@(h.CalculatedTotal)</td>
+                    <td>@(h.Exception ? h.ExceptionTotal.ToString() : "")</td>
+                    <td>@(h.Exception ? h.ExceptionReason : "")</td>
+                    <td>@(h.Approved.HasValue ? "Yes" : "No")</td>
+                    <td>@(h.Approved.HasValue ? (h.Approved.Value ? "Yes" : "No") : "")</td>
+                    <td>@(h.Exception ? h.ApprovedComment : "")</td>
+                    <td>@h.UpdatedOn.ToString("G")</td>
+                    <td>@h.UpdatedBy</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 
 </div>

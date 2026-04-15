@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@import "@ucdavis/gunrock-tailwind/imports.css";
+@source "../Views";

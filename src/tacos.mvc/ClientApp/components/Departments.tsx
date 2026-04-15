@@ -15,9 +15,9 @@ export default class Departments extends React.PureComponent<IProps, {}> {
 
     return (
       <div>
-        <label htmlFor="department">Your Department:</label>
+        <label className="tacos-form-label" htmlFor="department">Your Department:</label>
         <select
-          className="form-control"
+          className="tacos-select"
           id="department"
           value={departmentId}
           onChange={this.onChange}

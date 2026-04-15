@@ -8,34 +8,36 @@
 @{
     ViewData["Title"] = "Log in";
 }
-<div class="col">
-<h2>Choose how you would like to log in</h2>
+<div class="mx-auto max-w-xl px-4 py-10">
+    <div class="card rounded-none border border-base-300 bg-base-100 shadow-sm">
+        <div class="card-body space-y-4">
+            <h2 class="card-title text-2xl">Choose how you would like to log in</h2>
 
-        @{
-            var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (loginProviders.Count == 0)
-            {
-                <div>
-                    <p>
-                        There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
-                        for details on setting up this ASP.NET application to support logging in via external services.
-                    </p>
-                </div>
-            }
-            else
-            {
-                <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+            @{
+                var loginProviders = (await SignInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                if (loginProviders.Count == 0)
+                {
                     <div>
                         <p>
-                            @foreach (var provider in loginProviders)
-                            {
-                                <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>
-                            }
+                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                            for details on setting up this ASP.NET application to support logging in via external services.
                         </p>
                     </div>
-                </form>
+                }
+                else
+                {
+                    <form asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                        <div class="flex flex-wrap gap-3">
+                            @foreach (var provider in loginProviders)
+                            {
+                                <button type="submit" class="tacos-btn tacos-btn--primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.Name</button>
+                            }
+                        </div>
+                    </form>
+                }
             }
-        }
+        </div>
+    </div>
 </div>
 
 @section Scripts {

@@ -47,18 +47,28 @@ export default class CreateCourseModal extends React.PureComponent<IProps, IStat
             <Modal isOpen={isOpen} onClose={onClose} centered={true}>
                 <ModalHeader>Create Course</ModalHeader>
                 <ModalBody>
-                    <div className="form-group">
-                        <label>Course Number</label>
-                        <input className="form-control" value={courseNumber} onChange={this.onChangeNumber} />
+                    <div className="tacos-form-field">
+                        <label className="tacos-form-label" htmlFor="create-course-number">Course Number</label>
+                        <input
+                            className="tacos-input"
+                            id="create-course-number"
+                            value={courseNumber}
+                            onChange={this.onChangeNumber}
+                        />
                     </div>
-                    <div className="form-group">
-                        <label>Course Name</label>
-                        <input className="form-control" value={courseName} onChange={this.onChangeName} />
+                    <div className="tacos-form-field">
+                        <label className="tacos-form-label" htmlFor="create-course-name">Course Name</label>
+                        <input
+                            className="tacos-input"
+                            id="create-course-name"
+                            value={courseName}
+                            onChange={this.onChangeName}
+                        />
                     </div>
                 </ModalBody>
-                <ModalFooter className="d-flex justify-content-between">
-                    <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                    <button type="button" className="btn btn-primary" onClick={this.onSubmit}>Submit</button>
+                <ModalFooter className="tacos-modal-footer--split">
+                    <button type="button" className="tacos-btn tacos-btn--secondary" onClick={onClose}>Cancel</button>
+                    <button type="button" className="tacos-btn tacos-btn--primary" onClick={this.onSubmit}>Submit</button>
                 </ModalFooter>
             </Modal>
         );

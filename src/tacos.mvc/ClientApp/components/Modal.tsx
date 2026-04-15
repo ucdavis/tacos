@@ -19,6 +19,8 @@ interface IModalStackEntry {
     token: symbol;
 }
 
+const BODY_OPEN_CLASS_NAME = "tacos-modal-open";
+
 let openModalCount = 0;
 let modalTitleCount = 0;
 const modalStack: IModalStackEntry[] = [];
@@ -73,7 +75,7 @@ function removeModalFromStack(entry: IModalStackEntry) {
     }
 }
 
-const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
+const Modal = ({ children, centered: _centered, isOpen, onClose }: IModalProps) => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
     const onCloseRef = React.useRef(onClose);
     const previousFocusedElementRef = React.useRef<HTMLElement | null>(null);
@@ -119,7 +121,7 @@ const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
         }
 
         openModalCount += 1;
-        document.body.classList.add("modal-open");
+        document.body.classList.add(BODY_OPEN_CLASS_NAME);
         previousFocusedElementRef.current = document.activeElement instanceof HTMLElement
             ? document.activeElement
             : null;
@@ -132,7 +134,7 @@ const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
             openModalCount = Math.max(0, openModalCount - 1);
 
             if (openModalCount === 0) {
-                document.body.classList.remove("modal-open");
+                document.body.classList.remove(BODY_OPEN_CLASS_NAME);
             }
 
             removeModalFromStack(stackEntry);
@@ -194,34 +196,31 @@ const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
         return null;
     }
 
-    const dialogClassName = joinClassNames(
-        "modal-dialog",
-        centered ? "modal-dialog-centered" : undefined,
-    );
+    const modalClassName = joinClassNames("tacos-modal");
+
+    const dialogClassName = joinClassNames("tacos-modal__dialog");
 
     return createPortal(
         <ModalTitleContext.Provider value={titleId}>
-            <>
+            <div
+                className={modalClassName}
+                data-tacos-modal-root="true"
+                onClick={handleBackdropClick}
+            >
                 <div
-                    className="modal fade show"
-                    style={{ display: "block" }}
-                    onClick={handleBackdropClick}
+                    aria-labelledby={titleId}
+                    aria-modal="true"
+                    className={dialogClassName}
+                    data-tacos-modal-dialog="true"
+                    onClick={stopPropagation}
+                    onKeyDown={handleDialogKeyDown}
+                    ref={dialogRef}
+                    role="dialog"
+                    tabIndex={-1}
                 >
-                    <div
-                        aria-labelledby={titleId}
-                        aria-modal="true"
-                        className={dialogClassName}
-                        onClick={stopPropagation}
-                        onKeyDown={handleDialogKeyDown}
-                        ref={dialogRef}
-                        role="dialog"
-                        tabIndex={-1}
-                    >
-                        <div className="modal-content">{children}</div>
-                    </div>
+                    <div className="tacos-modal__content">{children}</div>
                 </div>
-                <div className="modal-backdrop fade show" />
-            </>
+            </div>,
         </ModalTitleContext.Provider>,
         document.body,
     );
@@ -231,18 +230,20 @@ export const ModalHeader = ({ children, className }: IModalSectionProps) => {
     const titleId = React.useContext(ModalTitleContext);
 
     return (
-        <div className={joinClassNames("modal-header", className)}>
-            <h5 className="modal-title mb-0" id={titleId}>{children}</h5>
+        <div className={joinClassNames("tacos-modal__header", className)}>
+            <h5 className="tacos-modal__title" data-tacos-modal-title="true" id={titleId}>
+                {children}
+            </h5>
         </div>
     );
 };
 
 export const ModalBody = ({ children, className }: IModalSectionProps) => (
-    <div className={joinClassNames("modal-body", className)}>{children}</div>
+    <div className={joinClassNames("tacos-modal__body", className)}>{children}</div>
 );
 
 export const ModalFooter = ({ children, className }: IModalSectionProps) => (
-    <div className={joinClassNames("modal-footer", className)}>{children}</div>
+    <div className={joinClassNames("tacos-modal__footer", className)}>{children}</div>
 );
 
 export default Modal;

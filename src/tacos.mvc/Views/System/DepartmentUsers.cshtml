@@ -7,72 +7,77 @@
     var departmentSelectItems = departments.Select(d => new SelectListItem() { Text = d.Name, Value = d.Id.ToString() });
 }
 
-<div class="container">
+<div class="tacos-page-shell tacos-page-stack">
 
-    <h2>Manage Department Roles</h2>
+    <h2 class="tacos-page-heading">Manage Department Roles</h2>
 
-    <table id="departmentRolesTable" class="table table-striped">
-        <thead>
-        <tr>
-            <th></th>
-            <th>Code</th>
-            <th>Department</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var row in Model.DepartmentRoles)
-        {
+    <div>
+        <table id="departmentRolesTable" class="table tacos-admin-roles-table tacos-department-roles-table w-full">
+            <thead>
             <tr>
-                <td>
-                    <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
-                        <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i></button>
-                    </form>
-                </td>
-                <td>@row.Department.Code</td>
-                <td>@row.Department.Name</td>
-                <td>@row.User.Name</td>
-                <td>@row.User.Email</td>
-                <td>@row.Role</td>
+                <th></th>
+                <th>Code</th>
+                <th>Department</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var row in Model.DepartmentRoles)
+            {
+                <tr>
+                    <td>
+                        <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
+                            <button class="tacos-btn tacos-btn--danger tacos-btn--icon-only" type="submit" aria-label="Remove @row.User.Name from @row.Department.Name" title="Remove @row.User.Name from @row.Department.Name">
+                                <i class="fas fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </td>
+                    <td>@row.Department.Code</td>
+                    <td>@row.Department.Name</td>
+                    <td>@row.User.Name</td>
+                    <td>@row.User.Email</td>
+                    <td>@row.Role</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserToDepartmentRoleModal">
+    <button type="button" class="tacos-btn tacos-btn--primary" onclick="document.getElementById('addUserToDepartmentRoleModal').showModal()">
         Add User to Department
     </button>
 
-    <form method="post" asp-action="AddUserToDepartmentRole">
-        <div id="addUserToDepartmentRoleModal" class="modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Modal title</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+    <dialog id="addUserToDepartmentRoleModal" class="tacos-dialog tacos-dialog--top" aria-labelledby="addUserToDepartmentRoleModalTitle">
+        <div class="tacos-dialog__panel tacos-modal__content" role="document">
+            <div class="tacos-modal__header">
+                <h5 class="tacos-modal__title" id="addUserToDepartmentRoleModalTitle">Add User to Department</h5>
+                <button type="button" class="tacos-modal__close" aria-label="Close" onclick="this.closest('dialog').close()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" asp-action="AddUserToDepartmentRole">
+                <div class="tacos-modal__body">
+                    <div class="tacos-form-field">
+                        <label class="tacos-form-label" for="departmentRoleDepartmentId">Department</label>
+                        <select id="departmentRoleDepartmentId" name="departmentId" class="tacos-select" asp-items="departmentSelectItems" autofocus></select>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="control-label">Department</label>
-                            <select name="departmentId" class="form-control" asp-items="departmentSelectItems"></select>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label">User</label>
-                            <input name="userId" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Add User</button>
+                    <div class="tacos-form-field">
+                        <label class="tacos-form-label" for="departmentRoleUserId">User</label>
+                        <input id="departmentRoleUserId" name="userId" class="tacos-input" type="text" />
                     </div>
                 </div>
-            </div>
+                <div class="tacos-modal__footer">
+                    <button type="button" class="tacos-btn tacos-btn--secondary" onclick="this.closest('dialog').close()">Close</button>
+                    <button type="submit" class="tacos-btn tacos-btn--primary">Add User</button>
+                </div>
+            </form>
         </div>
-    </form>
+        <form method="dialog" class="tacos-dialog__backdrop">
+            <button aria-label="Close dialog">close</button>
+        </form>
+    </dialog>
 
 </div>
 
@@ -80,13 +85,21 @@
 {
 <script>
         $(function () {
+            var defaultDom = "<'tacos-datatable-toolbar'<'tacos-datatable-toolbar__length'l><'tacos-datatable-toolbar__actions'f>>" +
+                "<'tacos-datatable-table'tr>" +
+                "<'tacos-datatable-footer'<'tacos-datatable-footer__info'i><'tacos-datatable-footer__pagination'p>>";
+            var dataTableDom = window.TacosDataTables && window.TacosDataTables.dom && window.TacosDataTables.dom.standard
+                ? window.TacosDataTables.dom.standard
+                : defaultDom;
+
             $('#departmentRolesTable').DataTable({
                 "columnDefs": [
                     {
                         "targets": [0],
                         "sortable": false
                     }],
-                "order": [[1, "desc"]]
+                "order": [[1, "desc"]],
+                "dom": dataTableDom
             });
         });
 </script>
