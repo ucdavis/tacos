@@ -26,15 +26,39 @@
         }
     }
 
+    function closeDialog(dialog) {
+        if (dialog && dialog.open) {
+            dialog.close();
+        }
+    }
+
     document.addEventListener("click", function (event) {
-        var collapseButton = event.target.closest("[data-tacos-collapse-target]");
+        var target = event.target instanceof Element ? event.target : null;
+
+        if (!target) {
+            return;
+        }
+
+        var dialogBackdrop = target.closest(".tacos-dialog__backdrop");
+
+        if (dialogBackdrop) {
+            closeDialog(dialogBackdrop.closest("dialog.tacos-dialog"));
+            return;
+        }
+
+        if (target instanceof HTMLDialogElement && target.classList.contains("tacos-dialog")) {
+            closeDialog(target);
+            return;
+        }
+
+        var collapseButton = target.closest("[data-tacos-collapse-target]");
 
         if (collapseButton) {
             toggleCollapse(collapseButton);
             return;
         }
 
-        var alertDismissButton = event.target.closest("[data-tacos-dismiss='alert']");
+        var alertDismissButton = target.closest("[data-tacos-dismiss='alert']");
 
         if (alertDismissButton) {
             dismissAlert(alertDismissButton);

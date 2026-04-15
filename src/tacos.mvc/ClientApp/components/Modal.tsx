@@ -75,7 +75,7 @@ function removeModalFromStack(entry: IModalStackEntry) {
     }
 }
 
-const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
+const Modal = ({ children, centered: _centered, isOpen, onClose }: IModalProps) => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
     const onCloseRef = React.useRef(onClose);
     const previousFocusedElementRef = React.useRef<HTMLElement | null>(null);
@@ -196,10 +196,7 @@ const Modal = ({ children, centered, isOpen, onClose }: IModalProps) => {
         return null;
     }
 
-    const modalClassName = joinClassNames(
-        "tacos-modal",
-        centered ? "tacos-modal--centered" : undefined,
-    );
+    const modalClassName = joinClassNames("tacos-modal");
 
     const dialogClassName = joinClassNames("tacos-modal__dialog");
 
