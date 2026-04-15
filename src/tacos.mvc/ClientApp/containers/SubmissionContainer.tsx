@@ -68,11 +68,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         }
 
         if (jsAction === "create") {
-            // check if first request is already empty
-            const firstRequest = requests[0];
-            if (!firstRequest || !firstRequest.course || !firstRequest.course.number) {
+            const lastRequestIndex = requests.length - 1;
+            const lastRequest = requests[lastRequestIndex];
+
+            // check if last request is already empty
+            if (lastRequest && (!lastRequest.course || !lastRequest.course.number)) {
                 // focus request
-                this.focusRequest(0);
+                this.focusRequest(lastRequestIndex);
                 return;
             }
 
@@ -494,6 +496,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
     private onAddRequest = () => {
         const newRequests: IRequest[] = [
+            ...this.state.requests,
             {
                 course: undefined,
                 courseName: "",
@@ -510,12 +513,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 hasApprovedException: false,
                 isValid: true,
             },
-            ...this.state.requests,
         ];
+        const newRequestIndex = newRequests.length - 1;
 
         this.setState({ requests: newRequests }, () => {
             // update isFocused to trigger ui flash
-            this.focusRequest(0);
+            this.focusRequest(newRequestIndex);
         });
     };
 

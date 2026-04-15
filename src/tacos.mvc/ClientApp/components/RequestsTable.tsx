@@ -384,7 +384,19 @@ const RequestsTable = (props: IProps) => {
     }, [startColumnResize]);
 
     const visibleColumnCount = table.getVisibleLeafColumns().length;
-    const rows = table.getRowModel().rows;
+    const rowModel = table.getRowModel();
+    const rows = React.useMemo(() => {
+        const persistedRows = rowModel.rows.filter((row) => row.original.request.id);
+        const unsavedRows = rowModel.rows
+            .filter((row) => !row.original.request.id)
+            .sort((leftRow, rightRow) => leftRow.original.originalIndex - rightRow.original.originalIndex);
+
+        if (unsavedRows.length === 0) {
+            return rowModel.rows;
+        }
+
+        return [...persistedRows, ...unsavedRows];
+    }, [rowModel.rows]);
 
     return (
         <div className={className}>

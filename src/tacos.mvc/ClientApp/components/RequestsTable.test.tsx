@@ -313,6 +313,39 @@ describe("RequestsTable UI coverage", () => {
         expect(getVisibleRequestIds()).toEqual(["request-2", "request-3", "request-1"]);
     });
 
+    it("keeps unsaved rows at the bottom in insertion order when sorting", async () => {
+        await renderTable({
+            requests: [
+                createRequest(1, { course: createCourse({ number: "TAC 300", name: "Saved Three Hundred" }) }),
+                createRequest(2, { course: createCourse({ number: "TAC 020", name: "Saved Twenty" }) }),
+                createRequest(3, {
+                    course: createCourse({ number: "TAC 100", name: "Unsaved One Hundred" }),
+                    id: undefined,
+                }),
+                createRequest(4, {
+                    course: createCourse({ number: "TAC 050", name: "Unsaved Fifty" }),
+                    id: undefined,
+                }),
+            ]
+        });
+
+        await click(getSortButton("course"));
+        expect(getVisibleRequestIds()).toEqual([
+            "request-2",
+            "request-1",
+            "request-new-2",
+            "request-new-3",
+        ]);
+
+        await click(getSortButton("course"));
+        expect(getVisibleRequestIds()).toEqual([
+            "request-1",
+            "request-2",
+            "request-new-2",
+            "request-new-3",
+        ]);
+    });
+
     it("resizes adjacent columns from the divider handle and keeps the divider bound to the column on the left", async () => {
         await renderTable({
             requests: [
