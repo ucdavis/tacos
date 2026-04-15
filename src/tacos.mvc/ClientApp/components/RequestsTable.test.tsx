@@ -466,7 +466,7 @@ describe("RequestsTable UI coverage", () => {
         expect(onEdit).toHaveBeenNthCalledWith(3, 1, { ...secondRequest, exception: true });
     });
 
-    it("forwards numeric edits from the expanded exception detail inputs and renders the reason field", async () => {
+    it("forwards numeric edits from the expanded exception detail inputs and preserves textarea typing until blur saves it", async () => {
         const onEdit = vi.fn();
 
         const request = createRequest(7, {
@@ -493,9 +493,11 @@ describe("RequestsTable UI coverage", () => {
 
         await setInputValue(totalInput!, "2.25");
         await setInputValue(annualCountInput!, "3");
+        await setInputValue(reasonInput!, "Updated justification");
         expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, exceptionTotal: 2.25 });
         expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, exceptionAnnualCount: 3 });
-        expect(reasonInput!.value).toBe("Existing justification");
+        expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exceptionReason: "Updated justification" });
+        expect(reasonInput!.value).toBe("Updated justification");
     });
 
     it("renders new-course, validation, and every-other-year warning indicators", async () => {

@@ -25,21 +25,11 @@ interface IState {
 export default class ExceptionDetail extends React.PureComponent<IProps, IState> {
     private isMountedFlag = false;
 
-    public static getDerivedStateFromProps(nextProps: IProps, prevState: IState) {
-        if (nextProps.exceptionReason !== prevState.exceptionReason) {
-            return {
-                exceptionReason: nextProps.exceptionReason,
-            };
-        }
-
-        return null;
-    }
-
     constructor(props: IProps) {
         super(props);
 
         this.state = {
-            exceptionReason: "",
+            exceptionReason: props.exceptionReason,
             revoked: false,
             isRevoking: false,
         };
@@ -47,6 +37,17 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
 
     public componentDidMount() {
         this.isMountedFlag = true;
+    }
+
+    public componentDidUpdate(prevProps: IProps) {
+        if (
+            prevProps.exceptionReason !== this.props.exceptionReason
+            && this.props.exceptionReason !== this.state.exceptionReason
+        ) {
+            this.setState({
+                exceptionReason: this.props.exceptionReason,
+            });
+        }
     }
 
     public componentWillUnmount() {
