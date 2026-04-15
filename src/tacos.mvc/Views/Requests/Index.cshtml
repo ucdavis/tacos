@@ -83,12 +83,19 @@
             window.location.href = "/requests/?code=" + code;
         });
 
+        var defaultDom = "<'tacos-datatable-toolbar'<'tacos-datatable-toolbar__length'l><'tacos-datatable-toolbar__actions'f>>" +
+            "<'tacos-datatable-table'tr>" +
+            "<'tacos-datatable-footer'<'tacos-datatable-footer__info'i><'tacos-datatable-footer__pagination'p>>";
+        var dataTableDom = window.TacosDataTables && window.TacosDataTables.dom && window.TacosDataTables.dom.standard
+            ? window.TacosDataTables.dom.standard
+            : defaultDom;
+
         $('#requestTable').DataTable({
             "lengthMenu": [
                 [ 10, 25, 50, -1 ],
                 [ 10, 25, 50, "All" ],
             ],
-            "dom": window.TacosDataTables.dom.standard,
+            "dom": dataTableDom,
             "columnDefs": [
                 {
                     "targets": [-1],

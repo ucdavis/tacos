@@ -112,8 +112,14 @@ export default class CourseNumber extends React.Component<IProps, IState> {
 
         if (isValid && isNew) {
             return (
-                <button className="tacos-link-button tacos-link-button--icon" type="button" onClick={this.onCourseCreate}>
-                    <i className="far fa-fw fa-edit" />
+                <button
+                    aria-label="Edit new course details"
+                    className="tacos-link-button tacos-link-button--icon"
+                    onClick={this.onCourseCreate}
+                    title="Edit new course details"
+                    type="button"
+                >
+                    <i aria-hidden="true" className="far fa-fw fa-edit" />
                 </button>
             );
         }

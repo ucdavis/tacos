@@ -121,7 +121,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 <div className="tacos-action-row tacos-action-row--end">
                     <button
                         className="tacos-btn tacos-btn--primary"
-                        id="submit-button"
                         onClick={this.onAddRequest}
                         type="button"
                     >
@@ -146,7 +145,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 <div className="tacos-action-row">
                     <button
                         className="tacos-btn tacos-btn--primary"
-                        id="submit-button"
                         onClick={this.onAddRequest}
                         type="button"
                     >

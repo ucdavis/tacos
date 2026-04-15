@@ -23,7 +23,6 @@ export default class Summary extends React.PureComponent<IProps, {}> {
         return (
             <button
                 className="tacos-btn tacos-btn--primary"
-                id="submit-button"
                 disabled={!this.props.canSave || this.props.isProcessing}
                 onClick={this.props.onSave}
                 type="button"
@@ -38,7 +37,6 @@ export default class Summary extends React.PureComponent<IProps, {}> {
         return (
             <button
                 className="tacos-btn tacos-btn--primary"
-                id="submit-button"
                 disabled={!this.props.canSubmit || this.props.isProcessing}
                 onClick={this.props.onSubmit}
                 type="button"

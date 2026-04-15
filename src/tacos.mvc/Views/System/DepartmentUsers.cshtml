@@ -29,7 +29,9 @@
                 <tr>
                     <td>
                         <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
-                            <button class="tacos-btn tacos-btn--danger tacos-btn--icon-only" type="submit"><i class="fas fa-trash"></i></button>
+                            <button class="tacos-btn tacos-btn--danger tacos-btn--icon-only" type="submit" aria-label="Remove @row.User.Name from @row.Department.Name" title="Remove @row.User.Name from @row.Department.Name">
+                                <i class="fas fa-trash" aria-hidden="true"></i>
+                            </button>
                         </form>
                     </td>
                     <td>@row.Department.Code</td>
@@ -58,12 +60,12 @@
             <form method="post" asp-action="AddUserToDepartmentRole">
                 <div class="tacos-modal__body">
                     <div class="tacos-form-field">
-                        <label class="tacos-form-label">Department</label>
-                        <select name="departmentId" class="tacos-select" asp-items="departmentSelectItems" autofocus></select>
+                        <label class="tacos-form-label" for="departmentRoleDepartmentId">Department</label>
+                        <select id="departmentRoleDepartmentId" name="departmentId" class="tacos-select" asp-items="departmentSelectItems" autofocus></select>
                     </div>
                     <div class="tacos-form-field">
-                        <label class="tacos-form-label">User</label>
-                        <input name="userId" class="tacos-input" />
+                        <label class="tacos-form-label" for="departmentRoleUserId">User</label>
+                        <input id="departmentRoleUserId" name="userId" class="tacos-input" type="text" />
                     </div>
                 </div>
                 <div class="tacos-modal__footer">
@@ -83,6 +85,13 @@
 {
 <script>
         $(function () {
+            var defaultDom = "<'tacos-datatable-toolbar'<'tacos-datatable-toolbar__length'l><'tacos-datatable-toolbar__actions'f>>" +
+                "<'tacos-datatable-table'tr>" +
+                "<'tacos-datatable-footer'<'tacos-datatable-footer__info'i><'tacos-datatable-footer__pagination'p>>";
+            var dataTableDom = window.TacosDataTables && window.TacosDataTables.dom && window.TacosDataTables.dom.standard
+                ? window.TacosDataTables.dom.standard
+                : defaultDom;
+
             $('#departmentRolesTable').DataTable({
                 "columnDefs": [
                     {
@@ -90,7 +99,7 @@
                         "sortable": false
                     }],
                 "order": [[1, "desc"]],
-                "dom": window.TacosDataTables.dom.standard
+                "dom": dataTableDom
             });
         });
 </script>
