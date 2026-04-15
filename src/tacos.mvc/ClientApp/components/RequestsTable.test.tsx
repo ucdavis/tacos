@@ -526,9 +526,31 @@ describe("RequestsTable UI coverage", () => {
 
         await setInputValue(totalInput!, "2.25");
         await setInputValue(annualCountInput!, "3");
-        await setInputValue(reasonInput!, "Updated justification");
+
+        const textareaValueSetter = Object.getOwnPropertyDescriptor(
+            HTMLTextAreaElement.prototype,
+            "value",
+        )?.set;
+
+        expect(textareaValueSetter).toBeDefined();
+
+        act(() => {
+            reasonInput!.focus();
+            textareaValueSetter!.call(reasonInput!, "Updated justification");
+            reasonInput!.dispatchEvent(new Event("input", { bubbles: true }));
+            reasonInput!.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+
         expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, exceptionTotal: 2.25 });
         expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, exceptionAnnualCount: 3 });
+        expect(onEdit).toHaveBeenCalledTimes(2);
+        expect(reasonInput!.value).toBe("Updated justification");
+
+        act(() => {
+            reasonInput!.blur();
+            reasonInput!.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
+        });
+
         expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exceptionReason: "Updated justification" });
         expect(reasonInput!.value).toBe("Updated justification");
     });
