@@ -36,13 +36,9 @@ namespace tacos.core.Data
 
         public string CourseType { get; set; }
 
-        public string RequestType { get; set; }
-
         public bool Exception { get; set; }
 
         public string ExceptionReason { get; set; }
-
-        public double ExceptionTotal { get; set; }
 
         public double ExceptionTaTotal { get; set; }
 
@@ -50,20 +46,13 @@ namespace tacos.core.Data
 
         public double ExceptionAnnualCount { get; set; }
 
-        public double ExceptionAnnualizedTotal { get; set; }
-
         public double ExceptionAnnualizedTaTotal { get; set; }
 
         public double ExceptionAnnualizedReaderTotal { get; set; }
 
-        // calculated total of TAs, regardless of what is requested
-        public double CalculatedTotal { get; set; }
-
         public double CalculatedTaTotal { get; set; }
 
         public double CalculatedReaderTotal { get; set; }
-
-        public double AnnualizedTotal { get; set; }
 
         public double AnnualizedTaTotal { get; set; }
 
@@ -108,6 +97,14 @@ namespace tacos.core.Data
                 return ApprovedTaTotal + ApprovedReaderTotal;
             }
         }
+
+        public double ExceptionTotal => ExceptionTaTotal + ExceptionReaderTotal;
+
+        public double ExceptionAnnualizedTotal => ExceptionAnnualizedTaTotal + ExceptionAnnualizedReaderTotal;
+
+        public double CalculatedTotal => CalculatedTaTotal + CalculatedReaderTotal;
+
+        public double AnnualizedTotal => AnnualizedTaTotal + AnnualizedReaderTotal;
 
         public double ApprovedAnnualizedTaTotal
         {

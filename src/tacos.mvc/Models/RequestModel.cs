@@ -11,13 +11,9 @@ namespace tacos.mvc.Models
 
         public string CourseType { get; set; }
 
-        public string RequestType { get; set; }
-
         public bool Exception { get; set; }
 
         public string ExceptionReason { get; set; }
-
-        public double ExceptionTotal { get; set; }
 
         public double ExceptionTaTotal { get; set; }
 
@@ -25,20 +21,13 @@ namespace tacos.mvc.Models
 
         public double ExceptionAnnualCount { get; set; }
 
-        public double ExceptionAnnualizedTotal { get; set; }
-
         public double ExceptionAnnualizedTaTotal { get; set; }
 
         public double ExceptionAnnualizedReaderTotal { get; set; }
 
-        // calculated total of TAs, regardless of what is requested
-        public double CalculatedTotal { get; set; }
-
         public double CalculatedTaTotal { get; set; }
 
         public double CalculatedReaderTotal { get; set; }
-
-        public double AnnualizedTotal { get; set; }
 
         public double AnnualizedTaTotal { get; set; }
 

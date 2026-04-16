@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tacos.core;
 
@@ -11,9 +12,11 @@ using tacos.core;
 namespace tacos.core.Migrations
 {
     [DbContext(typeof(TacoDbContext))]
-    partial class TacoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260416220720_RemoveRequestType")]
+    partial class RemoveRequestType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -327,6 +330,9 @@ namespace tacos.core.Migrations
                     b.Property<double>("AnnualizedTaTotal")
                         .HasColumnType("float");
 
+                    b.Property<double>("AnnualizedTotal")
+                        .HasColumnType("float");
+
                     b.Property<bool?>("Approved")
                         .HasColumnType("bit");
 
@@ -337,6 +343,9 @@ namespace tacos.core.Migrations
                         .HasColumnType("float");
 
                     b.Property<double>("CalculatedTaTotal")
+                        .HasColumnType("float");
+
+                    b.Property<double>("CalculatedTotal")
                         .HasColumnType("float");
 
                     b.Property<string>("CourseNumber")
@@ -361,6 +370,9 @@ namespace tacos.core.Migrations
                     b.Property<double>("ExceptionAnnualizedTaTotal")
                         .HasColumnType("float");
 
+                    b.Property<double>("ExceptionAnnualizedTotal")
+                        .HasColumnType("float");
+
                     b.Property<double>("ExceptionReaderTotal")
                         .HasColumnType("float");
 
@@ -368,6 +380,9 @@ namespace tacos.core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("ExceptionTaTotal")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ExceptionTotal")
                         .HasColumnType("float");
 
                     b.Property<bool>("IsActive")
@@ -411,6 +426,9 @@ namespace tacos.core.Migrations
                     b.Property<double>("AnnualizedTaTotal")
                         .HasColumnType("float");
 
+                    b.Property<double>("AnnualizedTotal")
+                        .HasColumnType("float");
+
                     b.Property<bool?>("Approved")
                         .HasColumnType("bit");
 
@@ -427,6 +445,9 @@ namespace tacos.core.Migrations
                         .HasColumnType("float");
 
                     b.Property<double>("CalculatedTaTotal")
+                        .HasColumnType("float");
+
+                    b.Property<double>("CalculatedTotal")
                         .HasColumnType("float");
 
                     b.Property<string>("CourseNumber")
@@ -450,6 +471,9 @@ namespace tacos.core.Migrations
                     b.Property<double>("ExceptionAnnualizedTaTotal")
                         .HasColumnType("float");
 
+                    b.Property<double>("ExceptionAnnualizedTotal")
+                        .HasColumnType("float");
+
                     b.Property<double>("ExceptionReaderTotal")
                         .HasColumnType("float");
 
@@ -457,6 +481,9 @@ namespace tacos.core.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("ExceptionTaTotal")
+                        .HasColumnType("float");
+
+                    b.Property<double>("ExceptionTotal")
                         .HasColumnType("float");
 
                     b.Property<int>("RequestId")

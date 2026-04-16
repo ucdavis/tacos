@@ -39,19 +39,15 @@ function createRequest(id: number, overrides: Partial<IRequest> = {}): IRequest 
         courseType: "STD",
         calculatedTaTotal: 1,
         calculatedReaderTotal: 0,
-        calculatedTotal: 1,
         annualizedTaTotal: 0.333,
         annualizedReaderTotal: 0,
-        annualizedTotal: 0.333,
         exception: false,
         exceptionReason: "",
         exceptionTaTotal: 0,
         exceptionReaderTotal: 0,
-        exceptionTotal: 0,
         exceptionAnnualCount: 0,
         exceptionAnnualizedTaTotal: 0,
         exceptionAnnualizedReaderTotal: 0,
-        exceptionAnnualizedTotal: 0,
         hasApprovedException: false,
         isDirty: true,
         isValid: true,
@@ -565,8 +561,7 @@ describe("RequestsTable UI coverage", () => {
                         isCourseTaughtOnceEveryTwoYears: true,
                         wasCourseTaughtInMostRecentYear: false
                     }),
-                    annualizedTaTotal: 0.5,
-                    annualizedTotal: 0.5
+                    annualizedTaTotal: 0.5
                 }),
             ]
         });
@@ -603,12 +598,11 @@ describe("RequestsTable UI coverage", () => {
                         isCourseTaughtOnceEveryTwoYears: true,
                         wasCourseTaughtInMostRecentYear: false
                     }),
-                    annualizedTotal: 0.5,
+                    annualizedTaTotal: 0.5,
                     exception: true,
                     exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3,
                     exceptionAnnualizedTaTotal: 1.5,
-                    exceptionAnnualizedTotal: 1.5,
                     hasApprovedException: true
                 }),
             ]
@@ -649,7 +643,6 @@ describe("RequestsTable UI coverage", () => {
                     exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3,
                     exceptionAnnualizedTaTotal: 1.5,
-                    exceptionAnnualizedTotal: 1.5,
                     hasApprovedException: true
                 }),
             ]

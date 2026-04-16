@@ -417,24 +417,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
 
                 request.calculatedTaTotal = support.taPerOffering;
                 request.calculatedReaderTotal = support.readerPerOffering;
-                request.calculatedTotal = request.calculatedTaTotal + request.calculatedReaderTotal;
                 request.annualizedTaTotal = annualizedSupport.annualizedTaTotal;
                 request.annualizedReaderTotal = annualizedSupport.annualizedReaderTotal;
-                request.annualizedTotal = request.annualizedTaTotal + request.annualizedReaderTotal;
                 request.exceptionAnnualizedTaTotal = request.exceptionTaTotal * request.exceptionAnnualCount / 3;
                 request.exceptionAnnualizedReaderTotal = request.exceptionReaderTotal * request.exceptionAnnualCount / 3;
-                request.exceptionAnnualizedTotal =
-                    request.exceptionAnnualizedTaTotal + request.exceptionAnnualizedReaderTotal;
             } else {
                 request.calculatedTaTotal = 0;
                 request.calculatedReaderTotal = 0;
-                request.calculatedTotal = 0;
                 request.annualizedTaTotal = 0;
                 request.annualizedReaderTotal = 0;
-                request.annualizedTotal = 0;
                 request.exceptionAnnualizedTaTotal = 0;
                 request.exceptionAnnualizedReaderTotal = 0;
-                request.exceptionAnnualizedTotal = 0;
             }
         }
     };
@@ -451,8 +444,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.courseName = "";
             request.courseNumber = "";
         }
-
-        normalizeLegacyRequest(request);
 
         // calculate totals
         this.recalculateRequests([request]);
@@ -523,19 +514,15 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 courseType: "STD",
                 calculatedTaTotal: 0,
                 calculatedReaderTotal: 0,
-                calculatedTotal: 0,
                 annualizedTaTotal: 0,
                 annualizedReaderTotal: 0,
-                annualizedTotal: 0,
                 exception: false,
                 exceptionReason: "",
                 exceptionTaTotal: 0.0,
                 exceptionReaderTotal: 0.0,
-                exceptionTotal: 0.0,
                 exceptionAnnualCount: 0.0,
                 exceptionAnnualizedTaTotal: 0,
                 exceptionAnnualizedReaderTotal: 0,
-                exceptionAnnualizedTotal: 0,
                 hasApprovedException: false,
                 isValid: true,
             },
@@ -591,38 +578,4 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         };
         this.requestUpdated(createCourseIndex, newRequest);
     };
-}
-
-function normalizeLegacyRequest(request: IRequest) {
-    if (
-        request.calculatedTaTotal === 0
-        && request.calculatedReaderTotal === 0
-        && request.calculatedTotal !== 0
-    ) {
-        request.calculatedTaTotal = request.calculatedTotal;
-    }
-
-    if (
-        request.annualizedTaTotal === 0
-        && request.annualizedReaderTotal === 0
-        && request.annualizedTotal !== 0
-    ) {
-        request.annualizedTaTotal = request.annualizedTotal;
-    }
-
-    if (
-        request.exceptionTaTotal === 0
-        && request.exceptionReaderTotal === 0
-        && request.exceptionTotal !== 0
-    ) {
-        request.exceptionTaTotal = request.exceptionTotal;
-    }
-
-    if (
-        request.exceptionAnnualizedTaTotal === 0
-        && request.exceptionAnnualizedReaderTotal === 0
-        && request.exceptionAnnualizedTotal !== 0
-    ) {
-        request.exceptionAnnualizedTaTotal = request.exceptionAnnualizedTotal;
-    }
 }
