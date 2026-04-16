@@ -90,7 +90,7 @@
         <dd>@Model.ApprovedAnnualizedReaderTotal.ToString("f3")</dd>
 
         <dt>Approved Annualized Combined Total</dt>
-        <dd>@Model.ApprovedAnnualizedTotal.ToString("f3")</dd>
+        <dd>@((Model.ApprovedAnnualizedTaTotal + Model.ApprovedAnnualizedReaderTotal).ToString("f3"))</dd>
     </dl>
 
 

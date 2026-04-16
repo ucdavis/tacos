@@ -7,11 +7,11 @@ This plan is intentionally phased. Phase 1 expands the schema and backfills exis
 
 ## Status
 - Phase 1: Complete
-- Phase 2: In progress
-- Phase 3: In progress
-- Phase 4: In progress
+- Phase 2: Complete
+- Phase 3: Complete
+- Phase 4: Complete
 - Phase 5: In progress
-- Phase 6: Not started
+- Phase 6: Complete
 
 ### Completed in Phase 1
 - Added split TA/Reader storage fields to the EF models in `src/tacos.core/Data/Request.cs` and `src/tacos.core/Data/RequestHistory.cs`.
@@ -99,19 +99,20 @@ Complete.
 Update the C# domain model and controller layer so the application stops depending on `RequestType` and starts reading and writing the split TA/Reader fields.
 
 ### Status
-In progress.
+Complete.
 
-### Completed so far
-- Added split TA/Reader properties to `src/tacos.mvc/Models/RequestModel.cs` while preserving legacy fields for compatibility during the transition.
+### Completed
+- Added split TA/Reader properties to `src/tacos.mvc/Models/RequestModel.cs`, then removed the legacy request-type and aggregate payload fields once the client cutover landed.
 - Added per-type approval computed properties in `src/tacos.core/Data/Request.cs`:
   - `ApprovedTaTotal`
   - `ApprovedReaderTotal`
   - `ApprovedAnnualizedTaTotal`
   - `ApprovedAnnualizedReaderTotal`
 - Updated `RequestsController.Save` to persist split TA/Reader values as the server-side source of truth.
-- Kept legacy aggregate fields in sync inside `RequestsController.Save` so the current UI and views continue to function before later phases land.
 - Updated request submission history creation in `RequestsController` to capture the split TA/Reader fields.
 - Updated approval history creation in `ApprovalController` to capture the split TA/Reader fields.
+- Removed active controller dependence on `RequestType` and aggregate fallback/synchronization once the split client payload shipped.
+- Removed server-side dependence on `CourseInfo.Requests`.
 - Added controller coverage for:
   - persisting split TA/Reader fields on save
   - capturing split TA/Reader fields in request history on submit
@@ -136,19 +137,14 @@ In progress.
 - Server payloads and persistence use split fields only.
 - History snapshots preserve TA and Reader values explicitly.
 
-### Remaining work in Phase 2
-- Remove active controller dependence on legacy `RequestType` fallback once the client submits split fields directly.
-- Decide whether to remove `RequestType` from `RequestModel` in this phase or defer that final contract cleanup until the client phase is ready.
-- Remove or retire legacy aggregate-field synchronization once downstream views and clients stop reading the old fields.
-
 ## Phase 3 — Review, Approval, Details, and Notification Surfaces
 ### Goal
 Update server-rendered pages and emails so all request data is displayed with separate TA and Reader values.
 
 ### Status
-In progress.
+Complete.
 
-### Completed so far
+### Completed
 - Updated `src/tacos.mvc/Views/Requests/Details.cshtml` to show separate TA and Reader values for:
   - suggested per-course support
   - exception per-course support
@@ -159,6 +155,7 @@ In progress.
 - Updated `src/tacos.mvc/Views/Approval/Index.cshtml` to remove row-level request type display and show separate TA/Reader exception, approved, and annualized totals.
 - Updated `src/tacos.mvc/Emails/SubmissionNotification.cshtml` to show separate TA and Reader exception amounts.
 - Updated `src/tacos.mvc/Emails/ApprovalNotification.cshtml` to show separate approved TA and Reader amounts.
+- Updated the request details view so any combined approved annualized total is computed explicitly in the view from the split TA and Reader values.
 - Verified `dotnet build src/tacos.mvc/tacos.mvc.csproj` after the Razor and email-template changes.
 
 ### Changes
@@ -176,23 +173,18 @@ In progress.
 - No user-facing review or detail page depends on `RequestType`.
 - All rendered totals are labeled as TA, Reader, or combined.
 
-### Remaining work in Phase 3
-- Decide whether to add explicit combined totals to the review and approval table footers, or keep the split annualized totals only.
-- Review any remaining non-React request surfaces for legacy unlabeled totals or request-type wording.
-
 ## Phase 4 — React State and Editing UI Restructure
 ### Goal
 Reshape the React editing flow so each course request row can edit both TA and Reader values.
 
 ### Status
-In progress.
+Complete.
 
-### Completed so far
+### Completed
 - Updated `src/tacos.mvc/ClientApp/models/IRequest.ts` to carry split TA/Reader support fields.
 - Updated `src/tacos.mvc/ClientApp/containers/SubmissionContainer.tsx` to:
   - maintain split TA and Reader totals in client state
   - calculate and submit split TA/Reader payload values
-  - keep legacy aggregate totals synchronized for compatibility
   - validate exceptions using split TA/Reader exception amounts
   - show separate TA and Reader summary totals
 - Updated `src/tacos.mvc/ClientApp/components/RequestsTable.tsx` to:
@@ -242,18 +234,14 @@ In progress.
 - The edit UI can store and submit TA and Reader values on the same row.
 - No client state or UI logic depends on `requestType`.
 
-### Remaining work in Phase 4
-- Decide whether to fully remove the legacy aggregate fields from the client model now or defer that final cleanup until all server endpoints and rendered views no longer depend on them.
-- Do a broader React test pass beyond the focused container/table coverage if additional client surfaces are added.
-
 ## Phase 5 — Formula Pipeline Reshape
 ### Goal
 Refactor the formula layer so course-type formulas can produce both TA and Reader values, even if Reader allocation policy is still temporary.
 
 ### Status
-In progress.
+Complete.
 
-### Completed so far
+### Completed
 - Updated `src/tacos.mvc/ClientApp/util/formulas.ts` so formulas now return a structured support result:
   - `taPerOffering`
   - `readerPerOffering`
@@ -288,6 +276,45 @@ In progress.
 ## Phase 6 — Legacy Cleanup
 ### Goal
 Remove the legacy single-value fields and all remaining request-type behavior after the application has fully cut over.
+
+### Status
+In progress.
+
+### Completed so far
+- Removed `RequestType` from the active EF/domain models:
+  - `src/tacos.core/Data/Request.cs`
+  - `src/tacos.core/Data/RequestHistory.cs`
+- Removed `RequestType` from the server request payload model in `src/tacos.mvc/Models/RequestModel.cs`.
+- Removed server-side `RequestType` handling and fallback logic from:
+  - `src/tacos.mvc/Controllers/RequestsController.cs`
+  - `src/tacos.mvc/Controllers/ApprovalController.cs`
+- Removed the obsolete `CourseInfo.Requests` dictionary from `src/tacos.core/Resources/CourseInfo.cs`.
+- Added EF migration `20260416220720_RemoveRequestType` to drop `RequestType` from `Requests` and `RequestHistory`.
+- Removed the stored aggregate support columns from the active EF/domain models and replaced them with computed combined properties:
+  - this was transitional and has since been removed from the active runtime models
+- Removed controller persistence/history writes for those stored aggregate columns.
+- Added EF migration `20260416220911_RemoveAggregateSupportColumns` to drop the aggregate support columns from `Requests` and `RequestHistory`.
+- Removed the aggregate support fields from the active request payload contract in `src/tacos.mvc/Models/RequestModel.cs`.
+- Removed the aggregate support fields from the active client request model in `src/tacos.mvc/ClientApp/models/IRequest.ts`.
+- Removed aggregate-field fallback/synchronization from:
+  - `src/tacos.mvc/Controllers/RequestsController.cs`
+  - `src/tacos.mvc/ClientApp/containers/SubmissionContainer.tsx`
+- Removed the last runtime combined convenience properties from:
+  - `src/tacos.core/Data/Request.cs`
+  - `src/tacos.core/Data/RequestHistory.cs`
+- Updated `src/tacos.mvc/Views/Requests/Details.cshtml` to compute the combined approved annualized total explicitly at the point of use.
+- Updated the SSDT project artifacts to match the EF-backed split schema:
+  - `src/tacos.sql/dbo/Tables/Requests.sql`
+  - `src/tacos.sql/dbo/Tables/RequestHistory.sql`
+  - `src/tacos.sql/dbo/Stored Procedures/usp_ResetRequests.sql`
+- Updated focused frontend tests to stop depending on aggregate payload fields.
+- Updated controller tests to stop depending on `RequestType`.
+- Verified:
+  - `dotnet build src/tacos.core/tacos.core.csproj`
+  - `dotnet build src/tacos.mvc/tacos.mvc.csproj`
+  - `dotnet test Test/Test.csproj --filter RequestsControllerTests`
+  - `npm run build` in `src/tacos.mvc`
+  - `npx vitest run ClientApp/util/formulas.test.ts ClientApp/components/RequestsTable.test.tsx ClientApp/containers/SubmissionContainer.test.tsx` in `src/tacos.mvc`
 
 ### Changes
 - Remove from SQL:

@@ -54,14 +54,6 @@ namespace tacos.core.Data
 
         public bool? Approved { get; set; }
 
-        public double ExceptionTotal => ExceptionTaTotal + ExceptionReaderTotal;
-
-        public double ExceptionAnnualizedTotal => ExceptionAnnualizedTaTotal + ExceptionAnnualizedReaderTotal;
-
-        public double CalculatedTotal => CalculatedTaTotal + CalculatedReaderTotal;
-
-        public double AnnualizedTotal => AnnualizedTaTotal + AnnualizedReaderTotal;
-
         public double AverageSectionsPerCourse { get; set; }
 
         public double AverageEnrollment { get; set; }

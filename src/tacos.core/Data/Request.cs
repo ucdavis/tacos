@@ -90,22 +90,6 @@ namespace tacos.core.Data
             }
         }
 
-        public double ApprovedTotal
-        {
-            get
-            {
-                return ApprovedTaTotal + ApprovedReaderTotal;
-            }
-        }
-
-        public double ExceptionTotal => ExceptionTaTotal + ExceptionReaderTotal;
-
-        public double ExceptionAnnualizedTotal => ExceptionAnnualizedTaTotal + ExceptionAnnualizedReaderTotal;
-
-        public double CalculatedTotal => CalculatedTaTotal + CalculatedReaderTotal;
-
-        public double AnnualizedTotal => AnnualizedTaTotal + AnnualizedReaderTotal;
-
         public double ApprovedAnnualizedTaTotal
         {
             get
@@ -133,14 +117,6 @@ namespace tacos.core.Data
                 }
 
                 return AnnualizedReaderTotal;
-            }
-        }
-
-        public double ApprovedAnnualizedTotal
-        {
-            get
-            {
-                return ApprovedAnnualizedTaTotal + ApprovedAnnualizedReaderTotal;
             }
         }
 

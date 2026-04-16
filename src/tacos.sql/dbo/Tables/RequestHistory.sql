@@ -4,16 +4,19 @@ CREATE TABLE [dbo].[RequestHistory] (
     [DepartmentId]             INT            NOT NULL,
     [CourseNumber]             NVARCHAR (20)  NOT NULL,
     [CourseType]               NVARCHAR (50)  NULL,
-    [RequestType]              NVARCHAR (50)  NULL,
     [Approved]                 BIT            NULL,
     [Exception]                BIT            NOT NULL,
-    [ExceptionAnnualizedTotal] FLOAT (53)     NOT NULL,
+    [ExceptionAnnualizedTaTotal] FLOAT (53)   NOT NULL,
+    [ExceptionAnnualizedReaderTotal] FLOAT (53) NOT NULL,
     [ExceptionAnnualCount]     FLOAT (53)     NOT NULL,
     [ExceptionReason]          NVARCHAR (MAX) NULL,
-    [ExceptionTotal]           FLOAT (53)     NOT NULL,
+    [ExceptionTaTotal]         FLOAT (53)     NOT NULL,
+    [ExceptionReaderTotal]     FLOAT (53)     NOT NULL,
     [ApprovedComment]          NVARCHAR (MAX) NULL, 
-	[AnnualizedTotal]          FLOAT (53)     NOT NULL,
-    [CalculatedTotal]          FLOAT (53)     NOT NULL,
+	[AnnualizedTaTotal]        FLOAT (53)     NOT NULL,
+    [AnnualizedReaderTotal]    FLOAT (53)     NOT NULL,
+    [CalculatedTaTotal]        FLOAT (53)     NOT NULL,
+    [CalculatedReaderTotal]    FLOAT (53)     NOT NULL,
 	[AverageEnrollment]        FLOAT (53)     NOT NULL,
     [AverageSectionsPerCourse] FLOAT (53)     NOT NULL,
     [TimesOfferedPerYear]      FLOAT (53)     NOT NULL,
@@ -27,4 +30,3 @@ CREATE TABLE [dbo].[RequestHistory] (
 GO
 CREATE NONCLUSTERED INDEX [IX_RequestHistory_RequestId]
     ON [dbo].[RequestHistory]([RequestId] ASC);
-

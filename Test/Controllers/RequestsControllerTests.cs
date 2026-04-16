@@ -72,13 +72,13 @@ namespace Test.Controllers
             savedRequest.CourseType.ShouldBe("MAN");
             savedRequest.CalculatedTaTotal.ShouldBe(1.25);
             savedRequest.CalculatedReaderTotal.ShouldBe(0);
-            savedRequest.CalculatedTotal.ShouldBe(1.25);
-            savedRequest.AnnualizedTotal.ShouldBe(0.417);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0.417);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0);
             savedRequest.UpdatedBy.ShouldBe(user.UserName);
         }
 
         [Fact]
-        public async Task Save_should_persist_split_support_fields_and_keep_legacy_totals_in_sync()
+        public async Task Save_should_persist_split_support_fields()
         {
             await using var context = CreateContext();
             var user = CreateUser();
@@ -113,16 +113,12 @@ namespace Test.Controllers
             var savedRequest = await context.Requests.SingleAsync();
             savedRequest.CalculatedTaTotal.ShouldBe(1.0);
             savedRequest.CalculatedReaderTotal.ShouldBe(0.25);
-            savedRequest.CalculatedTotal.ShouldBe(1.25);
             savedRequest.AnnualizedTaTotal.ShouldBe(0.333);
             savedRequest.AnnualizedReaderTotal.ShouldBe(0.083);
-            savedRequest.AnnualizedTotal.ShouldBe(0.416, 0.000001);
             savedRequest.ExceptionTaTotal.ShouldBe(1.5);
             savedRequest.ExceptionReaderTotal.ShouldBe(0.25);
-            savedRequest.ExceptionTotal.ShouldBe(1.75);
             savedRequest.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             savedRequest.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
-            savedRequest.ExceptionAnnualizedTotal.ShouldBe(1.75);
         }
 
         [Fact]
@@ -243,7 +239,8 @@ namespace Test.Controllers
             request.SubmittedBy.ShouldBe("submitter");
             request.SubmittedOn.ShouldBe(submittedOn);
             request.ExceptionReason.ShouldBe("Updated justification");
-            request.ExceptionTotal.ShouldBe(1.5);
+            request.ExceptionTaTotal.ShouldBe(1.5);
+            request.ExceptionReaderTotal.ShouldBe(0);
         }
 
         [Fact]
@@ -401,16 +398,12 @@ namespace Test.Controllers
             var history = request.History.Single();
             history.CalculatedTaTotal.ShouldBe(1.0);
             history.CalculatedReaderTotal.ShouldBe(0.5);
-            history.CalculatedTotal.ShouldBe(1.5);
             history.AnnualizedTaTotal.ShouldBe(0.333);
             history.AnnualizedReaderTotal.ShouldBe(0.167);
-            history.AnnualizedTotal.ShouldBe(0.5);
             history.ExceptionTaTotal.ShouldBe(1.5);
             history.ExceptionReaderTotal.ShouldBe(0.25);
-            history.ExceptionTotal.ShouldBe(1.75);
             history.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             history.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
-            history.ExceptionAnnualizedTotal.ShouldBe(1.75);
         }
 
         [Fact]
