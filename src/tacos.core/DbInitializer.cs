@@ -23,21 +23,21 @@ namespace tacos.core
 
         public async Task RecreateAndInitialize()
         {
-            _context.Database.EnsureDeleted();
+            await _context.Database.EnsureDeletedAsync();
 
             await Initialize();
         }
 
         public async Task Initialize()
         {
-            _context.Database.EnsureCreated();
+            await _context.Database.MigrateAsync();
 
             // seed basic information
             await CreateRoles();
             await CreateUsers();
             await CreateDepartments();
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         private async Task CreateDepartments()
