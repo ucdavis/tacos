@@ -15,7 +15,6 @@ import CourseNumber from "./CourseNumber";
 import CourseType, { CourseTypeOptions } from "./CourseType";
 import Exception from "./Exception";
 import ExceptionDetail from "./ExceptionDetail";
-import RequestType from "./RequestType";
 import UncontrolledTooltip from "./UncontrolledTooltip";
 
 import { ICourse } from "../models/ICourse";
@@ -40,7 +39,7 @@ interface IRequestTableRow {
 
 interface IColumnMeta {
     className?: string;
-    filterVariant?: "course" | "courseType" | "exception" | "icon" | "none" | "requestType";
+    filterVariant?: "course" | "courseType" | "exception" | "icon" | "none";
     headerClassName?: string;
     width?: number;
 }
@@ -172,38 +171,41 @@ const RequestsTable = (props: IProps) => {
             } satisfies IColumnMeta,
         },
         {
-            accessorFn: (row) => row.request.requestType,
-            cell: ({ row }) => renderRequestType(row.original, requestChanged),
-            filterFn: (row, columnId, value) => {
-                const filterValue = String(value || "");
-                if (filterValue === "") {
-                    return true;
-                }
-
-                return row.getValue<string>(columnId) === filterValue;
-            },
-            header: renderRequestTypeHeader,
-            id: "requestType",
-            meta: {
-                filterVariant: "requestType",
-            } satisfies IColumnMeta,
-        },
-        {
-            accessorFn: (row) => row.request.calculatedTotal,
+            accessorFn: (row) => row.request.calculatedTaTotal,
             cell: ({ row }) => (
-                <span>{row.original.request.calculatedTotal.toFixed(3)}</span>
+                <span>{row.original.request.calculatedTaTotal.toFixed(3)}</span>
             ),
             header: "TA % per course offering",
-            id: "calculatedTotal",
+            id: "calculatedTaTotal",
             meta: {
                 className: "requests-cell--center",
             } satisfies IColumnMeta,
         },
         {
-            accessorFn: (row) => row.request.exception ? row.request.exceptionAnnualizedTotal : row.request.annualizedTotal,
-            cell: ({ row }) => renderAnnualizedFTE(row.original),
+            accessorFn: (row) => row.request.calculatedReaderTotal,
+            cell: ({ row }) => (
+                <span>{row.original.request.calculatedReaderTotal.toFixed(3)}</span>
+            ),
+            header: "Reader % per course offering",
+            id: "calculatedReaderTotal",
+            meta: {
+                className: "requests-cell--center",
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.exception ? row.request.exceptionAnnualizedTaTotal : row.request.annualizedTaTotal,
+            cell: ({ row }) => renderAnnualizedFTE(row.original, "ta"),
             header: "Annualized TA FTE",
-            id: "annualizedTotal",
+            id: "annualizedTaTotal",
+            meta: {
+                className: "requests-cell--center",
+            } satisfies IColumnMeta,
+        },
+        {
+            accessorFn: (row) => row.request.exception ? row.request.exceptionAnnualizedReaderTotal : row.request.annualizedReaderTotal,
+            cell: ({ row }) => renderAnnualizedFTE(row.original, "reader"),
+            header: "Annualized Reader FTE",
+            id: "annualizedReaderTotal",
             meta: {
                 className: "requests-cell--center",
             } satisfies IColumnMeta,
@@ -561,12 +563,20 @@ const RequestsTable = (props: IProps) => {
                                                             exceptionAnnualCount,
                                                         )
                                                     }
-                                                    onExceptionTotalChange={(exceptionTotal) =>
+                                                    onExceptionTaTotalChange={(exceptionTaTotal) =>
                                                         requestChanged(
                                                             originalIndex,
                                                             request,
-                                                            "exceptionTotal",
-                                                            exceptionTotal,
+                                                            "exceptionTaTotal",
+                                                            exceptionTaTotal,
+                                                        )
+                                                    }
+                                                    onExceptionReaderTotalChange={(exceptionReaderTotal) =>
+                                                        requestChanged(
+                                                            originalIndex,
+                                                            request,
+                                                            "exceptionReaderTotal",
+                                                            exceptionReaderTotal,
                                                         )
                                                     }
                                                     onReasonChange={(reason) =>
@@ -582,7 +592,8 @@ const RequestsTable = (props: IProps) => {
                                                     exceptionAnnualCount={request.exceptionAnnualCount}
                                                     exceptionApproved={request.hasApprovedException}
                                                     exceptionReason={request.exceptionReason}
-                                                    exceptionTotal={request.exceptionTotal}
+                                                    exceptionTaTotal={request.exceptionTaTotal}
+                                                    exceptionReaderTotal={request.exceptionReaderTotal}
                                                 />
                                             </td>
                                         </tr>
@@ -639,21 +650,6 @@ const RequestsTable = (props: IProps) => {
                                     {courseTypeOption[1]}
                                 </option>
                             ))}
-                            <option value="">Show All</option>
-                        </select>
-                    </div>
-                );
-            case "requestType":
-                return (
-                    <div className="requests-filter-control">
-                        <select
-                            aria-label={getFilterLabel(column.id)}
-                            className="tacos-select requests-filter-select"
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => column.setFilterValue(e.target.value)}
-                            value={currentValue}
-                        >
-                            <option value="TA">TA</option>
-                            <option value="READ">Reader</option>
                             <option value="">Show All</option>
                         </select>
                     </div>
@@ -774,8 +770,6 @@ function getFilterLabel(columnId: string) {
             return "Filter Course";
         case "courseType":
             return "Filter Course Type";
-        case "requestType":
-            return "Filter Request Type";
         case "exception":
             return "Filter Exception";
         default:
@@ -809,8 +803,6 @@ function getSortableHeaderLabel(columnId: string, header: ColumnDef<IRequestTabl
     switch (columnId) {
         case "courseType":
             return "Course Type";
-        case "requestType":
-            return "Request Type";
         default:
             return columnId;
     }
@@ -911,44 +903,6 @@ function renderCourseTypeHeader() {
     );
 }
 
-function renderRequestType(
-    row: IRequestTableRow,
-    requestChanged: <K extends keyof IRequest>(
-        originalIndex: number,
-        request: IRequest,
-        prop: K,
-        value: IRequest[K],
-    ) => void
-) {
-    const { originalIndex, request } = row;
-
-    return (
-        <RequestType
-            onChange={(requestType) => requestChanged(originalIndex, request, "requestType", requestType)}
-            requestType={request.requestType}
-        />
-    );
-}
-
-function renderRequestTypeHeader() {
-    return (
-        <div className="requests-header-inline">
-            <span className="requests-header-label">Request Type</span>
-            {renderIconTrigger(
-                "requestTypeHeader",
-                "Request type help",
-                "fas fa-question-circle",
-            )}
-            <UncontrolledTooltip
-                placement="right"
-                target="requestTypeHeader"
-            >
-                For courses that require both TAs and Readers, select the majority position type.
-            </UncontrolledTooltip>
-        </div>
-    );
-}
-
 function renderException(
     row: IRequestTableRow,
     requestChanged: <K extends keyof IRequest>(
@@ -982,10 +936,13 @@ function renderRemoveButton(row: IRequestTableRow, onRemove: (i: number) => void
     );
 }
 
-function renderAnnualizedFTE(row: IRequestTableRow) {
+function renderAnnualizedFTE(row: IRequestTableRow, supportType: "ta" | "reader") {
     const { originalIndex, request } = row;
     const course = request.course;
-    const annualizedTotal = request.exception ? request.exceptionAnnualizedTotal : request.annualizedTotal;
+    const annualizedTotal = supportType === "ta"
+        ? (request.exception ? request.exceptionAnnualizedTaTotal : request.annualizedTaTotal)
+        : (request.exception ? request.exceptionAnnualizedReaderTotal : request.annualizedReaderTotal);
+    const supportLabel = supportType === "ta" ? "TA" : "Reader";
 
     if (course && course.isCourseTaughtOnceEveryTwoYears && !request.exception) {
         return (
@@ -993,16 +950,16 @@ function renderAnnualizedFTE(row: IRequestTableRow) {
                 {annualizedTotal.toFixed(3)}
                 <span style={{ paddingLeft: ".5em" }}>
                     {renderIconTrigger(
-                        `request-${originalIndex}-otheryear-warning`,
+                        `request-${originalIndex}-${supportType}-otheryear-warning`,
                         "Every-other-year course warning",
                         "fas fa-exclamation-triangle tacos-text-warning",
                     )}
                     <UncontrolledTooltip
                         className=""
                         placement="right"
-                        target={`request-${originalIndex}-otheryear-warning`}
+                        target={`request-${originalIndex}-${supportType}-otheryear-warning`}
                     >
-                        Data shows that this course is offered every other year and {course.wasCourseTaughtInMostRecentYear ? "WILL NOT" : "WILL"} be offered in the upcoming year. TA funding will not be allocated in the off year. If this is incorrect, please submit an exception request.
+                        Data shows that this course is offered every other year and {course.wasCourseTaughtInMostRecentYear ? "WILL NOT" : "WILL"} be offered in the upcoming year. {supportLabel} funding will not be allocated in the off year. If this is incorrect, please submit an exception request.
                     </UncontrolledTooltip>
                 </span>
             </>

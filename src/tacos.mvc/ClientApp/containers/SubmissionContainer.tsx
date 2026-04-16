@@ -6,7 +6,7 @@ import CreateCourseModal from "../components/CreateCourseModal";
 import Modal, { ModalHeader, ModalBody } from "../components/Modal";
 import RequestsTable from "../components/RequestsTable";
 
-import { annualizationRatio, formulas } from "../util/formulas";
+import { annualizeSupport, formulas } from "../util/formulas";
 
 import * as LogService from "../services/LogService";
 
@@ -155,7 +155,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 <Summary
                     canSave={canSave}
                     canSubmit={canSubmit}
-                    total={this.submissionTotal()}
+                    taTotal={this.submissionTaTotal()}
+                    readerTotal={this.submissionReaderTotal()}
                     pending={pending}
                     onSave={this.save}
                     onSubmit={this.submit}
@@ -206,19 +207,26 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         }
     };
 
-    private submissionTotal = () => {
+    private submissionTaTotal = () => {
         const { requests } = this.state;
 
-        // go add up everything they have requested
-        const total = requests
+        return requests
             .filter(r => !r.isDeleted)
             .reduce((acc, req) => {
-                // add in exception total if exception, otherwise the annualized total
-                const value = req.exception ? req.exceptionAnnualizedTotal : req.annualizedTotal;
+                const value = req.exception ? req.exceptionAnnualizedTaTotal : req.annualizedTaTotal;
                 return acc + value;
             }, 0);
+    };
 
-        return total;
+    private submissionReaderTotal = () => {
+        const { requests } = this.state;
+
+        return requests
+            .filter(r => !r.isDeleted)
+            .reduce((acc, req) => {
+                const value = req.exception ? req.exceptionAnnualizedReaderTotal : req.annualizedReaderTotal;
+                return acc + value;
+            }, 0);
     };
 
     private onReset = () => {
@@ -404,23 +412,28 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             // if the course info looks good, calculate totals
             const formula = formulas[request.courseType];
             if (formula && request.course) {
-                request.calculatedTotal = formula.calculate(request.course);
-                request.annualizedTotal =
-                    request.calculatedTotal *
-                    annualizationRatio *
-                    request.course.timesOfferedPerYear;
-                request.exceptionAnnualizedTotal =
-                    request.exceptionTotal *
-                    annualizationRatio *
-                    request.exceptionAnnualCount; // for exceptions, use the desired annual count instead of course times offered history
+                const support = formula.calculate(request.course);
+                const annualizedSupport = annualizeSupport(request.course, support);
 
-                // courses taught once every two years get 0 for off year, double for on year
-                if (request.course.isCourseTaughtOnceEveryTwoYears) {
-                    request.annualizedTotal = request.course.wasCourseTaughtInMostRecentYear ? 0 : request.annualizedTotal * 2;
-                }
+                request.calculatedTaTotal = support.taPerOffering;
+                request.calculatedReaderTotal = support.readerPerOffering;
+                request.calculatedTotal = request.calculatedTaTotal + request.calculatedReaderTotal;
+                request.annualizedTaTotal = annualizedSupport.annualizedTaTotal;
+                request.annualizedReaderTotal = annualizedSupport.annualizedReaderTotal;
+                request.annualizedTotal = request.annualizedTaTotal + request.annualizedReaderTotal;
+                request.exceptionAnnualizedTaTotal = request.exceptionTaTotal * request.exceptionAnnualCount / 3;
+                request.exceptionAnnualizedReaderTotal = request.exceptionReaderTotal * request.exceptionAnnualCount / 3;
+                request.exceptionAnnualizedTotal =
+                    request.exceptionAnnualizedTaTotal + request.exceptionAnnualizedReaderTotal;
             } else {
+                request.calculatedTaTotal = 0;
+                request.calculatedReaderTotal = 0;
                 request.calculatedTotal = 0;
+                request.annualizedTaTotal = 0;
+                request.annualizedReaderTotal = 0;
                 request.annualizedTotal = 0;
+                request.exceptionAnnualizedTaTotal = 0;
+                request.exceptionAnnualizedReaderTotal = 0;
                 request.exceptionAnnualizedTotal = 0;
             }
         }
@@ -438,6 +451,8 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.courseName = "";
             request.courseNumber = "";
         }
+
+        normalizeLegacyRequest(request);
 
         // calculate totals
         this.recalculateRequests([request]);
@@ -462,7 +477,13 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.error = "Exception required with new courses";
         }
 
-        if (request.exception && (request.exceptionTotal <= 0 || request.exceptionAnnualCount <= 0)) {
+        if (
+            request.exception
+            && (
+                (request.exceptionTaTotal <= 0 && request.exceptionReaderTotal <= 0)
+                || request.exceptionAnnualCount <= 0
+            )
+        ) {
             request.isValid = false;
             request.error = "Exception values > 0 required";
         }
@@ -500,13 +521,20 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 courseName: "",
                 courseNumber: "",
                 courseType: "STD",
-                requestType: "TA",
+                calculatedTaTotal: 0,
+                calculatedReaderTotal: 0,
                 calculatedTotal: 0,
+                annualizedTaTotal: 0,
+                annualizedReaderTotal: 0,
                 annualizedTotal: 0,
                 exception: false,
                 exceptionReason: "",
+                exceptionTaTotal: 0.0,
+                exceptionReaderTotal: 0.0,
                 exceptionTotal: 0.0,
                 exceptionAnnualCount: 0.0,
+                exceptionAnnualizedTaTotal: 0,
+                exceptionAnnualizedReaderTotal: 0,
                 exceptionAnnualizedTotal: 0,
                 hasApprovedException: false,
                 isValid: true,
@@ -563,4 +591,38 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         };
         this.requestUpdated(createCourseIndex, newRequest);
     };
+}
+
+function normalizeLegacyRequest(request: IRequest) {
+    if (
+        request.calculatedTaTotal === 0
+        && request.calculatedReaderTotal === 0
+        && request.calculatedTotal !== 0
+    ) {
+        request.calculatedTaTotal = request.calculatedTotal;
+    }
+
+    if (
+        request.annualizedTaTotal === 0
+        && request.annualizedReaderTotal === 0
+        && request.annualizedTotal !== 0
+    ) {
+        request.annualizedTaTotal = request.annualizedTotal;
+    }
+
+    if (
+        request.exceptionTaTotal === 0
+        && request.exceptionReaderTotal === 0
+        && request.exceptionTotal !== 0
+    ) {
+        request.exceptionTaTotal = request.exceptionTotal;
+    }
+
+    if (
+        request.exceptionAnnualizedTaTotal === 0
+        && request.exceptionAnnualizedReaderTotal === 0
+        && request.exceptionAnnualizedTotal !== 0
+    ) {
+        request.exceptionAnnualizedTaTotal = request.exceptionAnnualizedTotal;
+    }
 }

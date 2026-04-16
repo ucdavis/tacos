@@ -96,13 +96,20 @@ function createRequest(
         courseName: course.name,
         courseNumber: course.number,
         courseType,
-        requestType: "TA",
+        calculatedTaTotal: 0,
+        calculatedReaderTotal: 0,
         calculatedTotal: 0,
+        annualizedTaTotal: 0,
+        annualizedReaderTotal: 0,
         annualizedTotal: 0,
         exception: false,
         exceptionReason: "",
+        exceptionTaTotal: 0,
+        exceptionReaderTotal: 0,
         exceptionTotal: 0,
         exceptionAnnualCount: 0,
+        exceptionAnnualizedTaTotal: 0,
+        exceptionAnnualizedReaderTotal: 0,
         exceptionAnnualizedTotal: 0,
         hasApprovedException: false,
         isDirty: true,
@@ -208,7 +215,7 @@ describe("SubmissionContainer formula UI coverage", () => {
             const text = normalizeText(getHost().textContent);
 
             expect(text).toContain(expectedPerOffering);
-            expect(text).toContain(`Request Total: ${expectedAnnualized}`);
+            expect(text).toContain(`TA Total: ${expectedAnnualized} | Reader Total: ---`);
         }
     );
 
@@ -223,7 +230,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         const currentHost = getHost();
 
-        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 0.833");
+        expect(normalizeText(currentHost.textContent)).toContain("TA Total: 0.833 | Reader Total: ---");
 
         const courseTypeSelect = Array.from(currentHost.querySelectorAll("select")).find(
             element => (element as HTMLSelectElement).value === "STD"
@@ -239,7 +246,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).toContain("1.250");
-        expect(updatedText).toContain("Request Total: 0.417");
+        expect(updatedText).toContain("TA Total: 0.417 | Reader Total: ---");
     });
 
     it("preserves the in-progress course number input across the debounced parent update", async () => {
@@ -347,7 +354,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         const currentHost = getHost();
 
-        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 0.333");
+        expect(normalizeText(currentHost.textContent)).toContain("TA Total: 0.333 | Reader Total: ---");
 
         const exceptionCheckbox = currentHost.querySelector(
             "input[type=\"checkbox\"]"
@@ -358,15 +365,16 @@ describe("SubmissionContainer formula UI coverage", () => {
         await setCheckboxValue(exceptionCheckbox!, true);
 
         expect(normalizeText(getHost().textContent)).toContain("Proposed TA % per course offering");
+        expect(normalizeText(getHost().textContent)).toContain("Proposed Reader % per course offering");
         expect(getButton("Save Changes").disabled).toBe(true);
         expect(getButton("Submit for Approval").disabled).toBe(true);
 
-        await setInputValue(getInputByPlaceholder("Total FTE requested"), "1.50");
+        await setInputValue(getInputByPlaceholder("TA FTE requested"), "1.50");
         await setInputValue(getInputByPlaceholder("Annual offerings requested"), "3");
 
         const updatedText = normalizeText(getHost().textContent);
 
-        expect(updatedText).toContain("Request Total: 1.500");
+        expect(updatedText).toContain("TA Total: 1.500 | Reader Total: ---");
         expect(updatedText).toContain("1.500");
         expect(getButton("Save Changes").disabled).toBe(false);
         expect(getButton("Submit for Approval").disabled).toBe(false);
@@ -383,7 +391,7 @@ describe("SubmissionContainer formula UI coverage", () => {
                 },
                 {
                     exception: true,
-                    exceptionTotal: 1.5,
+                    exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3
                 }
             )
@@ -391,7 +399,7 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         const currentHost = getHost();
 
-        expect(normalizeText(currentHost.textContent)).toContain("Request Total: 1.500");
+        expect(normalizeText(currentHost.textContent)).toContain("TA Total: 1.500 | Reader Total: ---");
 
         const exceptionCheckbox = currentHost.querySelector(
             "input[type=\"checkbox\"]"
@@ -404,7 +412,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).not.toContain("Proposed TA % per course offering");
-        expect(updatedText).toContain("Request Total: 0.333");
+        expect(updatedText).toContain("TA Total: 0.333 | Reader Total: ---");
     });
 
     it("renders the approved exception state using the exception totals", async () => {
@@ -419,7 +427,7 @@ describe("SubmissionContainer formula UI coverage", () => {
                 {
                     id: 42,
                     exception: true,
-                    exceptionTotal: 1.5,
+                    exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3,
                     hasApprovedException: true
                 }
@@ -430,7 +438,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         const text = normalizeText(currentHost.textContent);
 
         expect(text).toContain("approved for the above course");
-        expect(text).toContain("Request Total: 1.500");
+        expect(text).toContain("TA Total: 1.500 | Reader Total: ---");
         expect(currentHost.querySelector("#revoke-button")).not.toBeNull();
     });
 });
