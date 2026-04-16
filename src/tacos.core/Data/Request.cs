@@ -71,18 +71,71 @@ namespace tacos.core.Data
         
         public bool? Approved { get; set; }        
 
-        public double ApprovedTotal
+        public double ApprovedTaTotal
         {
             get
             {
                 if (!Approved.HasValue) return 0;
 
-                // if we've made a decision
-                if (Approved.Value) {
-                    return Exception ? ExceptionTotal : CalculatedTotal;
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionTaTotal : CalculatedTaTotal;
                 }
 
-                return CalculatedTotal;
+                return CalculatedTaTotal;
+            }
+        }
+
+        public double ApprovedReaderTotal
+        {
+            get
+            {
+                if (!Approved.HasValue) return 0;
+
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionReaderTotal : CalculatedReaderTotal;
+                }
+
+                return CalculatedReaderTotal;
+            }
+        }
+
+        public double ApprovedTotal
+        {
+            get
+            {
+                return ApprovedTaTotal + ApprovedReaderTotal;
+            }
+        }
+
+        public double ApprovedAnnualizedTaTotal
+        {
+            get
+            {
+                if (!Approved.HasValue) return 0;
+
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionAnnualizedTaTotal : AnnualizedTaTotal;
+                }
+
+                return AnnualizedTaTotal;
+            }
+        }
+
+        public double ApprovedAnnualizedReaderTotal
+        {
+            get
+            {
+                if (!Approved.HasValue) return 0;
+
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionAnnualizedReaderTotal : AnnualizedReaderTotal;
+                }
+
+                return AnnualizedReaderTotal;
             }
         }
 
@@ -90,15 +143,7 @@ namespace tacos.core.Data
         {
             get
             {
-                if (!Approved.HasValue) return 0;
-
-                // if we've made a decision
-                if (Approved.Value)
-                {
-                    return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
-                }
-
-                return AnnualizedTotal;
+                return ApprovedAnnualizedTaTotal + ApprovedAnnualizedReaderTotal;
             }
         }
 

@@ -14,12 +14,14 @@
                     <th>Course Type</th>
                     <th>Average Sections</th>
                     <th>Average Enrollment</th>
-                    <th>Request Type</th>
                     <th>Exception Reason</th>
                     <th>Exception TA % per course</th>
+                    <th>Exception Reader % per course</th>
                     <th>Exception Annual Count</th>
                     <th>Approved TA % per course</th>
+                    <th>Approved Reader % per course</th>
                     <th>Approved Annualized TA FTE</th>
+                    <th>Approved Annualized Reader FTE</th>
                     <th></th>
                 </tr>
             </thead>
@@ -35,12 +37,14 @@
                         <td>@CourseInfo.Types[request.CourseType]</td>
                         <td>@request.Course.AverageSectionsPerCourse</td>
                         <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
-                        <td>@CourseInfo.Requests[request.RequestType]</td>
                         <td>@request.ExceptionReason</td>
-                        <td>@(request.Exception ? request.ExceptionTotal.ToString("f3") : "")</td>
+                        <td>@(request.Exception ? request.ExceptionTaTotal.ToString("f3") : "")</td>
+                        <td>@(request.Exception ? request.ExceptionReaderTotal.ToString("f3") : "")</td>
                         <td>@(request.Exception ? request.ExceptionAnnualCount.ToString("f3"): "")</td>
-                        <td>@request.ApprovedTotal.ToString("f3")</td>
-                        <td>@request.ApprovedAnnualizedTotal.ToString("f3")</td>
+                        <td>@request.ApprovedTaTotal.ToString("f3")</td>
+                        <td>@request.ApprovedReaderTotal.ToString("f3")</td>
+                        <td>@request.ApprovedAnnualizedTaTotal.ToString("f3")</td>
+                        <td>@request.ApprovedAnnualizedReaderTotal.ToString("f3")</td>
                         <td>
                             @if (!request.Approved.HasValue)
                             {
@@ -63,10 +67,13 @@
             </tbody>
             <tfoot>
                 <tr class="tacos-page-table__summary tacos-page-table__summary--info">
-                    <td colspan="12"></td>
+                    <td colspan="13"></td>
                     <td>Total:</td>
                     <td>
-                        @Model.Sum(r => r.ApprovedAnnualizedTotal).ToString("f3")
+                        @Model.Sum(r => r.ApprovedAnnualizedTaTotal).ToString("f3")
+                    </td>
+                    <td>
+                        @Model.Sum(r => r.ApprovedAnnualizedReaderTotal).ToString("f3")
                     </td>
                     <td>&nbsp;</td>
                 </tr>
@@ -139,7 +146,7 @@
             var table = $('#requestTable').DataTable({
                 //"paging": false,
                 //"info": false,
-                "order": [[11, "desc"], [4, "asc"]],
+                "order": [[3, "desc"], [4, "asc"]],
                 "columnDefs": [
                     {
                         "targets": [-1],

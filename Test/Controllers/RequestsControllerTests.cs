@@ -78,6 +78,56 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Save_should_persist_split_support_fields_and_keep_legacy_totals_in_sync()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+            var model = CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(
+                    courseNumber: "ECS 189A",
+                    courseName: "Special Topics",
+                    courseType: "MAN",
+                    requestType: null,
+                    exception: true,
+                    exceptionAnnualCount: 3,
+                    calculatedTaTotal: 1.0,
+                    calculatedReaderTotal: 0.25,
+                    annualizedTaTotal: 0.333,
+                    annualizedReaderTotal: 0.083,
+                    exceptionTaTotal: 1.5,
+                    exceptionReaderTotal: 0.25,
+                    exceptionAnnualizedTaTotal: 1.5,
+                    exceptionAnnualizedReaderTotal: 0.25
+                )
+            );
+
+            var result = await controller.Save(model);
+
+            JsonResultShouldIndicateSuccess(result);
+
+            var savedRequest = await context.Requests.SingleAsync();
+            savedRequest.RequestType.ShouldBeNull();
+            savedRequest.CalculatedTaTotal.ShouldBe(1.0);
+            savedRequest.CalculatedReaderTotal.ShouldBe(0.25);
+            savedRequest.CalculatedTotal.ShouldBe(1.25);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0.333);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0.083);
+            savedRequest.AnnualizedTotal.ShouldBe(0.416, 0.000001);
+            savedRequest.ExceptionTaTotal.ShouldBe(1.5);
+            savedRequest.ExceptionReaderTotal.ShouldBe(0.25);
+            savedRequest.ExceptionTotal.ShouldBe(1.75);
+            savedRequest.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            savedRequest.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+            savedRequest.ExceptionAnnualizedTotal.ShouldBe(1.75);
+        }
+
+        [Fact]
         public async Task Save_should_clear_approval_and_submission_state_when_request_is_no_longer_an_approved_exception()
         {
             await using var context = CreateContext();
@@ -300,6 +350,79 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Submit_should_capture_split_support_fields_in_request_history()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS 198");
+            var request = new Request
+            {
+                Department = department,
+                DepartmentId = department.Id,
+                Course = course,
+                CourseNumber = course.Number,
+                CourseType = "MAN",
+                RequestType = "TA",
+                Exception = true,
+                ExceptionReason = "Old reason",
+                ExceptionTotal = 1.25,
+                ExceptionAnnualCount = 3,
+                ExceptionAnnualizedTotal = 1.25,
+                CalculatedTotal = 1,
+                AnnualizedTotal = 0.333
+            };
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            context.Requests.Add(request);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+            var model = CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(
+                    id: request.Id,
+                    courseNumber: course.Number,
+                    courseName: course.Name,
+                    courseType: "MAN",
+                    requestType: null,
+                    exception: true,
+                    exceptionReason: "Needs both TA and Reader support",
+                    exceptionAnnualCount: 3,
+                    calculatedTaTotal: 1.0,
+                    calculatedReaderTotal: 0.5,
+                    annualizedTaTotal: 0.333,
+                    annualizedReaderTotal: 0.167,
+                    exceptionTaTotal: 1.5,
+                    exceptionReaderTotal: 0.25,
+                    exceptionAnnualizedTaTotal: 1.5,
+                    exceptionAnnualizedReaderTotal: 0.25
+                )
+            );
+
+            var result = await controller.Submit(model);
+
+            JsonResultShouldIndicateSuccess(result);
+
+            request.History.Count.ShouldBe(1);
+            var history = request.History.Single();
+            history.RequestType.ShouldBeNull();
+            history.CalculatedTaTotal.ShouldBe(1.0);
+            history.CalculatedReaderTotal.ShouldBe(0.5);
+            history.CalculatedTotal.ShouldBe(1.5);
+            history.AnnualizedTaTotal.ShouldBe(0.333);
+            history.AnnualizedReaderTotal.ShouldBe(0.167);
+            history.AnnualizedTotal.ShouldBe(0.5);
+            history.ExceptionTaTotal.ShouldBe(1.5);
+            history.ExceptionReaderTotal.ShouldBe(0.25);
+            history.ExceptionTotal.ShouldBe(1.75);
+            history.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            history.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+            history.ExceptionAnnualizedTotal.ShouldBe(1.75);
+        }
+
+        [Fact]
         public async Task Revoke_should_clear_approval_and_submission_fields()
         {
             await using var context = CreateContext();
@@ -466,10 +589,18 @@ namespace Test.Controllers
             bool exception = false,
             string exceptionReason = "",
             double exceptionTotal = 0,
+            double exceptionTaTotal = 0,
+            double exceptionReaderTotal = 0,
             double exceptionAnnualCount = 0,
             double exceptionAnnualizedTotal = 0,
+            double exceptionAnnualizedTaTotal = 0,
+            double exceptionAnnualizedReaderTotal = 0,
             double calculatedTotal = 0,
+            double calculatedTaTotal = 0,
+            double calculatedReaderTotal = 0,
             double annualizedTotal = 0,
+            double annualizedTaTotal = 0,
+            double annualizedReaderTotal = 0,
             bool isDeleted = false)
         {
             return new RequestModel
@@ -482,10 +613,18 @@ namespace Test.Controllers
                 Exception = exception,
                 ExceptionReason = exceptionReason,
                 ExceptionTotal = exceptionTotal,
+                ExceptionTaTotal = exceptionTaTotal,
+                ExceptionReaderTotal = exceptionReaderTotal,
                 ExceptionAnnualCount = exceptionAnnualCount,
                 ExceptionAnnualizedTotal = exceptionAnnualizedTotal,
+                ExceptionAnnualizedTaTotal = exceptionAnnualizedTaTotal,
+                ExceptionAnnualizedReaderTotal = exceptionAnnualizedReaderTotal,
                 CalculatedTotal = calculatedTotal,
+                CalculatedTaTotal = calculatedTaTotal,
+                CalculatedReaderTotal = calculatedReaderTotal,
                 AnnualizedTotal = annualizedTotal,
+                AnnualizedTaTotal = annualizedTaTotal,
+                AnnualizedReaderTotal = annualizedReaderTotal,
                 IsDeleted = isDeleted
             };
         }

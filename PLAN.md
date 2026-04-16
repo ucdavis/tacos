@@ -5,6 +5,24 @@ The current request model assumes a course request has one support type, one cal
 
 This plan is intentionally phased. Phase 1 expands the schema and backfills existing data without cutting the application over yet. Later phases update the server, client, and formula pipeline to read and write the new split fields end to end.
 
+## Status
+- Phase 1: Complete
+- Phase 2: In progress
+- Phase 3: In progress
+- Phase 4: Not started
+- Phase 5: Not started
+- Phase 6: Not started
+
+### Completed in Phase 1
+- Added split TA/Reader storage fields to the EF models in `src/tacos.core/Data/Request.cs` and `src/tacos.core/Data/RequestHistory.cs`.
+- Generated EF Core migration `20260416213915_SplitTaReaderPhase1`.
+- Updated the EF model snapshot to include the new columns.
+- Added migration backfill SQL inside the EF migration so existing `TA` rows populate TA columns and existing `READ` rows populate Reader columns in both `Requests` and `RequestHistory`.
+- Preserved legacy fields for compatibility with the current application code until Phase 2.
+- Verified the affected .NET projects build successfully:
+  - `dotnet build src/tacos.core/tacos.core.csproj`
+  - `dotnet build src/tacos.mvc/tacos.mvc.csproj`
+
 ## Target Data Contract
 The final request shape should remove row-level `RequestType` and replace all unlabeled support totals with explicit TA and Reader fields.
 
@@ -37,8 +55,11 @@ Any consumer that still needs a combined number should compute `TA + Reader` exp
 ### Goal
 Add the new TA/Reader columns to `Requests` and `RequestHistory`, preserve the old columns temporarily, and backfill existing rows so the database can hold the new shape without breaking the current application.
 
+### Status
+Complete.
+
 ### Changes
-- Add new split columns to `dbo.Requests`:
+- Add new split columns to the EF-backed `Requests` table:
   - `CalculatedTaTotal`
   - `CalculatedReaderTotal`
   - `AnnualizedTaTotal`
@@ -47,33 +68,57 @@ Add the new TA/Reader columns to `Requests` and `RequestHistory`, preserve the o
   - `ExceptionReaderTotal`
   - `ExceptionAnnualizedTaTotal`
   - `ExceptionAnnualizedReaderTotal`
-- Add the same split columns to `dbo.RequestHistory`.
+- Add the same split columns to `RequestHistory`.
 - Keep these legacy columns in place for now:
   - `RequestType`
   - `CalculatedTotal`
   - `AnnualizedTotal`
   - `ExceptionTotal`
   - `ExceptionAnnualizedTotal`
-- Add a deployment-time backfill script that maps existing rows using the old `RequestType`:
+- Add an EF Core migration that maps existing rows using the old `RequestType`:
   - `TA` rows populate only TA columns
   - `READ` rows populate only Reader columns
   - the opposite type is set to `0`
 - Apply the same backfill logic to `RequestHistory`.
-- Make the backfill safe to rerun in lower environments.
+- Leave the application on the legacy single-value fields until later phases cut over read/write behavior.
 
 ### Deliverables
-- Updated SQL table definitions in the SSDT project.
-- A post-deploy SQL script included in the SQL project.
-- Existing rows backfilled during deployment.
+- Updated EF models for `Request` and `RequestHistory`.
+- EF migration `20260416213915_SplitTaReaderPhase1`.
+- Updated `TacoDbContextModelSnapshot`.
+- Existing rows backfilled when the EF migration is applied.
 
 ### Notes
 - Phase 1 does not remove legacy columns.
 - Phase 1 does not update the application to read or write the new columns yet.
 - New rows written by the old application after Phase 1 deployment will still use the legacy columns until Phase 2 is deployed.
+- This phase was implemented through EF Core migrations, not through the SSDT SQL project.
 
 ## Phase 2 — Domain Model and Server Cutover
 ### Goal
 Update the C# domain model and controller layer so the application stops depending on `RequestType` and starts reading and writing the split TA/Reader fields.
+
+### Status
+In progress.
+
+### Completed so far
+- Added split TA/Reader properties to `src/tacos.mvc/Models/RequestModel.cs` while preserving legacy fields for compatibility during the transition.
+- Added per-type approval computed properties in `src/tacos.core/Data/Request.cs`:
+  - `ApprovedTaTotal`
+  - `ApprovedReaderTotal`
+  - `ApprovedAnnualizedTaTotal`
+  - `ApprovedAnnualizedReaderTotal`
+- Updated `RequestsController.Save` to persist split TA/Reader values as the server-side source of truth.
+- Kept legacy aggregate fields in sync inside `RequestsController.Save` so the current UI and views continue to function before later phases land.
+- Updated request submission history creation in `RequestsController` to capture the split TA/Reader fields.
+- Updated approval history creation in `ApprovalController` to capture the split TA/Reader fields.
+- Added controller coverage for:
+  - persisting split TA/Reader fields on save
+  - capturing split TA/Reader fields in request history on submit
+- Verified:
+  - `dotnet build src/tacos.core/tacos.core.csproj`
+  - `dotnet build src/tacos.mvc/tacos.mvc.csproj`
+  - `dotnet test Test/Test.csproj --filter RequestsControllerTests`
 
 ### Changes
 - Update `src/tacos.core/Data/Request.cs`:
@@ -91,9 +136,30 @@ Update the C# domain model and controller layer so the application stops dependi
 - Server payloads and persistence use split fields only.
 - History snapshots preserve TA and Reader values explicitly.
 
+### Remaining work in Phase 2
+- Remove active controller dependence on legacy `RequestType` fallback once the client submits split fields directly.
+- Decide whether to remove `RequestType` from `RequestModel` in this phase or defer that final contract cleanup until the client phase is ready.
+- Remove or retire legacy aggregate-field synchronization once downstream views and clients stop reading the old fields.
+
 ## Phase 3 — Review, Approval, Details, and Notification Surfaces
 ### Goal
 Update server-rendered pages and emails so all request data is displayed with separate TA and Reader values.
+
+### Status
+In progress.
+
+### Completed so far
+- Updated `src/tacos.mvc/Views/Requests/Details.cshtml` to show separate TA and Reader values for:
+  - suggested per-course support
+  - exception per-course support
+  - approved per-course support
+  - approved annualized support
+- Updated the request history table in the details view to display split TA and Reader values.
+- Updated `src/tacos.mvc/Views/Review/Index.cshtml` to remove row-level request type display and show separate TA/Reader exception, approved, and annualized totals.
+- Updated `src/tacos.mvc/Views/Approval/Index.cshtml` to remove row-level request type display and show separate TA/Reader exception, approved, and annualized totals.
+- Updated `src/tacos.mvc/Emails/SubmissionNotification.cshtml` to show separate TA and Reader exception amounts.
+- Updated `src/tacos.mvc/Emails/ApprovalNotification.cshtml` to show separate approved TA and Reader amounts.
+- Verified `dotnet build src/tacos.mvc/tacos.mvc.csproj` after the Razor and email-template changes.
 
 ### Changes
 - Update request details to show:
@@ -109,6 +175,10 @@ Update server-rendered pages and emails so all request data is displayed with se
 ### Deliverables
 - No user-facing review or detail page depends on `RequestType`.
 - All rendered totals are labeled as TA, Reader, or combined.
+
+### Remaining work in Phase 3
+- Decide whether to add explicit combined totals to the review and approval table footers, or keep the split annualized totals only.
+- Review any remaining non-React request surfaces for legacy unlabeled totals or request-type wording.
 
 ## Phase 4 — React State and Editing UI Restructure
 ### Goal
@@ -186,10 +256,11 @@ Remove the legacy single-value fields and all remaining request-type behavior af
 
 ## Testing and Verification
 ### Phase 1
-- Verify the SSDT project includes the new post-deploy script.
+- Verify the EF migration adds the new columns to both tables.
 - Verify existing TA rows backfill into TA columns only.
 - Verify existing Reader rows backfill into Reader columns only.
 - Verify `RequestHistory` receives the same mapping.
+- Verify `src/tacos.core` and `src/tacos.mvc` build successfully after the model and migration updates.
 
 ### Later phases
 - Add controller tests for save, submit, approval, and history creation with split TA/Reader values.

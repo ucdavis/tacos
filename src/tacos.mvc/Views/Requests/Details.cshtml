@@ -38,16 +38,22 @@
         <dt>Submitted By</dt>
         <dd>@Model.UpdatedBy</dd>
 
-        <dt>Suggested TAs per Course</dt>
-        <dd>@Model.CalculatedTotal</dd>
+        <dt>Suggested TA % per Course</dt>
+        <dd>@Model.CalculatedTaTotal.ToString("f3")</dd>
+
+        <dt>Suggested Reader % per Course</dt>
+        <dd>@Model.CalculatedReaderTotal.ToString("f3")</dd>
         
         <dt>Exception Requested?</dt>
         <dd>@(Model.Exception ? "Yes" : "No")</dd>
 
         @if (Model.Exception)
         {
-            <dt>Requested TAs per Course</dt>
-            <dd>@Model.ExceptionTotal.ToString("f3")</dd>
+            <dt>Requested TA % per Course</dt>
+            <dd>@Model.ExceptionTaTotal.ToString("f3")</dd>
+
+            <dt>Requested Reader % per Course</dt>
+            <dd>@Model.ExceptionReaderTotal.ToString("f3")</dd>
 
             <dt>Requested Annual Course Offerings</dt>
             <dd>@Model.ExceptionAnnualCount.ToString("f3")</dd>
@@ -71,10 +77,19 @@
             }
         }
 
-        <dt>Approved TAs per Course</dt>
-        <dd>@Model.ApprovedTotal.ToString("f3")</dd>
+        <dt>Approved TA % per Course</dt>
+        <dd>@Model.ApprovedTaTotal.ToString("f3")</dd>
 
-        <dt>Approved Annualized Total</dt>
+        <dt>Approved Reader % per Course</dt>
+        <dd>@Model.ApprovedReaderTotal.ToString("f3")</dd>
+
+        <dt>Approved Annualized TA FTE</dt>
+        <dd>@Model.ApprovedAnnualizedTaTotal.ToString("f3")</dd>
+
+        <dt>Approved Annualized Reader FTE</dt>
+        <dd>@Model.ApprovedAnnualizedReaderTotal.ToString("f3")</dd>
+
+        <dt>Approved Annualized Combined Total</dt>
         <dd>@Model.ApprovedAnnualizedTotal.ToString("f3")</dd>
     </dl>
 
@@ -87,8 +102,10 @@
                 <tr>
                     <th>Course Number</th>
                     <th>Course Type</th>
-                    <th>Suggested Total</th>
-                    <th>Requested Total</th>
+                    <th>Suggested TA</th>
+                    <th>Suggested Reader</th>
+                    <th>Requested TA</th>
+                    <th>Requested Reader</th>
                     <th>Reason</th>
                     <th>Reviewed?</th>
                     <th>Approved?</th>
@@ -103,8 +120,10 @@
                 <tr>
                     <td>@h.CourseNumber</td>
                     <td>@CourseInfo.Types[h.CourseType]</td>
-                    <td>@(h.CalculatedTotal)</td>
-                    <td>@(h.Exception ? h.ExceptionTotal.ToString() : "")</td>
+                    <td>@h.CalculatedTaTotal.ToString("f3")</td>
+                    <td>@h.CalculatedReaderTotal.ToString("f3")</td>
+                    <td>@(h.Exception ? h.ExceptionTaTotal.ToString("f3") : "")</td>
+                    <td>@(h.Exception ? h.ExceptionReaderTotal.ToString("f3") : "")</td>
                     <td>@(h.Exception ? h.ExceptionReason : "")</td>
                     <td>@(h.Approved.HasValue ? "Yes" : "No")</td>
                     <td>@(h.Approved.HasValue ? (h.Approved.Value ? "Yes" : "No") : "")</td>
