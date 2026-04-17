@@ -991,6 +991,25 @@ function renderWarnings(row: IRequestTableRow) {
         );
     }
 
+    if (request.calculationError) {
+        return (
+            <div>
+                {renderIconTrigger(
+                    `request-${originalIndex}-calculation-warning`,
+                    "Request calculation warning",
+                    "fas fa-exclamation-circle tacos-text-warning",
+                )}
+                <UncontrolledTooltip
+                    className=""
+                    placement="right"
+                    target={`request-${originalIndex}-calculation-warning`}
+                >
+                    {request.calculationError}
+                </UncontrolledTooltip>
+            </div>
+        );
+    }
+
     return null;
 }
 

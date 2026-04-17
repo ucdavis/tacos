@@ -6,8 +6,6 @@ import CreateCourseModal from "../components/CreateCourseModal";
 import Modal, { ModalHeader, ModalBody } from "../components/Modal";
 import RequestsTable from "../components/RequestsTable";
 
-import { annualizeSupport, formulas } from "../util/formulas";
-
 import * as LogService from "../services/LogService";
 
 import { ICourse } from "../models/ICourse";
@@ -33,18 +31,17 @@ interface IState {
 }
 
 export default class SubmissionContainer extends React.Component<IProps, IState> {
+    private static readonly recalculationDebounceMs = 250;
+
+    private nextClientId = 1;
+    private recalcTimeouts = new Map<string, number>();
+    private recalcRequestVersions = new Map<string, number>();
+    private isUnmounted = false;
+
     constructor(props: IProps) {
         super(props);
 
-        const requests = props.requests || [];
-
-        this.recalculateRequests(requests);
-
-        // TODO: hack for now, make everything dirty so it all gets processed
-        for (const request of requests) {
-            request.isDirty = true;
-            request.isValid = true;
-        }
+        const requests = this.initializeRequests(props.requests || []);
 
         this.state = {
             requests,
@@ -55,6 +52,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             isSaving: false,
             isSubmitting: false
         };
+    }
+
+    public componentWillUnmount() {
+        this.isUnmounted = true;
+
+        for (const timeoutId of this.recalcTimeouts.values()) {
+            window.clearTimeout(timeoutId);
+        }
+
+        this.recalcTimeouts.clear();
+        this.recalcRequestVersions.clear();
     }
 
     public componentDidMount() {
@@ -230,12 +238,17 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
     };
 
     private onReset = () => {
-        const { department } = this.props;
-
         // reset the form
         if (confirm("Are you sure you want to clear this form and start over?")) {
+            for (const timeoutId of this.recalcTimeouts.values()) {
+                window.clearTimeout(timeoutId);
+            }
+
+            this.recalcTimeouts.clear();
+            this.recalcRequestVersions.clear();
+
             this.setState({
-                requests: this.props.requests || []
+                requests: this.initializeRequests(this.props.requests || [])
             });
         }
     };
@@ -374,7 +387,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         let request = this.state.requests[i];
         request = { ...request, isFocused: true };
 
-        this.requestUpdated(i, request, false);
+        this.requestUpdated(i, request, false, false);
 
         // scroll to location
         const duration = request.id ? 3 : 0.5;
@@ -384,7 +397,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         setTimeout(() => {
             let unfocusRequest = this.state.requests[i];
             unfocusRequest = { ...unfocusRequest, isFocused: false };
-            this.requestUpdated(i, unfocusRequest, false);
+            this.requestUpdated(i, unfocusRequest, false, false);
         }, duration * 1000);
     };
 
@@ -398,7 +411,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         // if this is an existing request, mark it as deleted, so that we can delete it on the server
         if (request.id) {
             request = { ...request, isDeleted: true };
-            this.requestUpdated(i, request);
+            this.requestUpdated(i, request, true, false);
             return;
         }
 
@@ -407,33 +420,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
         this.setState({ requests: newRequests });
     };
 
-    private recalculateRequests = (requests: IRequest[]) => {
-        for (const request of requests) {
-            // if the course info looks good, calculate totals
-            const formula = formulas[request.courseType];
-            if (formula && request.course) {
-                const support = formula.calculate(request.course);
-                const annualizedSupport = annualizeSupport(request.course, support);
-
-                request.calculatedTaTotal = support.taPerOffering;
-                request.calculatedReaderTotal = support.readerPerOffering;
-                request.annualizedTaTotal = annualizedSupport.annualizedTaTotal;
-                request.annualizedReaderTotal = annualizedSupport.annualizedReaderTotal;
-                request.exceptionAnnualizedTaTotal = request.exceptionTaTotal * request.exceptionAnnualCount / 3;
-                request.exceptionAnnualizedReaderTotal = request.exceptionReaderTotal * request.exceptionAnnualCount / 3;
-            } else {
-                request.calculatedTaTotal = 0;
-                request.calculatedReaderTotal = 0;
-                request.annualizedTaTotal = 0;
-                request.annualizedReaderTotal = 0;
-                request.exceptionAnnualizedTaTotal = 0;
-                request.exceptionAnnualizedReaderTotal = 0;
-            }
-        }
-    };
-
-    private requestUpdated = (i: number, request: IRequest, dirty: boolean = true) => {
-        const { department } = this.props;
+    private requestUpdated = (i: number, request: IRequest, dirty: boolean = true, recalculate: boolean = true) => {
         const { requests } = this.state;
 
         // flatten model
@@ -444,9 +431,6 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.courseName = "";
             request.courseNumber = "";
         }
-
-        // calculate totals
-        this.recalculateRequests([request]);
 
         // clear error messages
         request.isValid = true;
@@ -494,11 +478,24 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             request.isDirty = true;
         }
 
+        if (recalculate) {
+            request.calculationError = undefined;
+            request.isRecalculating = this.shouldRecalculate(request);
+
+            if (!request.isRecalculating) {
+                this.clearDerivedTotals(request);
+            }
+        }
+
         // create new array and replace item
         const newRequests = [...requests];
         newRequests[i] = request;
 
-        this.setState({ requests: newRequests });
+        this.setState({ requests: newRequests }, () => {
+            if (recalculate) {
+                this.scheduleRecalculation(request);
+            }
+        });
 
         // trigger validations
         this.checkIsValid();
@@ -512,6 +509,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 courseName: "",
                 courseNumber: "",
                 courseType: "STD",
+                clientId: this.createClientId(),
                 calculatedTaTotal: 0,
                 calculatedReaderTotal: 0,
                 annualizedTaTotal: 0,
@@ -524,6 +522,7 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
                 exceptionAnnualizedTaTotal: 0,
                 exceptionAnnualizedReaderTotal: 0,
                 hasApprovedException: false,
+                isRecalculating: false,
                 isValid: true,
             },
         ];
@@ -577,5 +576,175 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             exception: true
         };
         this.requestUpdated(createCourseIndex, newRequest);
+    };
+
+    private initializeRequests = (requests: IRequest[]): IRequest[] => {
+        return requests.map((request) => ({
+            ...request,
+            clientId: request.clientId || this.createClientId(),
+            calculationError: undefined,
+            isDirty: true,
+            isRecalculating: false,
+            isValid: true,
+        }));
+    };
+
+    private createClientId = (): string => {
+        const clientId = `request-${this.nextClientId}`;
+        this.nextClientId += 1;
+        return clientId;
+    };
+
+    private shouldRecalculate = (request: IRequest): boolean => {
+        return !!request.course && !!request.courseNumber && !!request.courseType && !request.isDeleted;
+    };
+
+    private clearDerivedTotals = (request: IRequest) => {
+        request.calculatedTaTotal = 0;
+        request.calculatedReaderTotal = 0;
+        request.annualizedTaTotal = 0;
+        request.annualizedReaderTotal = 0;
+        request.exceptionAnnualizedTaTotal = 0;
+        request.exceptionAnnualizedReaderTotal = 0;
+        request.isRecalculating = false;
+    };
+
+    private scheduleRecalculation = (request: IRequest) => {
+        const clientId = request.clientId;
+        if (!clientId) {
+            return;
+        }
+
+        const existingTimeout = this.recalcTimeouts.get(clientId);
+        if (existingTimeout !== undefined) {
+            window.clearTimeout(existingTimeout);
+        }
+
+        if (!this.shouldRecalculate(request)) {
+            this.recalcTimeouts.delete(clientId);
+            this.recalcRequestVersions.delete(clientId);
+            return;
+        }
+
+        const requestVersion = (this.recalcRequestVersions.get(clientId) || 0) + 1;
+        this.recalcRequestVersions.set(clientId, requestVersion);
+
+        const requestSnapshot = this.buildRecalculationRequest(request);
+        const timeoutId = window.setTimeout(() => {
+            this.recalcTimeouts.delete(clientId);
+            void this.recalculateRequest(clientId, requestVersion, requestSnapshot);
+        }, SubmissionContainer.recalculationDebounceMs);
+
+        this.recalcTimeouts.set(clientId, timeoutId);
+    };
+
+    private recalculateRequest = async (
+        clientId: string,
+        requestVersion: number,
+        requestSnapshot: Record<string, unknown>,
+    ) => {
+        try {
+            const response = await fetch("/requests/recalculate", {
+                body: JSON.stringify(requestSnapshot),
+                headers: [["Accept", "application/json"], ["Content-Type", "application/json"]],
+                method: "POST",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error(response.statusText || "Recalculation failed.");
+            }
+
+            const result = await response.json() as {
+                calculatedTaTotal: number;
+                calculatedReaderTotal: number;
+                annualizedTaTotal: number;
+                annualizedReaderTotal: number;
+                exceptionAnnualizedTaTotal: number;
+                exceptionAnnualizedReaderTotal: number;
+            };
+
+            this.setState((state) => {
+                if (this.isStaleRecalculation(clientId, requestVersion)) {
+                    return null;
+                }
+
+                const requestIndex = state.requests.findIndex(r => r.clientId === clientId);
+                if (requestIndex < 0) {
+                    return null;
+                }
+
+                const request = {
+                    ...state.requests[requestIndex],
+                    calculatedTaTotal: result.calculatedTaTotal,
+                    calculatedReaderTotal: result.calculatedReaderTotal,
+                    annualizedTaTotal: result.annualizedTaTotal,
+                    annualizedReaderTotal: result.annualizedReaderTotal,
+                    exceptionAnnualizedTaTotal: result.exceptionAnnualizedTaTotal,
+                    exceptionAnnualizedReaderTotal: result.exceptionAnnualizedReaderTotal,
+                    calculationError: undefined,
+                    isRecalculating: false,
+                };
+
+                const requests = [...state.requests];
+                requests[requestIndex] = request;
+
+                return { requests };
+            });
+        } catch (err) {
+            LogService.error(err);
+
+            this.setState((state) => {
+                if (this.isStaleRecalculation(clientId, requestVersion)) {
+                    return null;
+                }
+
+                const requestIndex = state.requests.findIndex(r => r.clientId === clientId);
+                if (requestIndex < 0) {
+                    return null;
+                }
+
+                const request = {
+                    ...state.requests[requestIndex],
+                    calculationError: "Unable to refresh calculated totals. Save or submit will recalculate on the server.",
+                    isRecalculating: false,
+                };
+
+                const requests = [...state.requests];
+                requests[requestIndex] = request;
+
+                return { requests };
+            });
+        }
+    };
+
+    private isStaleRecalculation = (clientId: string, requestVersion: number): boolean => {
+        return this.isUnmounted || this.recalcRequestVersions.get(clientId) !== requestVersion;
+    };
+
+    private buildRecalculationRequest = (request: IRequest): Record<string, unknown> => {
+        const payload: Record<string, unknown> = {
+            departmentId: this.props.department.id,
+            courseNumber: request.courseNumber,
+            courseType: request.courseType,
+            exception: request.exception,
+            exceptionTaTotal: request.exceptionTaTotal,
+            exceptionReaderTotal: request.exceptionReaderTotal,
+            exceptionAnnualCount: request.exceptionAnnualCount,
+        };
+
+        if (request.course) {
+            payload.course = {
+                number: request.course.number,
+                name: request.course.name,
+                averageEnrollment: request.course.averageEnrollment,
+                averageSectionsPerCourse: request.course.averageSectionsPerCourse,
+                timesOfferedPerYear: request.course.timesOfferedPerYear,
+                wasCourseTaughtInMostRecentYear: request.course.wasCourseTaughtInMostRecentYear,
+                isCourseTaughtOnceEveryTwoYears: request.course.isCourseTaughtOnceEveryTwoYears,
+            };
+        }
+
+        return payload;
     };
 }

@@ -66,6 +66,15 @@ const formulaScenarios = [
     }
 ] as const;
 
+interface IRecalculationResult {
+    calculatedTaTotal: number;
+    calculatedReaderTotal: number;
+    annualizedTaTotal: number;
+    annualizedReaderTotal: number;
+    exceptionAnnualizedTaTotal: number;
+    exceptionAnnualizedReaderTotal: number;
+}
+
 function createCourse(overrides: Partial<ICourse> = {}): ICourse {
     return {
         averageEnrollment: 0,
@@ -118,7 +127,7 @@ function normalizeText(value: string | null | undefined): string {
     return (value || "").replace(/\s+/g, " ").trim();
 }
 
-describe("SubmissionContainer formula UI coverage", () => {
+describe("SubmissionContainer server recalculation UI coverage", () => {
     let host: HTMLDivElement | undefined;
     let root: Root | undefined;
 
@@ -135,6 +144,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         }
 
         vi.unstubAllGlobals();
+        vi.useRealTimers();
     });
 
     async function renderSubmission(requests: IRequest[]) {
@@ -147,6 +157,27 @@ describe("SubmissionContainer formula UI coverage", () => {
 
         await act(async () => {
             root!.render(<SubmissionContainer department={department} requests={requests} />);
+        });
+    }
+
+    function stubFetchResults(...results: IRecalculationResult[]) {
+        const fetchMock = vi.fn();
+
+        for (const result of results) {
+            fetchMock.mockResolvedValueOnce({
+                ok: true,
+                json: async () => result,
+            });
+        }
+
+        vi.stubGlobal("fetch", fetchMock);
+        return fetchMock;
+    }
+
+    async function advanceRecalculation() {
+        await act(async () => {
+            vi.advanceTimersByTime(300);
+            await Promise.resolve();
         });
     }
 
@@ -204,9 +235,14 @@ describe("SubmissionContainer formula UI coverage", () => {
     }
 
     it.each(formulaScenarios)(
-        "renders $courseType request totals from the configured formula",
+        "renders $courseType request totals from server-hydrated values",
         async ({ courseType, course, expectedPerOffering, expectedAnnualized }) => {
-            await renderSubmission([createRequest(courseType, course)]);
+            await renderSubmission([
+                createRequest(courseType, course, {
+                    calculatedTaTotal: Number(expectedPerOffering),
+                    annualizedTaTotal: Number(expectedAnnualized),
+                })
+            ]);
 
             const text = normalizeText(getHost().textContent);
 
@@ -216,11 +252,24 @@ describe("SubmissionContainer formula UI coverage", () => {
     );
 
     it("updates the rendered totals when the user changes the course type", async () => {
+        vi.useFakeTimers();
+        const fetchMock = stubFetchResults({
+            calculatedTaTotal: 1.25,
+            calculatedReaderTotal: 0,
+            annualizedTaTotal: 0.417,
+            annualizedReaderTotal: 0,
+            exceptionAnnualizedTaTotal: 0,
+            exceptionAnnualizedReaderTotal: 0,
+        });
+
         await renderSubmission([
             createRequest("STD", {
                 averageEnrollment: 250,
                 name: "ECS 250",
                 number: "250"
+            }, {
+                calculatedTaTotal: 1.5,
+                annualizedTaTotal: 0.833,
             })
         ]);
 
@@ -239,10 +288,13 @@ describe("SubmissionContainer formula UI coverage", () => {
             courseTypeSelect!.dispatchEvent(new Event("change", { bubbles: true }));
         });
 
+        await advanceRecalculation();
+
         const updatedText = normalizeText(getHost().textContent);
 
         expect(updatedText).toContain("1.250");
         expect(updatedText).toContain("TA Total: 0.417 | Reader Total: ---");
+        expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
     it("preserves the in-progress course number input across the debounced parent update", async () => {
@@ -340,11 +392,42 @@ describe("SubmissionContainer formula UI coverage", () => {
     });
 
     it("uses exception values in the rendered annualized totals once they are entered", async () => {
+        vi.useFakeTimers();
+        stubFetchResults(
+            {
+                calculatedTaTotal: 1,
+                calculatedReaderTotal: 0,
+                annualizedTaTotal: 0.333,
+                annualizedReaderTotal: 0,
+                exceptionAnnualizedTaTotal: 0,
+                exceptionAnnualizedReaderTotal: 0,
+            },
+            {
+                calculatedTaTotal: 1,
+                calculatedReaderTotal: 0,
+                annualizedTaTotal: 0.333,
+                annualizedReaderTotal: 0,
+                exceptionAnnualizedTaTotal: 0,
+                exceptionAnnualizedReaderTotal: 0,
+            },
+            {
+                calculatedTaTotal: 1,
+                calculatedReaderTotal: 0,
+                annualizedTaTotal: 0.333,
+                annualizedReaderTotal: 0,
+                exceptionAnnualizedTaTotal: 1.5,
+                exceptionAnnualizedReaderTotal: 0,
+            }
+        );
+
         await renderSubmission([
             createRequest("STD", {
                 averageEnrollment: 111,
                 name: "ECS 111",
                 number: "111"
+            }, {
+                calculatedTaTotal: 1,
+                annualizedTaTotal: 0.333,
             })
         ]);
 
@@ -359,6 +442,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(exceptionCheckbox).toBeDefined();
 
         await setCheckboxValue(exceptionCheckbox!, true);
+        await advanceRecalculation();
 
         expect(normalizeText(getHost().textContent)).toContain("Proposed TA % per course offering");
         expect(normalizeText(getHost().textContent)).toContain("Proposed Reader % per course offering");
@@ -366,7 +450,9 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(getButton("Submit for Approval").disabled).toBe(true);
 
         await setInputValue(getInputByPlaceholder("TA FTE requested"), "1.50");
+        await advanceRecalculation();
         await setInputValue(getInputByPlaceholder("Annual offerings requested"), "3");
+        await advanceRecalculation();
 
         const updatedText = normalizeText(getHost().textContent);
 
@@ -376,7 +462,17 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(getButton("Submit for Approval").disabled).toBe(false);
     });
 
-    it("restores formula-based totals when an exception is removed", async () => {
+    it("restores server-calculated totals when an exception is removed", async () => {
+        vi.useFakeTimers();
+        stubFetchResults({
+            calculatedTaTotal: 1,
+            calculatedReaderTotal: 0,
+            annualizedTaTotal: 0.333,
+            annualizedReaderTotal: 0,
+            exceptionAnnualizedTaTotal: 0,
+            exceptionAnnualizedReaderTotal: 0,
+        });
+
         await renderSubmission([
             createRequest(
                 "STD",
@@ -388,7 +484,10 @@ describe("SubmissionContainer formula UI coverage", () => {
                 {
                     exception: true,
                     exceptionTaTotal: 1.5,
-                    exceptionAnnualCount: 3
+                    exceptionAnnualCount: 3,
+                    calculatedTaTotal: 1,
+                    annualizedTaTotal: 0.333,
+                    exceptionAnnualizedTaTotal: 1.5,
                 }
             )
         ]);
@@ -404,6 +503,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(exceptionCheckbox).toBeDefined();
 
         await setCheckboxValue(exceptionCheckbox!, false);
+        await advanceRecalculation();
 
         const updatedText = normalizeText(getHost().textContent);
 
@@ -425,6 +525,7 @@ describe("SubmissionContainer formula UI coverage", () => {
                     exception: true,
                     exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3,
+                    exceptionAnnualizedTaTotal: 1.5,
                     hasApprovedException: true
                 }
             )
@@ -436,5 +537,44 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(text).toContain("approved for the above course");
         expect(text).toContain("TA Total: 1.500 | Reader Total: ---");
         expect(currentHost.querySelector("#revoke-button")).not.toBeNull();
+    });
+
+    it("shows a non-blocking warning when recalculation fails", async () => {
+        vi.useFakeTimers();
+        const fetchMock = vi.fn().mockRejectedValueOnce(new Error("boom"));
+        vi.stubGlobal("fetch", fetchMock);
+
+        await renderSubmission([
+            createRequest("STD", {
+                averageEnrollment: 250,
+                name: "ECS 250",
+                number: "250"
+            }, {
+                calculatedTaTotal: 1.5,
+                annualizedTaTotal: 0.833,
+            })
+        ]);
+
+        const currentHost = getHost();
+        const courseTypeSelect = Array.from(currentHost.querySelectorAll("select")).find(
+            element => (element as HTMLSelectElement).value === "STD"
+        ) as HTMLSelectElement | undefined;
+
+        expect(courseTypeSelect).toBeDefined();
+
+        act(() => {
+            courseTypeSelect!.value = "MAN";
+            courseTypeSelect!.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+
+        await advanceRecalculation();
+
+        const warningButton = getHost().querySelector(
+            "button[aria-label='Request calculation warning']"
+        );
+
+        expect(warningButton).not.toBeNull();
+        expect(getButton("Save Changes").disabled).toBe(false);
+        expect(getButton("Submit for Approval").disabled).toBe(false);
     });
 });

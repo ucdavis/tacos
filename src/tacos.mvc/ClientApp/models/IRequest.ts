@@ -2,6 +2,7 @@ import { ICourse } from "./ICourse";
 
 export interface IRequest {
     id?: number;
+    clientId?: string;
 
     course: ICourse | undefined;
 
@@ -28,7 +29,9 @@ export interface IRequest {
     isDirty?: boolean;
     isFocused?: boolean;
     isDeleted?: boolean;
+    isRecalculating?: boolean;
 
     error?: string;
+    calculationError?: string;
     isValid?: boolean;
 }

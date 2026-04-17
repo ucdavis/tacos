@@ -14,28 +14,23 @@ using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers
 {
-    internal readonly record struct RequestSupportTotals(
-        double CalculatedTaTotal,
-        double CalculatedReaderTotal,
-        double AnnualizedTaTotal,
-        double AnnualizedReaderTotal,
-        double ExceptionTaTotal,
-        double ExceptionReaderTotal,
-        double ExceptionAnnualizedTaTotal,
-        double ExceptionAnnualizedReaderTotal
-    );
-
     public class RequestsController : ApplicationController
     {
         private readonly TacoDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
+        private readonly IRequestCalculationService _requestCalculationService;
 
-        public RequestsController(TacoDbContext context, UserManager<User> userManager, IEmailService emailService)
+        public RequestsController(
+            TacoDbContext context,
+            UserManager<User> userManager,
+            IEmailService emailService,
+            IRequestCalculationService requestCalculationService)
         {
             _context = context;
             _userManager = userManager;
             _emailService = emailService;
+            _requestCalculationService = requestCalculationService;
         }
 
         // list submissions
@@ -138,6 +133,22 @@ namespace tacos.mvc.Controllers
                 .AsNoTracking()
                 .ToArrayAsync();
 
+            foreach (var request in requests)
+            {
+                ApplySupportTotals(
+                    request,
+                    _requestCalculationService.Calculate(
+                        request.Course,
+                        new RequestCalculationInput(
+                            request.CourseType,
+                            request.ExceptionTaTotal,
+                            request.ExceptionReaderTotal,
+                            request.ExceptionAnnualCount
+                        )
+                    )
+                );
+            }
+
             return View(requests);
         }
 
@@ -222,24 +233,25 @@ namespace tacos.mvc.Controllers
                     request.ApprovedComment = null;
                 }
 
-                var supportTotals = GetSupportTotals(m);
+                var supportTotals = _requestCalculationService.Calculate(
+                    course,
+                    new RequestCalculationInput(
+                        m.CourseType,
+                        m.ExceptionTaTotal,
+                        m.ExceptionReaderTotal,
+                        m.ExceptionAnnualCount
+                    )
+                );
 
                 // update values
                 request.IsActive                      = true;
                 request.CourseType                    = m.CourseType;
                 request.Exception                     = m.Exception;
                 request.ExceptionReason               = m.ExceptionReason;
-                request.ExceptionTaTotal              = supportTotals.ExceptionTaTotal;
-                request.ExceptionReaderTotal          = supportTotals.ExceptionReaderTotal;
                 request.ExceptionAnnualCount          = m.ExceptionAnnualCount;
-                request.ExceptionAnnualizedTaTotal    = supportTotals.ExceptionAnnualizedTaTotal;
-                request.ExceptionAnnualizedReaderTotal = supportTotals.ExceptionAnnualizedReaderTotal;
-                request.CalculatedTaTotal             = supportTotals.CalculatedTaTotal;
-                request.CalculatedReaderTotal         = supportTotals.CalculatedReaderTotal;
-                request.AnnualizedTaTotal             = supportTotals.AnnualizedTaTotal;
-                request.AnnualizedReaderTotal         = supportTotals.AnnualizedReaderTotal;
                 request.UpdatedOn                     = DateTime.UtcNow;
                 request.UpdatedBy                     = user.UserName;
+                ApplySupportTotals(request, supportTotals);
 
                 // clean approval and submission info unless this already has an approved exception
                 if (!request.HasApprovedException) {
@@ -254,6 +266,62 @@ namespace tacos.mvc.Controllers
             await _context.SaveChangesAsync();
 
             return Json(new { success = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Recalculate([FromBody]RequestRecalculationModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var departments = await _context.GetUsersDepartments(user);
+
+            var department = departments.SingleOrDefault(d => d.Id == model.DepartmentId);
+            if (department == null)
+            {
+                return BadRequest("Matching department not found among user's permission set.");
+            }
+
+            var course = await _context.Courses
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Number == model.CourseNumber);
+
+            if (course == null)
+            {
+                if (model.Course == null)
+                {
+                    return BadRequest("Course data required to calculate totals.");
+                }
+
+                course = new Course
+                {
+                    Number = string.IsNullOrWhiteSpace(model.Course.Number) ? model.CourseNumber : model.Course.Number,
+                    Name = model.Course.Name,
+                    AverageEnrollment = model.Course.AverageEnrollment,
+                    AverageSectionsPerCourse = model.Course.AverageSectionsPerCourse,
+                    TimesOfferedPerYear = model.Course.TimesOfferedPerYear,
+                    WasCourseTaughtInMostRecentYear = model.Course.WasCourseTaughtInMostRecentYear,
+                    IsCourseTaughtOnceEveryTwoYears = model.Course.IsCourseTaughtOnceEveryTwoYears,
+                };
+            }
+
+            var supportTotals = _requestCalculationService.Calculate(
+                course,
+                new RequestCalculationInput(
+                    model.CourseType,
+                    model.ExceptionTaTotal,
+                    model.ExceptionReaderTotal,
+                    model.ExceptionAnnualCount
+                )
+            );
+
+            return Json(new RequestRecalculationResultModel
+            {
+                CalculatedTaTotal = supportTotals.CalculatedTaTotal,
+                CalculatedReaderTotal = supportTotals.CalculatedReaderTotal,
+                AnnualizedTaTotal = supportTotals.AnnualizedTaTotal,
+                AnnualizedReaderTotal = supportTotals.AnnualizedReaderTotal,
+                ExceptionAnnualizedTaTotal = supportTotals.ExceptionAnnualizedTaTotal,
+                ExceptionAnnualizedReaderTotal = supportTotals.ExceptionAnnualizedReaderTotal,
+            });
         }
 
         [HttpPost]
@@ -363,18 +431,16 @@ namespace tacos.mvc.Controllers
             request.History.Add(history);
         }
 
-        private static RequestSupportTotals GetSupportTotals(RequestModel model)
+        private static void ApplySupportTotals(Request request, RequestSupportTotals supportTotals)
         {
-            return new RequestSupportTotals(
-                model.CalculatedTaTotal,
-                model.CalculatedReaderTotal,
-                model.AnnualizedTaTotal,
-                model.AnnualizedReaderTotal,
-                model.ExceptionTaTotal,
-                model.ExceptionReaderTotal,
-                model.ExceptionAnnualizedTaTotal,
-                model.ExceptionAnnualizedReaderTotal
-            );
+            request.ExceptionTaTotal = supportTotals.ExceptionTaTotal;
+            request.ExceptionReaderTotal = supportTotals.ExceptionReaderTotal;
+            request.ExceptionAnnualizedTaTotal = supportTotals.ExceptionAnnualizedTaTotal;
+            request.ExceptionAnnualizedReaderTotal = supportTotals.ExceptionAnnualizedReaderTotal;
+            request.CalculatedTaTotal = supportTotals.CalculatedTaTotal;
+            request.CalculatedReaderTotal = supportTotals.CalculatedReaderTotal;
+            request.AnnualizedTaTotal = supportTotals.AnnualizedTaTotal;
+            request.AnnualizedReaderTotal = supportTotals.AnnualizedReaderTotal;
         }
     }
 }
