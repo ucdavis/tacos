@@ -15,11 +15,5 @@ namespace tacos.core.Resources
                 { "MODW", "Lecture only, moderate writing" },
                 { "INT", "Lecture only, writing intensive or substantial project" }
             };
-
-        public static readonly Dictionary<string, string> Requests =
-            new Dictionary<string, string> {
-                {"READ", "Reader"},
-                {"TA", "TA"}
-            };
     }
 }

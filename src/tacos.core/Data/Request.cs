@@ -36,53 +36,87 @@ namespace tacos.core.Data
 
         public string CourseType { get; set; }
 
-        public string RequestType { get; set; }
-
         public bool Exception { get; set; }
 
         public string ExceptionReason { get; set; }
 
-        public double ExceptionTotal { get; set; }
+        public double ExceptionTaTotal { get; set; }
+
+        public double ExceptionReaderTotal { get; set; }
 
         public double ExceptionAnnualCount { get; set; }
 
-        public double ExceptionAnnualizedTotal { get; set; }
+        public double ExceptionAnnualizedTaTotal { get; set; }
 
-        // calculated total of TAs, regardless of what is requested
-        public double CalculatedTotal { get; set; }
+        public double ExceptionAnnualizedReaderTotal { get; set; }
 
-        public double AnnualizedTotal { get; set; }
+        public double CalculatedTaTotal { get; set; }
+
+        public double CalculatedReaderTotal { get; set; }
+
+        public double AnnualizedTaTotal { get; set; }
+
+        public double AnnualizedReaderTotal { get; set; }
         
         public bool? Approved { get; set; }        
 
-        public double ApprovedTotal
+        public double ApprovedTaTotal
         {
             get
             {
                 if (!Approved.HasValue) return 0;
 
-                // if we've made a decision
-                if (Approved.Value) {
-                    return Exception ? ExceptionTotal : CalculatedTotal;
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionTaTotal : CalculatedTaTotal;
                 }
 
-                return CalculatedTotal;
+                return CalculatedTaTotal;
             }
         }
 
-        public double ApprovedAnnualizedTotal
+        public double ApprovedReaderTotal
         {
             get
             {
                 if (!Approved.HasValue) return 0;
 
-                // if we've made a decision
                 if (Approved.Value)
                 {
-                    return Exception ? ExceptionAnnualizedTotal : AnnualizedTotal;
+                    return Exception ? ExceptionReaderTotal : CalculatedReaderTotal;
                 }
 
-                return AnnualizedTotal;
+                return CalculatedReaderTotal;
+            }
+        }
+
+        public double ApprovedAnnualizedTaTotal
+        {
+            get
+            {
+                if (!Approved.HasValue) return 0;
+
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionAnnualizedTaTotal : AnnualizedTaTotal;
+                }
+
+                return AnnualizedTaTotal;
+            }
+        }
+
+        public double ApprovedAnnualizedReaderTotal
+        {
+            get
+            {
+                if (!Approved.HasValue) return 0;
+
+                if (Approved.Value)
+                {
+                    return Exception ? ExceptionAnnualizedReaderTotal : AnnualizedReaderTotal;
+                }
+
+                return AnnualizedReaderTotal;
             }
         }
 

@@ -37,14 +37,17 @@ function createRequest(id: number, overrides: Partial<IRequest> = {}): IRequest 
         courseName: course ? course.name : "",
         courseNumber: course ? course.number : "",
         courseType: "STD",
-        requestType: "TA",
-        calculatedTotal: 1,
-        annualizedTotal: 0.333,
+        calculatedTaTotal: 1,
+        calculatedReaderTotal: 0,
+        annualizedTaTotal: 0.333,
+        annualizedReaderTotal: 0,
         exception: false,
         exceptionReason: "",
-        exceptionTotal: 0,
+        exceptionTaTotal: 0,
+        exceptionReaderTotal: 0,
         exceptionAnnualCount: 0,
-        exceptionAnnualizedTotal: 0,
+        exceptionAnnualizedTaTotal: 0,
+        exceptionAnnualizedReaderTotal: 0,
         hasApprovedException: false,
         isDirty: true,
         isValid: true,
@@ -141,16 +144,6 @@ describe("RequestsTable UI coverage", () => {
         const select = Array.from(scope.querySelectorAll("select")).find(element => {
             const values = optionValues(element as HTMLSelectElement);
             return values.includes("STD") && values.includes("MAN") && !values.includes("");
-        }) as HTMLSelectElement | undefined;
-
-        expect(select).toBeDefined();
-        return select!;
-    }
-
-    function getRequestTypeCellSelect(scope: ParentNode = getHost()): HTMLSelectElement {
-        const select = Array.from(scope.querySelectorAll("select")).find(element => {
-            const values = optionValues(element as HTMLSelectElement);
-            return values.length === 2 && values[0] === "TA" && values[1] === "READ";
         }) as HTMLSelectElement | undefined;
 
         expect(select).toBeDefined();
@@ -418,28 +411,21 @@ describe("RequestsTable UI coverage", () => {
         expect(courseTypeColumn!.style.width).toBe("100px");
     });
 
-    it("keeps header help controls separate from sorting and hardens the external criteria link", async () => {
+    it("keeps the criteria help link separate from sorting and hardens the external criteria link", async () => {
         await renderTable({
             requests: [
-                createRequest(1, { requestType: "READ" }),
-                createRequest(2, { requestType: "TA" }),
+                createRequest(1),
+                createRequest(2),
             ]
         });
 
-        const requestTypeHelpButton = getHost().querySelector("#requestTypeHeader") as HTMLButtonElement | null;
         const criteriaInfoLink = Array.from(getHost().querySelectorAll("a")).find(
             element => normalizeText(element.textContent).includes("Criteria Info")
         ) as HTMLAnchorElement | undefined;
 
-        expect(requestTypeHelpButton).not.toBeNull();
-        expect(requestTypeHelpButton!.tagName).toBe("BUTTON");
-        expect(requestTypeHelpButton!.getAttribute("aria-describedby")).toMatch(/^tooltip-/);
-
         expect(criteriaInfoLink).toBeDefined();
         expect(criteriaInfoLink!.getAttribute("rel")).toBe("noopener noreferrer");
 
-        expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
-        await click(requestTypeHelpButton!);
         expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
     });
 
@@ -451,21 +437,22 @@ describe("RequestsTable UI coverage", () => {
                     course: createCourse({ number: "TAC 202", name: "Exception Row" }),
                     exception: true,
                     exceptionReason: "Special staffing",
-                    exceptionTotal: 1.5,
+                    exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 2
                 }),
             ]
         });
 
-        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='TA FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='Reader FTE requested']")).not.toBeNull();
 
         await setSelectValue(getExceptionFilterSelect(), "true");
         expect(getVisibleRequestIds()).toEqual(["request-2"]);
-        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).not.toBeNull();
+        expect(getHost().querySelector("input[placeholder='TA FTE requested']")).not.toBeNull();
 
         await setSelectValue(getExceptionFilterSelect(), "false");
         expect(getVisibleRequestIds()).toEqual(["request-1"]);
-        expect(getHost().querySelector("input[placeholder='Total FTE requested']")).toBeNull();
+        expect(getHost().querySelector("input[placeholder='TA FTE requested']")).toBeNull();
     });
 
     it("emits onEdit with updated request values from the original request index after sorting", async () => {
@@ -490,13 +477,10 @@ describe("RequestsTable UI coverage", () => {
         expect(sortedRow).not.toBeNull();
 
         await setSelectValue(getCourseTypeCellSelect(sortedRow!), "MAN");
-        await setSelectValue(getRequestTypeCellSelect(sortedRow!), "READ");
-
         await setCheckboxValue(getExceptionCheckbox(sortedRow!), true);
 
         expect(onEdit).toHaveBeenNthCalledWith(1, 1, { ...secondRequest, courseType: "MAN" });
-        expect(onEdit).toHaveBeenNthCalledWith(2, 1, { ...secondRequest, requestType: "READ" });
-        expect(onEdit).toHaveBeenNthCalledWith(3, 1, { ...secondRequest, exception: true });
+        expect(onEdit).toHaveBeenNthCalledWith(2, 1, { ...secondRequest, exception: true });
     });
 
     it("forwards numeric edits from the expanded exception detail inputs and preserves textarea typing until blur saves it", async () => {
@@ -514,17 +498,20 @@ describe("RequestsTable UI coverage", () => {
         });
 
         const currentHost = getHost();
-        const totalInput = currentHost.querySelector("input[placeholder='Total FTE requested']") as HTMLInputElement | null;
+        const totalInput = currentHost.querySelector("input[placeholder='TA FTE requested']") as HTMLInputElement | null;
+        const readerInput = currentHost.querySelector("input[placeholder='Reader FTE requested']") as HTMLInputElement | null;
         const annualCountInput = currentHost.querySelector("input[placeholder='Annual offerings requested']") as HTMLInputElement | null;
         const reasonInput = currentHost.querySelector(
             "textarea[placeholder='Reason for exceptioning the course request']"
         ) as HTMLTextAreaElement | null;
 
         expect(totalInput).not.toBeNull();
+        expect(readerInput).not.toBeNull();
         expect(annualCountInput).not.toBeNull();
         expect(reasonInput).not.toBeNull();
 
         await setInputValue(totalInput!, "2.25");
+        await setInputValue(readerInput!, "0.50");
         await setInputValue(annualCountInput!, "3");
 
         const textareaValueSetter = Object.getOwnPropertyDescriptor(
@@ -541,9 +528,10 @@ describe("RequestsTable UI coverage", () => {
             reasonInput!.dispatchEvent(new Event("change", { bubbles: true }));
         });
 
-        expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, exceptionTotal: 2.25 });
-        expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, exceptionAnnualCount: 3 });
-        expect(onEdit).toHaveBeenCalledTimes(2);
+        expect(onEdit).toHaveBeenNthCalledWith(1, 0, { ...request, exceptionTaTotal: 2.25 });
+        expect(onEdit).toHaveBeenNthCalledWith(2, 0, { ...request, exceptionReaderTotal: 0.5 });
+        expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exceptionAnnualCount: 3 });
+        expect(onEdit).toHaveBeenCalledTimes(3);
         expect(reasonInput!.value).toBe("Updated justification");
 
         act(() => {
@@ -551,7 +539,7 @@ describe("RequestsTable UI coverage", () => {
             reasonInput!.dispatchEvent(new FocusEvent("focusout", { bubbles: true }));
         });
 
-        expect(onEdit).toHaveBeenNthCalledWith(3, 0, { ...request, exceptionReason: "Updated justification" });
+        expect(onEdit).toHaveBeenNthCalledWith(4, 0, { ...request, exceptionReason: "Updated justification" });
         expect(reasonInput!.value).toBe("Updated justification");
     });
 
@@ -573,7 +561,7 @@ describe("RequestsTable UI coverage", () => {
                         isCourseTaughtOnceEveryTwoYears: true,
                         wasCourseTaughtInMostRecentYear: false
                     }),
-                    annualizedTotal: 0.5
+                    annualizedTaTotal: 0.5
                 }),
             ]
         });
@@ -581,7 +569,7 @@ describe("RequestsTable UI coverage", () => {
         const currentHost = getHost();
         const newIndicator = currentHost.querySelector("#request-new-indicator-0") as HTMLButtonElement | null;
         const validationWarning = currentHost.querySelector("#request-1-error") as HTMLButtonElement | null;
-        const alternatingWarning = currentHost.querySelector("#request-2-otheryear-warning") as HTMLButtonElement | null;
+        const alternatingWarning = currentHost.querySelector("#request-2-ta-otheryear-warning") as HTMLButtonElement | null;
 
         expect(newIndicator).not.toBeNull();
         expect(newIndicator!.tagName).toBe("BUTTON");
@@ -610,11 +598,11 @@ describe("RequestsTable UI coverage", () => {
                         isCourseTaughtOnceEveryTwoYears: true,
                         wasCourseTaughtInMostRecentYear: false
                     }),
-                    annualizedTotal: 0.5,
+                    annualizedTaTotal: 0.5,
                     exception: true,
-                    exceptionTotal: 1.5,
+                    exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3,
-                    exceptionAnnualizedTotal: 1.5,
+                    exceptionAnnualizedTaTotal: 1.5,
                     hasApprovedException: true
                 }),
             ]
@@ -625,7 +613,7 @@ describe("RequestsTable UI coverage", () => {
 
         expect(text).toContain("approved for the above course");
         expect(text).toContain("1.500");
-        expect(currentHost.querySelector("#request-0-otheryear-warning")).toBeNull();
+        expect(currentHost.querySelector("#request-0-ta-otheryear-warning")).toBeNull();
 
         const revokeLink = currentHost.querySelector("#revoke-button") as HTMLButtonElement | null;
         expect(revokeLink).not.toBeNull();
@@ -652,9 +640,9 @@ describe("RequestsTable UI coverage", () => {
                 createRequest(42, {
                     course: createCourse({ number: "TAC 420", name: "Approved Exception" }),
                     exception: true,
-                    exceptionTotal: 1.5,
+                    exceptionTaTotal: 1.5,
                     exceptionAnnualCount: 3,
-                    exceptionAnnualizedTotal: 1.5,
+                    exceptionAnnualizedTaTotal: 1.5,
                     hasApprovedException: true
                 }),
             ]

@@ -14,6 +14,17 @@ using tacos.mvc.services;
 
 namespace tacos.mvc.Controllers
 {
+    internal readonly record struct RequestSupportTotals(
+        double CalculatedTaTotal,
+        double CalculatedReaderTotal,
+        double AnnualizedTaTotal,
+        double AnnualizedReaderTotal,
+        double ExceptionTaTotal,
+        double ExceptionReaderTotal,
+        double ExceptionAnnualizedTaTotal,
+        double ExceptionAnnualizedReaderTotal
+    );
+
     public class RequestsController : ApplicationController
     {
         private readonly TacoDbContext _context;
@@ -211,19 +222,24 @@ namespace tacos.mvc.Controllers
                     request.ApprovedComment = null;
                 }
 
+                var supportTotals = GetSupportTotals(m);
+
                 // update values
-                request.IsActive                 = true;
-                request.CourseType               = m.CourseType;
-                request.RequestType              = m.RequestType;
-                request.Exception                = m.Exception;
-                request.ExceptionReason          = m.ExceptionReason;
-                request.ExceptionTotal           = m.ExceptionTotal;
-                request.ExceptionAnnualCount     = m.ExceptionAnnualCount;
-                request.ExceptionAnnualizedTotal = m.ExceptionAnnualizedTotal;
-                request.CalculatedTotal          = m.CalculatedTotal;
-                request.AnnualizedTotal          = m.AnnualizedTotal;
-                request.UpdatedOn                = DateTime.UtcNow;
-                request.UpdatedBy                = user.UserName;
+                request.IsActive                      = true;
+                request.CourseType                    = m.CourseType;
+                request.Exception                     = m.Exception;
+                request.ExceptionReason               = m.ExceptionReason;
+                request.ExceptionTaTotal              = supportTotals.ExceptionTaTotal;
+                request.ExceptionReaderTotal          = supportTotals.ExceptionReaderTotal;
+                request.ExceptionAnnualCount          = m.ExceptionAnnualCount;
+                request.ExceptionAnnualizedTaTotal    = supportTotals.ExceptionAnnualizedTaTotal;
+                request.ExceptionAnnualizedReaderTotal = supportTotals.ExceptionAnnualizedReaderTotal;
+                request.CalculatedTaTotal             = supportTotals.CalculatedTaTotal;
+                request.CalculatedReaderTotal         = supportTotals.CalculatedReaderTotal;
+                request.AnnualizedTaTotal             = supportTotals.AnnualizedTaTotal;
+                request.AnnualizedReaderTotal         = supportTotals.AnnualizedReaderTotal;
+                request.UpdatedOn                     = DateTime.UtcNow;
+                request.UpdatedBy                     = user.UserName;
 
                 // clean approval and submission info unless this already has an approved exception
                 if (!request.HasApprovedException) {
@@ -326,14 +342,17 @@ namespace tacos.mvc.Controllers
                 UpdatedOn                = request.UpdatedOn,
                 UpdatedBy                = request.UpdatedBy,
                 CourseType               = request.CourseType,
-                RequestType              = request.RequestType,
                 Exception                = request.Exception,
                 ExceptionReason          = request.ExceptionReason,
-                ExceptionTotal           = request.ExceptionTotal,
+                ExceptionTaTotal         = request.ExceptionTaTotal,
+                ExceptionReaderTotal     = request.ExceptionReaderTotal,
                 ExceptionAnnualCount     = request.ExceptionAnnualCount,
-                ExceptionAnnualizedTotal = request.ExceptionAnnualizedTotal,
-                CalculatedTotal          = request.CalculatedTotal,
-                AnnualizedTotal          = request.AnnualizedTotal,
+                ExceptionAnnualizedTaTotal = request.ExceptionAnnualizedTaTotal,
+                ExceptionAnnualizedReaderTotal = request.ExceptionAnnualizedReaderTotal,
+                CalculatedTaTotal        = request.CalculatedTaTotal,
+                CalculatedReaderTotal    = request.CalculatedReaderTotal,
+                AnnualizedTaTotal        = request.AnnualizedTaTotal,
+                AnnualizedReaderTotal    = request.AnnualizedReaderTotal,
                 Approved                 = request.Approved,
                 ApprovedComment          = request.ApprovedComment,
                 CourseNumber             = course.Number,
@@ -342,6 +361,20 @@ namespace tacos.mvc.Controllers
                 TimesOfferedPerYear      = course.TimesOfferedPerYear,
             };
             request.History.Add(history);
+        }
+
+        private static RequestSupportTotals GetSupportTotals(RequestModel model)
+        {
+            return new RequestSupportTotals(
+                model.CalculatedTaTotal,
+                model.CalculatedReaderTotal,
+                model.AnnualizedTaTotal,
+                model.AnnualizedReaderTotal,
+                model.ExceptionTaTotal,
+                model.ExceptionReaderTotal,
+                model.ExceptionAnnualizedTaTotal,
+                model.ExceptionAnnualizedReaderTotal
+            );
         }
     }
 }

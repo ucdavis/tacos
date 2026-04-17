@@ -8,10 +8,12 @@ interface IProps {
     exception: boolean;
     exceptionApproved?: boolean;
     exceptionReason: string;
-    exceptionTotal: number;
+    exceptionTaTotal: number;
+    exceptionReaderTotal: number;
     exceptionAnnualCount: number;
     onExceptionAnnualCountChange: (exceptionAnnualCount: number) => void;
-    onExceptionTotalChange: (exceptionTotal: number) => void;
+    onExceptionTaTotalChange: (exceptionTotal: number) => void;
+    onExceptionReaderTotalChange: (exceptionTotal: number) => void;
     onReasonChange: (exceptionReason: string) => void;
 }
 
@@ -68,7 +70,11 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                 <p>
                     <b>Proposed TA % per course offering</b>
                 </p>
-                <div className="exceptionRowComponents">{this.renderExceptionTotal()}</div>
+                <div className="exceptionRowComponents">{this.renderExceptionTaTotal()}</div>
+                <p>
+                    <b>Proposed Reader % per course offering</b>
+                </p>
+                <div className="exceptionRowComponents">{this.renderExceptionReaderTotal()}</div>
                 <p>
                     <b>Proposed number of annual course offerings</b>
                 </p>
@@ -93,7 +99,9 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
             <div className="exceptionRow exceptionRow--approved">
                 <p>
                     <b>
-                        Your exception request for {this.props.exceptionTotal} TA% per course has
+                        Your approved exception request is TA {this.props.exceptionTaTotal.toFixed(2)}
+                        {" and "}Reader {this.props.exceptionReaderTotal.toFixed(2)} per course
+                        and has
                         been approved for the above course (see review page for approved totals).
                     </b>
                     <button
@@ -165,15 +173,29 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         }
     };
 
-    private renderExceptionTotal = () => {
+    private renderExceptionTaTotal = () => {
         return (
             <NumberInput
                 className="tacos-input"
                 min={0}
                 step={0.25}
-                placeholder="Total FTE requested"
-                value={this.props.exceptionTotal}
-                onChange={this.onChangeTotal}
+                placeholder="TA FTE requested"
+                value={this.props.exceptionTaTotal}
+                onChange={this.onChangeTaTotal}
+                format={this.formatExceptionTotal}
+            />
+        );
+    };
+
+    private renderExceptionReaderTotal = () => {
+        return (
+            <NumberInput
+                className="tacos-input"
+                min={0}
+                step={0.25}
+                placeholder="Reader FTE requested"
+                value={this.props.exceptionReaderTotal}
+                onChange={this.onChangeReaderTotal}
                 format={this.formatExceptionTotal}
             />
         );
@@ -219,8 +241,12 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
         this.props.onExceptionAnnualCountChange(value);
     };
 
-    private onChangeTotal = (value: number) => {
-        this.props.onExceptionTotalChange(value);
+    private onChangeTaTotal = (value: number) => {
+        this.props.onExceptionTaTotalChange(value);
+    };
+
+    private onChangeReaderTotal = (value: number) => {
+        this.props.onExceptionReaderTotalChange(value);
     };
 
     private onBlurReason = (e: React.FocusEvent<HTMLTextAreaElement>) => {

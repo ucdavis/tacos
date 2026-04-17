@@ -2,9 +2,14 @@ import { ICourse } from "../models/ICourse";
 
 // dictionary where props are equal to different course types
 
+export interface IFormulaResult {
+    taPerOffering: number;
+    readerPerOffering: number;
+}
+
 // each entry is an object of type IFormula
 export interface IFormula {
-    calculate: (course: ICourse) => number;
+    calculate: (course: ICourse) => IFormulaResult;
 }
 
 interface IFormulas {
@@ -17,11 +22,11 @@ const standardLectureFormula: IFormula = {
     calculate: (course: ICourse) => {
         // minimum enrollment
         if (course.averageEnrollment < 55.0) {
-            return 0;
+            return noSupport();
         }
 
         // Half-time TA per 55 students for courses with 55 or more students
-        return roundTo((course.averageEnrollment / 55.0) * 0.5, 0.5);
+        return taOnly(roundTo((course.averageEnrollment / 55.0) * 0.5, 0.5));
     }
 };
 
@@ -33,17 +38,17 @@ const writingLectureFormula: IFormula = {
 
         // minimum sections - minimum avg non-credit sections is 2 in order to be eligible for funding
         if (sectionsPerCourse < 2) {
-            return 0;
+            return noSupport();
         }
 
         // minimum enrollment -  minimum section size is 20
         if (course.averageEnrollment / sectionsPerCourse < 20.0) {
-            return 0;
+            return noSupport();
         }
 
         // "Discussion sections average 20-25 students
         // Half-time TA is responsible for 2 discussion sections, i.e. 40 students"
-        return roundTo((sectionsPerCourse / 2.0) * 0.5, 0.5);
+        return taOnly(roundTo((sectionsPerCourse / 2.0) * 0.5, 0.5));
     }
 };
 
@@ -53,13 +58,13 @@ const labFormula: IFormula = {
     calculate: (course: ICourse) => {
         // minimum enrollment - minimum avg enrollment is 25 students in order to be eligible for TA funding
         if (course.averageEnrollment < 25) {
-            return 0;
+            return noSupport();
         }
 
         // "Lab/studio sections average 15-20 students
         // Half-time TA is responsible for 2 lab/studio sections, i.e. 25-30 students
         // Alternative: 10-15 students per section if room size, equipment, or safety concerns require"
-        return roundTo((course.averageEnrollment / 30.0) * 0.5, 0.5);
+        return taOnly(roundTo((course.averageEnrollment / 30.0) * 0.5, 0.5));
     }
 };
 
@@ -67,7 +72,7 @@ const labFormula: IFormula = {
 const fieldFormula: IFormula = {
     calculate: (course: ICourse) => {
         // Half-time TA per 25 students
-        return roundTo((course.averageEnrollment / 25.0) * 0.5, 0.5);
+        return taOnly(roundTo((course.averageEnrollment / 25.0) * 0.5, 0.5));
     }
 };
 
@@ -78,10 +83,10 @@ const lectureAutoGradingFormula: IFormula = {
         // 25% TA or Reader for first 150 students for courses with 150 or more students
         // Additional 25% TA or Reader for each 100 after that
         if (course.averageEnrollment < 150) {
-            return 0;
+            return noSupport();
         }
 
-        return roundTo(0.25 + ((course.averageEnrollment - 150) / 100.0) * 0.25, 0.25);
+        return taOnly(roundTo(0.25 + ((course.averageEnrollment - 150) / 100.0) * 0.25, 0.25));
     }
 };
 
@@ -93,15 +98,15 @@ const lectureManualGradingFormula: IFormula = {
         // Additional 25% TA or Reader for each 100 after that.
         // Plus, 25% of a TA or Reader per 100 students
         if (course.averageEnrollment < 150) {
-            return 0;
+            return noSupport();
         }
 
-        return roundTo(
+        return taOnly(roundTo(
             0.25 +
                 ((course.averageEnrollment - 150) / 100.0) * 0.25 +
                 (course.averageEnrollment / 100.0) * 0.25,
             0.25
-        );
+        ));
     }
 };
 
@@ -111,10 +116,10 @@ const lectureModerateWritingFormula: IFormula = {
     calculate: (course: ICourse) => {
         // 25% TA or Reader per 100 students for courses with 100 or more students
         if (course.averageEnrollment < 100) {
-            return 0;
+            return noSupport();
         }
 
-        return roundTo((course.averageEnrollment / 100.0) * 0.25, 0.25);
+        return taOnly(roundTo((course.averageEnrollment / 100.0) * 0.25, 0.25));
     }
 };
 
@@ -124,12 +129,26 @@ const lectureIntensiveFormula: IFormula = {
     calculate: (course: ICourse) => {
         // 25% TA or Reader per 40 students for courses with 40 or more students
         if (course.averageEnrollment < 40) {
-            return 0;
+            return noSupport();
         }
 
-        return roundTo((course.averageEnrollment / 40.0) * 0.25, 0.25);
+        return taOnly(roundTo((course.averageEnrollment / 40.0) * 0.25, 0.25));
     }
 };
+
+function noSupport(): IFormulaResult {
+    return {
+        taPerOffering: 0,
+        readerPerOffering: 0,
+    };
+}
+
+function taOnly(taPerOffering: number): IFormulaResult {
+    return {
+        taPerOffering,
+        readerPerOffering: 0,
+    };
+}
 
 function normalizedSectionsPerCourse(course: ICourse): number {
     // normalize by rounding down to even, whole number
@@ -152,3 +171,37 @@ export const formulas: IFormulas = {
 };
 
 export const annualizationRatio = 4.0 / 12.0;
+
+export function annualizeSupport(
+    course: ICourse,
+    perOfferingSupport: IFormulaResult,
+): Pick<IRequestLikeSupport, "annualizedTaTotal" | "annualizedReaderTotal"> {
+    let annualizedTaTotal =
+        perOfferingSupport.taPerOffering *
+        annualizationRatio *
+        course.timesOfferedPerYear;
+    let annualizedReaderTotal =
+        perOfferingSupport.readerPerOffering *
+        annualizationRatio *
+        course.timesOfferedPerYear;
+
+    if (course.isCourseTaughtOnceEveryTwoYears) {
+        if (course.wasCourseTaughtInMostRecentYear) {
+            annualizedTaTotal = 0;
+            annualizedReaderTotal = 0;
+        } else {
+            annualizedTaTotal *= 2;
+            annualizedReaderTotal *= 2;
+        }
+    }
+
+    return {
+        annualizedTaTotal,
+        annualizedReaderTotal,
+    };
+}
+
+interface IRequestLikeSupport {
+    annualizedTaTotal: number;
+    annualizedReaderTotal: number;
+}

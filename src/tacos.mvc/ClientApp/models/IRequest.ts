@@ -12,14 +12,17 @@ export interface IRequest {
     courseNumber: string;
 
     courseType: string;
-    requestType: string;
-    calculatedTotal: number;
-    annualizedTotal: number;
+    calculatedTaTotal: number;
+    calculatedReaderTotal: number;
+    annualizedTaTotal: number;
+    annualizedReaderTotal: number;
     exception: boolean;
     exceptionReason: string;
-    exceptionTotal: number;
+    exceptionTaTotal: number;
+    exceptionReaderTotal: number;
     exceptionAnnualCount: number;
-    exceptionAnnualizedTotal: number;
+    exceptionAnnualizedTaTotal: number;
+    exceptionAnnualizedReaderTotal: number;
     hasApprovedException: boolean;
 
     isDirty?: boolean;

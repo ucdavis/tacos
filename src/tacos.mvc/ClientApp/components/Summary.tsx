@@ -8,7 +8,8 @@ interface IProps {
     canSave: boolean;
     canSubmit: boolean;
 
-    total: number;
+    taTotal: number;
+    readerTotal: number;
     pending: number;
 
     isSaving: boolean;
@@ -53,8 +54,11 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                 <div className="tacos-summary-bar__banner">
                     <div className="tacos-summary-bar__content">
                         <div className="tacos-summary-bar__title">
-                            Request Total:{" "}
-                            {this.props.total > 0 ? this.props.total.toFixed(3) : "---"}
+                            TA Total:{" "}
+                            {this.props.taTotal > 0 ? this.props.taTotal.toFixed(3) : "---"}
+                            {" | "}
+                            Reader Total:{" "}
+                            {this.props.readerTotal > 0 ? this.props.readerTotal.toFixed(3) : "---"}
                         </div>
                         <div className="tacos-summary-bar__actions">
                             <button

@@ -54,9 +54,8 @@ namespace Test.Controllers
                     courseNumber: "ECS 188",
                     courseName: "Special Topics",
                     courseType: "MAN",
-                    requestType: "READ",
-                    calculatedTotal: 1.25,
-                    annualizedTotal: 0.417
+                    calculatedTaTotal: 1.25,
+                    annualizedTaTotal: 0.417
                 )
             );
 
@@ -71,10 +70,55 @@ namespace Test.Controllers
             savedRequest.DepartmentId.ShouldBe(department.Id);
             savedRequest.CourseNumber.ShouldBe("ECS 188");
             savedRequest.CourseType.ShouldBe("MAN");
-            savedRequest.RequestType.ShouldBe("READ");
-            savedRequest.CalculatedTotal.ShouldBe(1.25);
-            savedRequest.AnnualizedTotal.ShouldBe(0.417);
+            savedRequest.CalculatedTaTotal.ShouldBe(1.25);
+            savedRequest.CalculatedReaderTotal.ShouldBe(0);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0.417);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0);
             savedRequest.UpdatedBy.ShouldBe(user.UserName);
+        }
+
+        [Fact]
+        public async Task Save_should_persist_split_support_fields()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+            var model = CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(
+                    courseNumber: "ECS 189A",
+                    courseName: "Special Topics",
+                    courseType: "MAN",
+                    exception: true,
+                    exceptionAnnualCount: 3,
+                    calculatedTaTotal: 1.0,
+                    calculatedReaderTotal: 0.25,
+                    annualizedTaTotal: 0.333,
+                    annualizedReaderTotal: 0.083,
+                    exceptionTaTotal: 1.5,
+                    exceptionReaderTotal: 0.25,
+                    exceptionAnnualizedTaTotal: 1.5,
+                    exceptionAnnualizedReaderTotal: 0.25
+                )
+            );
+
+            var result = await controller.Save(model);
+
+            JsonResultShouldIndicateSuccess(result);
+
+            var savedRequest = await context.Requests.SingleAsync();
+            savedRequest.CalculatedTaTotal.ShouldBe(1.0);
+            savedRequest.CalculatedReaderTotal.ShouldBe(0.25);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0.333);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0.083);
+            savedRequest.ExceptionTaTotal.ShouldBe(1.5);
+            savedRequest.ExceptionReaderTotal.ShouldBe(0.25);
+            savedRequest.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            savedRequest.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
         }
 
         [Fact]
@@ -91,14 +135,13 @@ namespace Test.Controllers
                 Course = course,
                 CourseNumber = course.Number,
                 CourseType = "STD",
-                RequestType = "TA",
                 Exception = true,
                 ExceptionReason = "Old exception",
-                ExceptionTotal = 1.5,
+                ExceptionTaTotal = 1.5,
                 ExceptionAnnualCount = 3,
-                ExceptionAnnualizedTotal = 1.5,
-                CalculatedTotal = 1,
-                AnnualizedTotal = 0.333,
+                ExceptionAnnualizedTaTotal = 1.5,
+                CalculatedTaTotal = 1,
+                AnnualizedTaTotal = 0.333,
                 Approved = true,
                 ApprovedComment = "Looks good",
                 Submitted = true,
@@ -120,8 +163,8 @@ namespace Test.Controllers
                     courseName: course.Name,
                     courseType: "STD",
                     exception: false,
-                    calculatedTotal: 1,
-                    annualizedTotal: 0.333
+                    calculatedTaTotal: 1,
+                    annualizedTaTotal: 0.333
                 )
             );
 
@@ -150,14 +193,13 @@ namespace Test.Controllers
                 Course = course,
                 CourseNumber = course.Number,
                 CourseType = "MAN",
-                RequestType = "TA",
                 Exception = true,
                 ExceptionReason = "Current exception",
-                ExceptionTotal = 1.25,
+                ExceptionTaTotal = 1.25,
                 ExceptionAnnualCount = 3,
-                ExceptionAnnualizedTotal = 1.25,
-                CalculatedTotal = 1,
-                AnnualizedTotal = 0.333,
+                ExceptionAnnualizedTaTotal = 1.25,
+                CalculatedTaTotal = 1,
+                AnnualizedTaTotal = 0.333,
                 Approved = true,
                 ApprovedComment = "Approved",
                 Submitted = true,
@@ -180,11 +222,11 @@ namespace Test.Controllers
                     courseType: "MAN",
                     exception: true,
                     exceptionReason: "Updated justification",
-                    exceptionTotal: 1.5,
                     exceptionAnnualCount: 3,
-                    exceptionAnnualizedTotal: 1.5,
-                    calculatedTotal: 1.25,
-                    annualizedTotal: 0.417
+                    exceptionTaTotal: 1.5,
+                    exceptionAnnualizedTaTotal: 1.5,
+                    calculatedTaTotal: 1.25,
+                    annualizedTaTotal: 0.417
                 )
             );
 
@@ -197,7 +239,8 @@ namespace Test.Controllers
             request.SubmittedBy.ShouldBe("submitter");
             request.SubmittedOn.ShouldBe(submittedOn);
             request.ExceptionReason.ShouldBe("Updated justification");
-            request.ExceptionTotal.ShouldBe(1.5);
+            request.ExceptionTaTotal.ShouldBe(1.5);
+            request.ExceptionReaderTotal.ShouldBe(0);
         }
 
         [Fact]
@@ -215,10 +258,9 @@ namespace Test.Controllers
                 Course = standardCourse,
                 CourseNumber = standardCourse.Number,
                 CourseType = "STD",
-                RequestType = "TA",
                 Exception = false,
-                CalculatedTotal = 1,
-                AnnualizedTotal = 0.333
+                CalculatedTaTotal = 1,
+                AnnualizedTaTotal = 0.333
             };
             var exceptionRequest = new Request
             {
@@ -227,14 +269,13 @@ namespace Test.Controllers
                 Course = exceptionCourse,
                 CourseNumber = exceptionCourse.Number,
                 CourseType = "MAN",
-                RequestType = "TA",
                 Exception = true,
                 ExceptionReason = "Needs manual grading support",
-                ExceptionTotal = 1.5,
+                ExceptionTaTotal = 1.5,
                 ExceptionAnnualCount = 3,
-                ExceptionAnnualizedTotal = 1.5,
-                CalculatedTotal = 1.25,
-                AnnualizedTotal = 0.417
+                ExceptionAnnualizedTaTotal = 1.5,
+                CalculatedTaTotal = 1.25,
+                AnnualizedTaTotal = 0.417
             };
 
             await SeedMembership(context, user, department);
@@ -256,8 +297,8 @@ namespace Test.Controllers
                     courseName: standardCourse.Name,
                     courseType: "STD",
                     exception: false,
-                    calculatedTotal: 1,
-                    annualizedTotal: 0.333
+                    calculatedTaTotal: 1,
+                    annualizedTaTotal: 0.333
                 ),
                 CreateRequestModel(
                     id: exceptionRequest.Id,
@@ -266,11 +307,11 @@ namespace Test.Controllers
                     courseType: "MAN",
                     exception: true,
                     exceptionReason: "Needs manual grading support",
-                    exceptionTotal: 1.5,
                     exceptionAnnualCount: 3,
-                    exceptionAnnualizedTotal: 1.5,
-                    calculatedTotal: 1.25,
-                    annualizedTotal: 0.417
+                    exceptionTaTotal: 1.5,
+                    exceptionAnnualizedTaTotal: 1.5,
+                    calculatedTaTotal: 1.25,
+                    annualizedTaTotal: 0.417
                 )
             );
 
@@ -300,6 +341,72 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Submit_should_capture_split_support_fields_in_request_history()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS 198");
+            var request = new Request
+            {
+                Department = department,
+                DepartmentId = department.Id,
+                Course = course,
+                CourseNumber = course.Number,
+                CourseType = "MAN",
+                Exception = true,
+                ExceptionReason = "Old reason",
+                ExceptionTaTotal = 1.25,
+                ExceptionAnnualCount = 3,
+                ExceptionAnnualizedTaTotal = 1.25,
+                CalculatedTaTotal = 1,
+                AnnualizedTaTotal = 0.333
+            };
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            context.Requests.Add(request);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+            var model = CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(
+                    id: request.Id,
+                    courseNumber: course.Number,
+                    courseName: course.Name,
+                    courseType: "MAN",
+                    exception: true,
+                    exceptionReason: "Needs both TA and Reader support",
+                    exceptionAnnualCount: 3,
+                    calculatedTaTotal: 1.0,
+                    calculatedReaderTotal: 0.5,
+                    annualizedTaTotal: 0.333,
+                    annualizedReaderTotal: 0.167,
+                    exceptionTaTotal: 1.5,
+                    exceptionReaderTotal: 0.25,
+                    exceptionAnnualizedTaTotal: 1.5,
+                    exceptionAnnualizedReaderTotal: 0.25
+                )
+            );
+
+            var result = await controller.Submit(model);
+
+            JsonResultShouldIndicateSuccess(result);
+
+            request.History.Count.ShouldBe(1);
+            var history = request.History.Single();
+            history.CalculatedTaTotal.ShouldBe(1.0);
+            history.CalculatedReaderTotal.ShouldBe(0.5);
+            history.AnnualizedTaTotal.ShouldBe(0.333);
+            history.AnnualizedReaderTotal.ShouldBe(0.167);
+            history.ExceptionTaTotal.ShouldBe(1.5);
+            history.ExceptionReaderTotal.ShouldBe(0.25);
+            history.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            history.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+        }
+
+        [Fact]
         public async Task Revoke_should_clear_approval_and_submission_fields()
         {
             await using var context = CreateContext();
@@ -313,7 +420,6 @@ namespace Test.Controllers
                 Course = course,
                 CourseNumber = course.Number,
                 CourseType = "MAN",
-                RequestType = "TA",
                 Exception = true,
                 Approved = true,
                 ApprovedComment = "Approved",
@@ -462,14 +568,17 @@ namespace Test.Controllers
             string courseNumber = "ECS 101",
             string courseName = "Test Course",
             string courseType = "STD",
-            string requestType = "TA",
             bool exception = false,
             string exceptionReason = "",
-            double exceptionTotal = 0,
+            double exceptionTaTotal = 0,
+            double exceptionReaderTotal = 0,
             double exceptionAnnualCount = 0,
-            double exceptionAnnualizedTotal = 0,
-            double calculatedTotal = 0,
-            double annualizedTotal = 0,
+            double exceptionAnnualizedTaTotal = 0,
+            double exceptionAnnualizedReaderTotal = 0,
+            double calculatedTaTotal = 0,
+            double calculatedReaderTotal = 0,
+            double annualizedTaTotal = 0,
+            double annualizedReaderTotal = 0,
             bool isDeleted = false)
         {
             return new RequestModel
@@ -478,14 +587,17 @@ namespace Test.Controllers
                 CourseName = courseName,
                 CourseNumber = courseNumber,
                 CourseType = courseType,
-                RequestType = requestType,
                 Exception = exception,
                 ExceptionReason = exceptionReason,
-                ExceptionTotal = exceptionTotal,
+                ExceptionTaTotal = exceptionTaTotal,
+                ExceptionReaderTotal = exceptionReaderTotal,
                 ExceptionAnnualCount = exceptionAnnualCount,
-                ExceptionAnnualizedTotal = exceptionAnnualizedTotal,
-                CalculatedTotal = calculatedTotal,
-                AnnualizedTotal = annualizedTotal,
+                ExceptionAnnualizedTaTotal = exceptionAnnualizedTaTotal,
+                ExceptionAnnualizedReaderTotal = exceptionAnnualizedReaderTotal,
+                CalculatedTaTotal = calculatedTaTotal,
+                CalculatedReaderTotal = calculatedReaderTotal,
+                AnnualizedTaTotal = annualizedTaTotal,
+                AnnualizedReaderTotal = annualizedReaderTotal,
                 IsDeleted = isDeleted
             };
         }
