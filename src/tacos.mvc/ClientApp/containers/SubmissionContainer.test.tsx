@@ -127,7 +127,7 @@ function normalizeText(value: string | null | undefined): string {
     return (value || "").replace(/\s+/g, " ").trim();
 }
 
-describe("SubmissionContainer formula UI coverage", () => {
+describe("SubmissionContainer server recalculation UI coverage", () => {
     let host: HTMLDivElement | undefined;
     let root: Root | undefined;
 
@@ -462,7 +462,7 @@ describe("SubmissionContainer formula UI coverage", () => {
         expect(getButton("Submit for Approval").disabled).toBe(false);
     });
 
-    it("restores formula-based totals when an exception is removed", async () => {
+    it("restores server-calculated totals when an exception is removed", async () => {
         vi.useFakeTimers();
         stubFetchResults({
             calculatedTaTotal: 1,
