@@ -23,7 +23,7 @@ CREATE TABLE [dbo].[RequestHistory] (
     [UpdatedBy]                NVARCHAR (450) NULL,
     [UpdatedOn]                DATETIME2 (7)  NOT NULL,
     CONSTRAINT [PK_RequestHistory] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_RequestHistory_Requests_RequestId] FOREIGN KEY ([RequestId]) REFERENCES [dbo].[Requests] ([Id]) ON DELETE CASCADE
+    CONSTRAINT [FK_RequestHistory_Requests_RequestId] FOREIGN KEY ([RequestId]) REFERENCES [dbo].[Requests] ([Id]) ON DELETE NO ACTION
 );
 
 
