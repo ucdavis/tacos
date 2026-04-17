@@ -72,6 +72,7 @@ namespace tacos.mvc
 
             services.AddTransient<IEmailService, EmailService>();
             services.AddTransient<IDirectorySearchService, IetWsSearchService>();
+            services.AddTransient<IRequestCalculationService, RequestCalculationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
