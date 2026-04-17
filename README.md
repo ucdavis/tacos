@@ -30,7 +30,7 @@
 
 * the first EF migration is `20260416212924_InitialCreate`
 * do not run that initial migration directly against an already-existing production database
-* instead, run [20260416212924_InitialCreate.baseline.sql](/Users/postit/Documents/github/tacos/src/tacos.core/Migrations/20260416212924_InitialCreate.baseline.sql) once to create `__EFMigrationsHistory` if needed and record the initial migration as already applied
+* instead, run [20260416212924_InitialCreate.baseline.sql](src/tacos.core/Migrations/20260416212924_InitialCreate.baseline.sql) once to create `__EFMigrationsHistory` if needed and record the initial migration as already applied
 * after that baseline step, normal EF migrations can be applied by startup or by `dotnet ef database update`
 
 ### Annual Refresh
