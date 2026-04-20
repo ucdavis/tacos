@@ -656,12 +656,12 @@ export default class SubmissionContainer extends React.Component<IProps, IState>
             }
 
             const result = await response.json() as {
-                calculatedTaTotal: number;
-                calculatedReaderTotal: number;
-                annualizedTaTotal: number;
                 annualizedReaderTotal: number;
-                exceptionAnnualizedTaTotal: number;
+                annualizedTaTotal: number;
+                calculatedReaderTotal: number;
+                calculatedTaTotal: number;
                 exceptionAnnualizedReaderTotal: number;
+                exceptionAnnualizedTaTotal: number;
             };
 
             this.setState((state) => {
