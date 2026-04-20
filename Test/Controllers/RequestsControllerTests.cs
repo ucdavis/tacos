@@ -158,10 +158,10 @@ namespace Test.Controllers
             JsonResultShouldIndicateSuccess(result);
 
             var savedRequest = await context.Requests.SingleAsync();
-            savedRequest.CalculatedTaTotal.ShouldBe(1.25);
-            savedRequest.CalculatedReaderTotal.ShouldBe(0);
-            savedRequest.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
-            savedRequest.AnnualizedReaderTotal.ShouldBe(0);
+            savedRequest.CalculatedTaTotal.ShouldBe(0.25);
+            savedRequest.CalculatedReaderTotal.ShouldBe(0.5);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
             savedRequest.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             savedRequest.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
         }
@@ -441,10 +441,10 @@ namespace Test.Controllers
 
             request.History.Count.ShouldBe(1);
             var history = request.History.Single();
-            history.CalculatedTaTotal.ShouldBe(1.25);
-            history.CalculatedReaderTotal.ShouldBe(0);
-            history.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
-            history.AnnualizedReaderTotal.ShouldBe(0);
+            history.CalculatedTaTotal.ShouldBe(0.25);
+            history.CalculatedReaderTotal.ShouldBe(0.5);
+            history.AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            history.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
             history.ExceptionTaTotal.ShouldBe(1.5);
             history.ExceptionReaderTotal.ShouldBe(0.25);
             history.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
@@ -489,10 +489,10 @@ namespace Test.Controllers
             var view = result.ShouldBeOfType<ViewResult>();
             var model = view.Model.ShouldBeOfType<Request[]>();
             model.Length.ShouldBe(1);
-            model[0].CalculatedTaTotal.ShouldBe(1.25);
-            model[0].CalculatedReaderTotal.ShouldBe(0);
-            model[0].AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
-            model[0].AnnualizedReaderTotal.ShouldBe(0);
+            model[0].CalculatedTaTotal.ShouldBe(0.25);
+            model[0].CalculatedReaderTotal.ShouldBe(0.5);
+            model[0].AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            model[0].AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
             model[0].ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             model[0].ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
 
@@ -530,10 +530,10 @@ namespace Test.Controllers
 
             var json = result.ShouldBeOfType<JsonResult>();
             var totals = json.Value.ShouldBeOfType<RequestRecalculationResultModel>();
-            totals.CalculatedTaTotal.ShouldBe(1.25);
-            totals.CalculatedReaderTotal.ShouldBe(0);
-            totals.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
-            totals.AnnualizedReaderTotal.ShouldBe(0);
+            totals.CalculatedTaTotal.ShouldBe(0.25);
+            totals.CalculatedReaderTotal.ShouldBe(0.5);
+            totals.AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            totals.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
             totals.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             totals.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
         }
@@ -572,10 +572,10 @@ namespace Test.Controllers
 
             var json = result.ShouldBeOfType<JsonResult>();
             var totals = json.Value.ShouldBeOfType<RequestRecalculationResultModel>();
-            totals.CalculatedTaTotal.ShouldBe(1.25);
-            totals.CalculatedReaderTotal.ShouldBe(0);
-            totals.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
-            totals.AnnualizedReaderTotal.ShouldBe(0);
+            totals.CalculatedTaTotal.ShouldBe(0.25);
+            totals.CalculatedReaderTotal.ShouldBe(0.5);
+            totals.AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            totals.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
             totals.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             totals.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
         }

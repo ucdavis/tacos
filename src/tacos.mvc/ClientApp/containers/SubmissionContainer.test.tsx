@@ -19,50 +19,66 @@ const formulaScenarios = [
     {
         courseType: "STD",
         course: { averageEnrollment: 111 },
-        expectedPerOffering: "1.000",
-        expectedAnnualized: "0.333"
+        expectedPerOfferingTa: "1.000",
+        expectedPerOfferingReader: undefined,
+        expectedAnnualizedTa: "0.333",
+        expectedAnnualizedReader: "---"
     },
     {
         courseType: "WRT",
         course: { averageEnrollment: 80, averageSectionsPerCourse: 5 },
-        expectedPerOffering: "1.000",
-        expectedAnnualized: "0.333"
+        expectedPerOfferingTa: "0.750",
+        expectedPerOfferingReader: undefined,
+        expectedAnnualizedTa: "0.250",
+        expectedAnnualizedReader: "---"
     },
     {
         courseType: "LAB",
         course: { averageEnrollment: 91 },
-        expectedPerOffering: "1.500",
-        expectedAnnualized: "0.500"
+        expectedPerOfferingTa: "1.250",
+        expectedPerOfferingReader: undefined,
+        expectedAnnualizedTa: "0.417",
+        expectedAnnualizedReader: "---"
     },
     {
         courseType: "FLD",
         course: { averageEnrollment: 76 },
-        expectedPerOffering: "1.500",
-        expectedAnnualized: "0.500"
+        expectedPerOfferingTa: "1.500",
+        expectedPerOfferingReader: undefined,
+        expectedAnnualizedTa: "0.500",
+        expectedAnnualizedReader: "---"
     },
     {
         courseType: "AUTO",
         course: { averageEnrollment: 350 },
-        expectedPerOffering: "0.750",
-        expectedAnnualized: "0.250"
+        expectedPerOfferingTa: "0.250",
+        expectedPerOfferingReader: "0.500",
+        expectedAnnualizedTa: "0.083",
+        expectedAnnualizedReader: "0.167"
     },
     {
         courseType: "MAN",
         course: { averageEnrollment: 250 },
-        expectedPerOffering: "1.250",
-        expectedAnnualized: "0.417"
+        expectedPerOfferingTa: "0.250",
+        expectedPerOfferingReader: "0.500",
+        expectedAnnualizedTa: "0.083",
+        expectedAnnualizedReader: "0.167"
     },
     {
         courseType: "MODW",
         course: { averageEnrollment: 250 },
-        expectedPerOffering: "0.750",
-        expectedAnnualized: "0.250"
+        expectedPerOfferingTa: "0.250",
+        expectedPerOfferingReader: "0.500",
+        expectedAnnualizedTa: "0.083",
+        expectedAnnualizedReader: "0.167"
     },
     {
         courseType: "INT",
         course: { averageEnrollment: 120 },
-        expectedPerOffering: "0.750",
-        expectedAnnualized: "0.250"
+        expectedPerOfferingTa: "0.250",
+        expectedPerOfferingReader: "0.500",
+        expectedAnnualizedTa: "0.083",
+        expectedAnnualizedReader: "0.167"
     }
 ] as const;
 
@@ -236,28 +252,43 @@ describe("SubmissionContainer server recalculation UI coverage", () => {
 
     it.each(formulaScenarios)(
         "renders $courseType request totals from server-hydrated values",
-        async ({ courseType, course, expectedPerOffering, expectedAnnualized }) => {
+        async ({
+            courseType,
+            course,
+            expectedPerOfferingTa,
+            expectedPerOfferingReader,
+            expectedAnnualizedTa,
+            expectedAnnualizedReader
+        }) => {
             await renderSubmission([
                 createRequest(courseType, course, {
-                    calculatedTaTotal: Number(expectedPerOffering),
-                    annualizedTaTotal: Number(expectedAnnualized),
+                    calculatedTaTotal: Number(expectedPerOfferingTa),
+                    calculatedReaderTotal: expectedPerOfferingReader ? Number(expectedPerOfferingReader) : 0,
+                    annualizedTaTotal: Number(expectedAnnualizedTa),
+                    annualizedReaderTotal:
+                        expectedAnnualizedReader === "---" ? 0 : Number(expectedAnnualizedReader),
                 })
             ]);
 
             const text = normalizeText(getHost().textContent);
 
-            expect(text).toContain(expectedPerOffering);
-            expect(text).toContain(`TA Total: ${expectedAnnualized} | Reader Total: ---`);
+            expect(text).toContain(expectedPerOfferingTa);
+            if (expectedPerOfferingReader) {
+                expect(text).toContain(expectedPerOfferingReader);
+            }
+            expect(text).toContain(
+                `TA Total: ${expectedAnnualizedTa} | Reader Total: ${expectedAnnualizedReader}`
+            );
         }
     );
 
     it("updates the rendered totals when the user changes the course type", async () => {
         vi.useFakeTimers();
         const fetchMock = stubFetchResults({
-            calculatedTaTotal: 1.25,
-            calculatedReaderTotal: 0,
-            annualizedTaTotal: 0.417,
-            annualizedReaderTotal: 0,
+            calculatedTaTotal: 0.25,
+            calculatedReaderTotal: 0.5,
+            annualizedTaTotal: 0.083,
+            annualizedReaderTotal: 0.167,
             exceptionAnnualizedTaTotal: 0,
             exceptionAnnualizedReaderTotal: 0,
         });
@@ -268,14 +299,14 @@ describe("SubmissionContainer server recalculation UI coverage", () => {
                 name: "ECS 250",
                 number: "250"
             }, {
-                calculatedTaTotal: 1.5,
-                annualizedTaTotal: 0.833,
+                calculatedTaTotal: 2.0,
+                annualizedTaTotal: 0.667,
             })
         ]);
 
         const currentHost = getHost();
 
-        expect(normalizeText(currentHost.textContent)).toContain("TA Total: 0.833 | Reader Total: ---");
+        expect(normalizeText(currentHost.textContent)).toContain("TA Total: 0.667 | Reader Total: ---");
 
         const courseTypeSelect = Array.from(currentHost.querySelectorAll("select")).find(
             element => (element as HTMLSelectElement).value === "STD"
@@ -292,8 +323,8 @@ describe("SubmissionContainer server recalculation UI coverage", () => {
 
         const updatedText = normalizeText(getHost().textContent);
 
-        expect(updatedText).toContain("1.250");
-        expect(updatedText).toContain("TA Total: 0.417 | Reader Total: ---");
+        expect(updatedText).toContain("0.500");
+        expect(updatedText).toContain("TA Total: 0.083 | Reader Total: 0.167");
         expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
