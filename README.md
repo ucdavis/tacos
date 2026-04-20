@@ -18,6 +18,9 @@
 
 * `npm run debug`
 
+* client code in `src/tacos.mvc` uses ESLint; before pushing, run `npm run lint`
+* if ESLint reports fixable ordering/style issues, run `npm run lint -- --fix`
+
 ## EF Core Migrations
 
 * restore the repo-pinned EF CLI tool with `dotnet tool restore`

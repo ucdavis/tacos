@@ -70,9 +70,9 @@ namespace Test.Controllers
             savedRequest.DepartmentId.ShouldBe(department.Id);
             savedRequest.CourseNumber.ShouldBe("ECS 188");
             savedRequest.CourseType.ShouldBe("MAN");
-            savedRequest.CalculatedTaTotal.ShouldBe(1.25);
+            savedRequest.CalculatedTaTotal.ShouldBe(0);
             savedRequest.CalculatedReaderTotal.ShouldBe(0);
-            savedRequest.AnnualizedTaTotal.ShouldBe(0.417);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0);
             savedRequest.AnnualizedReaderTotal.ShouldBe(0);
             savedRequest.UpdatedBy.ShouldBe(user.UserName);
         }
@@ -111,12 +111,57 @@ namespace Test.Controllers
             JsonResultShouldIndicateSuccess(result);
 
             var savedRequest = await context.Requests.SingleAsync();
-            savedRequest.CalculatedTaTotal.ShouldBe(1.0);
-            savedRequest.CalculatedReaderTotal.ShouldBe(0.25);
-            savedRequest.AnnualizedTaTotal.ShouldBe(0.333);
-            savedRequest.AnnualizedReaderTotal.ShouldBe(0.083);
+            savedRequest.CalculatedTaTotal.ShouldBe(0);
+            savedRequest.CalculatedReaderTotal.ShouldBe(0);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0);
             savedRequest.ExceptionTaTotal.ShouldBe(1.5);
             savedRequest.ExceptionReaderTotal.ShouldBe(0.25);
+            savedRequest.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            savedRequest.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+        }
+
+        [Fact]
+        public async Task Save_should_ignore_client_supplied_derived_totals_and_recalculate_from_course_data()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS 250", averageEnrollment: 250);
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+            var model = CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(
+                    courseNumber: course.Number,
+                    courseName: course.Name,
+                    courseType: "MAN",
+                    exception: true,
+                    exceptionAnnualCount: 3,
+                    exceptionTaTotal: 1.5,
+                    exceptionReaderTotal: 0.25,
+                    exceptionAnnualizedTaTotal: 99,
+                    exceptionAnnualizedReaderTotal: 88,
+                    calculatedTaTotal: 77,
+                    calculatedReaderTotal: 66,
+                    annualizedTaTotal: 55,
+                    annualizedReaderTotal: 44
+                )
+            );
+
+            var result = await controller.Save(model);
+
+            JsonResultShouldIndicateSuccess(result);
+
+            var savedRequest = await context.Requests.SingleAsync();
+            savedRequest.CalculatedTaTotal.ShouldBe(1.25);
+            savedRequest.CalculatedReaderTotal.ShouldBe(0);
+            savedRequest.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
+            savedRequest.AnnualizedReaderTotal.ShouldBe(0);
             savedRequest.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             savedRequest.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
         }
@@ -346,7 +391,7 @@ namespace Test.Controllers
             await using var context = CreateContext();
             var user = CreateUser();
             var department = CreateDepartment(1, "ECS");
-            var course = CreateCourse("ECS 198");
+            var course = CreateCourse("ECS 198", averageEnrollment: 250);
             var request = new Request
             {
                 Department = department,
@@ -396,14 +441,143 @@ namespace Test.Controllers
 
             request.History.Count.ShouldBe(1);
             var history = request.History.Single();
-            history.CalculatedTaTotal.ShouldBe(1.0);
-            history.CalculatedReaderTotal.ShouldBe(0.5);
-            history.AnnualizedTaTotal.ShouldBe(0.333);
-            history.AnnualizedReaderTotal.ShouldBe(0.167);
+            history.CalculatedTaTotal.ShouldBe(1.25);
+            history.CalculatedReaderTotal.ShouldBe(0);
+            history.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
+            history.AnnualizedReaderTotal.ShouldBe(0);
             history.ExceptionTaTotal.ShouldBe(1.5);
             history.ExceptionReaderTotal.ShouldBe(0.25);
             history.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             history.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+        }
+
+        [Fact]
+        public async Task Edit_should_recalculate_loaded_requests_without_persisting_them()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS 260", averageEnrollment: 250);
+            var request = new Request
+            {
+                Department = department,
+                DepartmentId = department.Id,
+                Course = course,
+                CourseNumber = course.Number,
+                CourseType = "MAN",
+                Exception = true,
+                ExceptionTaTotal = 1.5,
+                ExceptionReaderTotal = 0.25,
+                ExceptionAnnualCount = 3,
+                ExceptionAnnualizedTaTotal = 99,
+                ExceptionAnnualizedReaderTotal = 88,
+                CalculatedTaTotal = 77,
+                CalculatedReaderTotal = 66,
+                AnnualizedTaTotal = 55,
+                AnnualizedReaderTotal = 44
+            };
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            context.Requests.Add(request);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Edit(0, department.Code);
+
+            var view = result.ShouldBeOfType<ViewResult>();
+            var model = view.Model.ShouldBeOfType<Request[]>();
+            model.Length.ShouldBe(1);
+            model[0].CalculatedTaTotal.ShouldBe(1.25);
+            model[0].CalculatedReaderTotal.ShouldBe(0);
+            model[0].AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
+            model[0].AnnualizedReaderTotal.ShouldBe(0);
+            model[0].ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            model[0].ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+
+            var storedRequest = await context.Requests.SingleAsync();
+            storedRequest.CalculatedTaTotal.ShouldBe(77);
+            storedRequest.CalculatedReaderTotal.ShouldBe(66);
+            storedRequest.AnnualizedTaTotal.ShouldBe(55);
+            storedRequest.AnnualizedReaderTotal.ShouldBe(44);
+        }
+
+        [Fact]
+        public async Task Recalculate_should_return_server_calculated_totals_for_existing_courses()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS 270", averageEnrollment: 250);
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Recalculate(new RequestRecalculationModel
+            {
+                DepartmentId = department.Id,
+                CourseNumber = course.Number,
+                CourseType = "MAN",
+                Exception = true,
+                ExceptionTaTotal = 1.5,
+                ExceptionReaderTotal = 0.25,
+                ExceptionAnnualCount = 3
+            });
+
+            var json = result.ShouldBeOfType<JsonResult>();
+            var totals = json.Value.ShouldBeOfType<RequestRecalculationResultModel>();
+            totals.CalculatedTaTotal.ShouldBe(1.25);
+            totals.CalculatedReaderTotal.ShouldBe(0);
+            totals.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
+            totals.AnnualizedReaderTotal.ShouldBe(0);
+            totals.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            totals.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+        }
+
+        [Fact]
+        public async Task Recalculate_should_use_supplied_course_snapshot_for_unsaved_courses()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Recalculate(new RequestRecalculationModel
+            {
+                DepartmentId = department.Id,
+                CourseNumber = "ECS 299",
+                CourseType = "MAN",
+                Exception = true,
+                ExceptionTaTotal = 1.5,
+                ExceptionReaderTotal = 0.25,
+                ExceptionAnnualCount = 3,
+                Course = new CourseCalculationModel
+                {
+                    Number = "ECS 299",
+                    Name = "Special Topics",
+                    AverageEnrollment = 250,
+                    AverageSectionsPerCourse = 2,
+                    TimesOfferedPerYear = 1,
+                    WasCourseTaughtInMostRecentYear = false,
+                    IsCourseTaughtOnceEveryTwoYears = false
+                }
+            });
+
+            var json = result.ShouldBeOfType<JsonResult>();
+            var totals = json.Value.ShouldBeOfType<RequestRecalculationResultModel>();
+            totals.CalculatedTaTotal.ShouldBe(1.25);
+            totals.CalculatedReaderTotal.ShouldBe(0);
+            totals.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
+            totals.AnnualizedReaderTotal.ShouldBe(0);
+            totals.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            totals.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
         }
 
         [Fact]
@@ -454,7 +628,8 @@ namespace Test.Controllers
             var controller = new RequestsController(
                 context,
                 CreateUserManager(user).Object,
-                (emailService ?? new Mock<IEmailService>()).Object
+                (emailService ?? new Mock<IEmailService>()).Object,
+                new RequestCalculationService()
             );
 
             controller.ControllerContext = new ControllerContext
@@ -541,16 +716,24 @@ namespace Test.Controllers
             };
         }
 
-        private static Course CreateCourse(string number)
+        private static Course CreateCourse(
+            string number,
+            double averageEnrollment = 100,
+            double averageSectionsPerCourse = 2,
+            double timesOfferedPerYear = 1,
+            bool isCourseTaughtOnceEveryTwoYears = false,
+            bool wasCourseTaughtInMostRecentYear = false)
         {
             return new Course
             {
                 Number = number,
                 Name = $"{number} Course",
-                AverageEnrollment = 100,
-                AverageSectionsPerCourse = 2,
-                TimesOfferedPerYear = 1,
-                IsOfferedWithinPastTwoYears = true
+                AverageEnrollment = averageEnrollment,
+                AverageSectionsPerCourse = averageSectionsPerCourse,
+                TimesOfferedPerYear = timesOfferedPerYear,
+                IsOfferedWithinPastTwoYears = true,
+                IsCourseTaughtOnceEveryTwoYears = isCourseTaughtOnceEveryTwoYears,
+                WasCourseTaughtInMostRecentYear = wasCourseTaughtInMostRecentYear
             };
         }
 
