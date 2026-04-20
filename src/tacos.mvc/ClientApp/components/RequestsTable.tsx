@@ -896,7 +896,7 @@ function renderCourseTypeHeader() {
     return (
         <div className="requests-header-inline">
             <span className="requests-header-label">Course Type</span>
-            <a href="/CAES-TA-Guidelines 2018-23.pdf" rel="noopener noreferrer" target="_blank">
+            <a href="/CAES-TA-Criteria-2026-2030.pdf" rel="noopener noreferrer" target="_blank">
                 Criteria Info <i className="fas fa-external-link-alt" />
             </a>
         </div>
