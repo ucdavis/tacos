@@ -424,7 +424,7 @@ describe("RequestsTable UI coverage", () => {
         ) as HTMLAnchorElement | undefined;
 
         expect(criteriaInfoLink).toBeDefined();
-        expect(criteriaInfoLink!.getAttribute("href")).toBe("/CAES-TA-Criteria-2026-2030.pdf");
+        expect(criteriaInfoLink!.getAttribute("href")).toBe("/CAES-TA-Reader-Criteria-Fall-2026.pdf");
         expect(criteriaInfoLink!.getAttribute("rel")).toBe("noopener noreferrer");
 
         expect(getVisibleRequestIds()).toEqual(["request-1", "request-2"]);
