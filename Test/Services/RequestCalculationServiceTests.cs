@@ -13,17 +13,17 @@ namespace Test.Services
         [Fact]
         public void Calculate_should_return_no_standard_lecture_support_below_minimum_enrollment()
         {
-            var result = Calculate("STD", CreateCourse(averageEnrollment: 54));
+            var result = Calculate("STD", CreateCourse(averageEnrollment: 29));
 
             result.CalculatedTaTotal.ShouldBe(0);
             result.CalculatedReaderTotal.ShouldBe(0);
         }
 
         [Theory]
-        [InlineData(55, 0.5)]
+        [InlineData(30, 0.25)]
         [InlineData(111, 1.0)]
         [InlineData(165, 1.5)]
-        public void Calculate_should_round_standard_lecture_support_to_half_time_increments(
+        public void Calculate_should_round_standard_lecture_support_to_quarter_time_increments(
             double averageEnrollment,
             double expectedTaTotal)
         {
@@ -34,67 +34,62 @@ namespace Test.Services
         }
 
         [Fact]
-        public void Calculate_should_require_at_least_two_normalized_writing_sections()
+        public void Calculate_should_return_no_writing_support_below_minimum_enrollment()
         {
             var result = Calculate(
                 "WRT",
-                CreateCourse(averageEnrollment: 80, averageSectionsPerCourse: 1)
+                CreateCourse(averageEnrollment: 24, averageSectionsPerCourse: 1)
             );
 
             result.CalculatedTaTotal.ShouldBe(0);
         }
 
         [Fact]
-        public void Calculate_should_require_writing_sections_to_average_at_least_twenty_students()
+        public void Calculate_should_ignore_section_counts_for_writing_support()
         {
             var result = Calculate(
                 "WRT",
-                CreateCourse(averageEnrollment: 39, averageSectionsPerCourse: 2)
+                CreateCourse(averageEnrollment: 80, averageSectionsPerCourse: 0)
             );
 
-            result.CalculatedTaTotal.ShouldBe(0);
-        }
-
-        [Fact]
-        public void Calculate_should_normalize_odd_writing_sections_before_calculating_support()
-        {
-            var result = Calculate(
-                "WRT",
-                CreateCourse(averageEnrollment: 80, averageSectionsPerCourse: 5)
-            );
-
-            result.CalculatedTaTotal.ShouldBe(1);
+            result.CalculatedTaTotal.ShouldBe(0.75);
+            result.CalculatedReaderTotal.ShouldBe(0);
         }
 
         [Theory]
-        [InlineData("LAB", 24, 0)]
-        [InlineData("LAB", 25, 0.5)]
-        [InlineData("LAB", 91, 1.5)]
-        [InlineData("FLD", 0, 0)]
-        [InlineData("FLD", 24, 0.5)]
-        [InlineData("FLD", 76, 1.5)]
-        [InlineData("AUTO", 149, 0)]
-        [InlineData("AUTO", 150, 0.25)]
-        [InlineData("AUTO", 250, 0.5)]
-        [InlineData("AUTO", 350, 0.75)]
-        [InlineData("MAN", 149, 0)]
-        [InlineData("MAN", 150, 0.75)]
-        [InlineData("MAN", 250, 1.25)]
-        [InlineData("MODW", 99, 0)]
-        [InlineData("MODW", 100, 0.25)]
-        [InlineData("MODW", 250, 0.75)]
-        [InlineData("INT", 39, 0)]
-        [InlineData("INT", 40, 0.25)]
-        [InlineData("INT", 120, 0.75)]
-        public void Calculate_should_match_existing_formula_outputs(
+        [InlineData("WRT", 25, 0.25, 0)]
+        [InlineData("WRT", 99, 1.0, 0)]
+        [InlineData("LAB", 19, 0, 0)]
+        [InlineData("LAB", 20, 0.25, 0)]
+        [InlineData("LAB", 91, 1.25, 0)]
+        [InlineData("FLD", 0, 0, 0)]
+        [InlineData("FLD", 12, 0.25, 0)]
+        [InlineData("FLD", 76, 1.5, 0)]
+        [InlineData("AUTO", 199, 0, 0)]
+        [InlineData("AUTO", 200, 0.25, 0)]
+        [InlineData("AUTO", 250, 0.25, 0.25)]
+        [InlineData("AUTO", 350, 0.25, 0.5)]
+        [InlineData("MAN", 99, 0, 0)]
+        [InlineData("MAN", 100, 0.25, 0)]
+        [InlineData("MAN", 150, 0.25, 0.25)]
+        [InlineData("MAN", 250, 0.25, 0.5)]
+        [InlineData("MODW", 99, 0, 0)]
+        [InlineData("MODW", 100, 0.25, 0)]
+        [InlineData("MODW", 250, 0.25, 0.5)]
+        [InlineData("INT", 39, 0, 0)]
+        [InlineData("INT", 40, 0.25, 0)]
+        [InlineData("INT", 80, 0.25, 0.25)]
+        [InlineData("INT", 120, 0.25, 0.5)]
+        public void Calculate_should_match_2026_formula_outputs(
             string courseType,
             double averageEnrollment,
-            double expectedTaTotal)
+            double expectedTaTotal,
+            double expectedReaderTotal)
         {
             var result = Calculate(courseType, CreateCourse(averageEnrollment: averageEnrollment));
 
             result.CalculatedTaTotal.ShouldBe(expectedTaTotal);
-            result.CalculatedReaderTotal.ShouldBe(0);
+            result.CalculatedReaderTotal.ShouldBe(expectedReaderTotal);
         }
 
         [Fact]
@@ -102,8 +97,8 @@ namespace Test.Services
         {
             var result = Calculate("MAN", CreateCourse(averageEnrollment: 250, timesOfferedPerYear: 1));
 
-            result.AnnualizedTaTotal.ShouldBe(0.41666666666666663, 0.000001);
-            result.AnnualizedReaderTotal.ShouldBe(0);
+            result.AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            result.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
         }
 
         [Fact]
@@ -136,8 +131,8 @@ namespace Test.Services
                 )
             );
 
-            result.AnnualizedTaTotal.ShouldBe(0.8333333333333333, 0.000001);
-            result.AnnualizedReaderTotal.ShouldBe(0);
+            result.AnnualizedTaTotal.ShouldBe(0.16666666666666666, 0.000001);
+            result.AnnualizedReaderTotal.ShouldBe(0.3333333333333333, 0.000001);
         }
 
         [Fact]

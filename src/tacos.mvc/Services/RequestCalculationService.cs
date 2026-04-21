@@ -89,89 +89,94 @@ namespace tacos.mvc.services
 
         private static FormulaSupport CalculateStandardLecture(Course course)
         {
-            if (course.AverageEnrollment < 55.0)
+            if (course.AverageEnrollment < 30.0)
             {
                 return NoSupport();
             }
 
-            return TaOnly(RoundTo((course.AverageEnrollment / 55.0) * 0.5, 0.5));
+            return TaOnly(RoundTo((course.AverageEnrollment / 30.0) * 0.25, 0.25));
         }
 
         private static FormulaSupport CalculateWritingLecture(Course course)
         {
-            var sectionsPerCourse = NormalizedSectionsPerCourse(course);
-
-            if (sectionsPerCourse < 2)
+            if (course.AverageEnrollment < 25.0)
             {
                 return NoSupport();
             }
 
-            if (course.AverageEnrollment / sectionsPerCourse < 20.0)
-            {
-                return NoSupport();
-            }
-
-            return TaOnly(RoundTo((sectionsPerCourse / 2.0) * 0.5, 0.5));
+            return TaOnly(RoundTo((course.AverageEnrollment / 25.0) * 0.25, 0.25));
         }
 
         private static FormulaSupport CalculateLab(Course course)
         {
-            if (course.AverageEnrollment < 25)
+            if (course.AverageEnrollment < 20)
             {
                 return NoSupport();
             }
 
-            return TaOnly(RoundTo((course.AverageEnrollment / 30.0) * 0.5, 0.5));
+            return TaOnly(RoundTo((course.AverageEnrollment / 20.0) * 0.25, 0.25));
         }
 
         private static FormulaSupport CalculateField(Course course)
         {
-            return TaOnly(RoundTo((course.AverageEnrollment / 25.0) * 0.5, 0.5));
+            if (course.AverageEnrollment < 12.0)
+            {
+                return NoSupport();
+            }
+
+            return TaOnly(RoundTo((course.AverageEnrollment / 12.0) * 0.25, 0.25));
         }
 
         private static FormulaSupport CalculateLectureAutoGrading(Course course)
         {
-            if (course.AverageEnrollment < 150)
+            if (course.AverageEnrollment < 200.0)
             {
                 return NoSupport();
             }
 
-            return TaOnly(RoundTo(0.25 + ((course.AverageEnrollment - 150) / 100.0) * 0.25, 0.25));
+            return HybridSupport(
+                taPerOffering: 0.25,
+                readerPerOffering: RoundTo(((course.AverageEnrollment - 200.0) / 100.0) * 0.25, 0.25)
+            );
         }
 
         private static FormulaSupport CalculateLectureManualGrading(Course course)
         {
-            if (course.AverageEnrollment < 150)
+            if (course.AverageEnrollment < 100.0)
             {
                 return NoSupport();
             }
 
-            return TaOnly(RoundTo(
-                0.25 +
-                ((course.AverageEnrollment - 150) / 100.0) * 0.25 +
-                (course.AverageEnrollment / 100.0) * 0.25,
-                0.25
-            ));
+            return HybridSupport(
+                taPerOffering: 0.25,
+                readerPerOffering: RoundTo(((course.AverageEnrollment - 100.0) / 100.0) * 0.25, 0.25)
+            );
         }
 
         private static FormulaSupport CalculateLectureModerateWriting(Course course)
         {
-            if (course.AverageEnrollment < 100)
+            if (course.AverageEnrollment < 100.0)
             {
                 return NoSupport();
             }
 
-            return TaOnly(RoundTo((course.AverageEnrollment / 100.0) * 0.25, 0.25));
+            return HybridSupport(
+                taPerOffering: 0.25,
+                readerPerOffering: RoundTo(((course.AverageEnrollment - 100.0) / 100.0) * 0.25, 0.25)
+            );
         }
 
         private static FormulaSupport CalculateLectureIntensive(Course course)
         {
-            if (course.AverageEnrollment < 40)
+            if (course.AverageEnrollment < 40.0)
             {
                 return NoSupport();
             }
 
-            return TaOnly(RoundTo((course.AverageEnrollment / 40.0) * 0.25, 0.25));
+            return HybridSupport(
+                taPerOffering: 0.25,
+                readerPerOffering: RoundTo(((course.AverageEnrollment - 40.0) / 40.0) * 0.25, 0.25)
+            );
         }
 
         private static FormulaSupport NoSupport()
@@ -184,9 +189,9 @@ namespace tacos.mvc.services
             return new FormulaSupport(taPerOffering, 0);
         }
 
-        private static double NormalizedSectionsPerCourse(Course course)
+        private static FormulaSupport HybridSupport(double taPerOffering, double readerPerOffering)
         {
-            return 2 * Math.Floor(course.AverageSectionsPerCourse / 2);
+            return new FormulaSupport(taPerOffering, readerPerOffering);
         }
 
         private static double RoundTo(double value, double unit)
