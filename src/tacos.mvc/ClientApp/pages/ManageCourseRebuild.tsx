@@ -97,7 +97,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
         }
 
         const confirmed = window.confirm(
-            `Rebuild the Course List from ${selectedOption.academicYearSpan} and reset all submissions?`
+            `Rebuild the Course List from ${selectedOption.academicYearSpan} and reset all submissions? This can take a minute; stay on this page until it finishes.`
         );
 
         if (!confirmed) {
@@ -106,7 +106,10 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
 
         const academicTermCodes = selectedOption.terms.map(term => term.academicTermCode);
 
-        setAlert(null);
+        setAlert({
+            message: "Rebuilding courses and resetting submissions. This can take a minute; stay on this page until it finishes.",
+            type: "alert-info"
+        });
         setIsRebuilding(true);
 
         try {
@@ -151,6 +154,17 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
 
             <section className="tacos-admin-panel" aria-labelledby="courseRebuildHeading">
                 <h3 id="courseRebuildHeading" className="tacos-section-heading">Processing Window</h3>
+
+                <div className="tacos-admin-note">
+                    <p>
+                        The six academic terms shown here will be used to rebuild the Courses table.
+                    </p>
+                    <p>
+                        Rebuilding also resets all current requests to unsubmitted. Approval decisions, review comments,
+                        exception details, submitter, and submitted dates are cleared. Requests for courses that are not
+                        in the rebuilt Course List are retired from active request screens.
+                    </p>
+                </div>
 
                 <div className="tacos-form-field">
                     <label className="tacos-form-label" htmlFor="academicYearSpanSelect">Academic Year Span</label>
