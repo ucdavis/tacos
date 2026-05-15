@@ -662,6 +662,12 @@ namespace tacos.core.Migrations
                         SELECT 1
                         FROM #NewCourses NewCourses
                         WHERE NewCourses.[Number] = ExistingCourses.[Number]
+                    )
+                    AND NOT EXISTS
+                    (
+                        SELECT 1
+                        FROM [dbo].[Requests] Requests
+                        WHERE Requests.[CourseNumber] = ExistingCourses.[Number]
                     );
 
                     COMMIT TRANSACTION;

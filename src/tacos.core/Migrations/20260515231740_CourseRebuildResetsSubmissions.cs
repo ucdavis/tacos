@@ -13,13 +13,21 @@ namespace tacos.core.Migrations
             migrationBuilder.Sql(
                 """
                 DECLARE @Definition nvarchar(max) = OBJECT_DEFINITION(OBJECT_ID(N'[dbo].[usp_RebuildCoursesFromProcessingWindow]'));
-                DECLARE @ThrowIndex int = CHARINDEX(N'THROW 50007', @Definition);
-                DECLARE @Start int = @ThrowIndex;
-                DECLARE @End int = CHARINDEX(N'UPDATE ExistingCourses', @Definition, @ThrowIndex);
-                DECLARE @ProcedureIndex int = CHARINDEX(N'PROCEDURE', UPPER(@Definition));
 
                 IF @Definition IS NULL
                     THROW 50008, 'dbo.usp_RebuildCoursesFromProcessingWindow was not found.', 1;
+
+                DECLARE @ProcedureIndex int = CHARINDEX(N'PROCEDURE', UPPER(@Definition));
+                IF @ProcedureIndex = 0
+                    THROW 50009, 'dbo.usp_RebuildCoursesFromProcessingWindow did not contain the expected procedure definition.', 1;
+
+                IF CHARINDEX(N'UPDATE [dbo].[Requests]', @Definition) > 0
+                    AND CHARINDEX(N'SET [IsActive] = 0', @Definition) > 0
+                    RETURN;
+
+                DECLARE @ThrowIndex int = CHARINDEX(N'THROW 50007', @Definition);
+                DECLARE @Start int = @ThrowIndex;
+                DECLARE @End int = CHARINDEX(N'UPDATE ExistingCourses', @Definition, @ThrowIndex);
 
                 IF @ThrowIndex = 0 OR @End = 0 OR @ProcedureIndex = 0
                     THROW 50009, 'dbo.usp_RebuildCoursesFromProcessingWindow did not contain the expected request guard.', 1;
@@ -82,13 +90,20 @@ namespace tacos.core.Migrations
             migrationBuilder.Sql(
                 """
                 DECLARE @Definition nvarchar(max) = OBJECT_DEFINITION(OBJECT_ID(N'[dbo].[usp_RebuildCoursesFromProcessingWindow]'));
-                DECLARE @ResetIndex int = CHARINDEX(N'UPDATE [dbo].[Requests]', @Definition);
-                DECLARE @Start int = CHARINDEX(N'UPDATE Requests', @Definition);
-                DECLARE @End int = CHARINDEX(N'UPDATE ExistingCourses', @Definition, @ResetIndex);
-                DECLARE @ProcedureIndex int = CHARINDEX(N'PROCEDURE', UPPER(@Definition));
 
                 IF @Definition IS NULL
                     THROW 50008, 'dbo.usp_RebuildCoursesFromProcessingWindow was not found.', 1;
+
+                DECLARE @ProcedureIndex int = CHARINDEX(N'PROCEDURE', UPPER(@Definition));
+                IF @ProcedureIndex = 0
+                    THROW 50009, 'dbo.usp_RebuildCoursesFromProcessingWindow did not contain the expected procedure definition.', 1;
+
+                IF CHARINDEX(N'THROW 50007', @Definition) > 0
+                    RETURN;
+
+                DECLARE @ResetIndex int = CHARINDEX(N'UPDATE [dbo].[Requests]', @Definition);
+                DECLARE @Start int = CHARINDEX(N'UPDATE Requests', @Definition);
+                DECLARE @End int = CHARINDEX(N'UPDATE ExistingCourses', @Definition, @ResetIndex);
 
                 IF @Start = 0 OR @ResetIndex = 0 OR @End = 0 OR @ProcedureIndex = 0
                     THROW 50009, 'dbo.usp_RebuildCoursesFromProcessingWindow did not contain the expected reset block.', 1;
