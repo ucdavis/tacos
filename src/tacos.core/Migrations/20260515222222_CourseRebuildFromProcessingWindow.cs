@@ -45,6 +45,8 @@ namespace tacos.core.Migrations
                     END;
 
                     DECLARE @List nvarchar(200) = UPPER(COALESCE(@CrossListing, N''));
+                    SET @List = REPLACE(@List, N'CROSS-LISTING WITH ', N'');
+                    SET @List = REPLACE(@List, N'CROSS LISTED WITH ', N'');
                     SET @List = REPLACE(@List, N'.', N'');
                     SET @List = REPLACE(@List, N';', N',');
                     SET @List = REPLACE(@List, N' 12Y', N' 012Y');
@@ -59,6 +61,7 @@ namespace tacos.core.Migrations
                         SELECT UPPER(REPLACE(LTRIM(RTRIM(SplitValues.[value])), N' ', N'')) AS CourseNumber
                     ) Parsed
                     WHERE Parsed.CourseNumber <> N''
+                        AND LEN(Parsed.CourseNumber) <= 20
                         AND NOT EXISTS
                         (
                             SELECT 1
@@ -568,20 +571,36 @@ namespace tacos.core.Migrations
                     LEFT JOIN GroupEnrollment
                         ON GroupEnrollment.[GroupKey] = CrossListingGroups.[GroupKey];
 
-                    IF EXISTS
+                    UPDATE Requests
+                    SET [CourseNumber] = NewCourses.[Number]
+                    FROM [dbo].[Requests] Requests
+                    INNER JOIN #NewCourses NewCourses
+                        ON NewCourses.[Number] = UPPER(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''));
+
+                    UPDATE [dbo].[Requests]
+                    SET
+                        [Approved] = NULL,
+                        [Exception] = 0,
+                        [ExceptionAnnualizedTaTotal] = 0,
+                        [ExceptionAnnualizedReaderTotal] = 0,
+                        [ExceptionAnnualCount] = 0,
+                        [ExceptionReason] = NULL,
+                        [ExceptionTaTotal] = 0,
+                        [ExceptionReaderTotal] = 0,
+                        [ApprovedComment] = NULL,
+                        [Submitted] = 0,
+                        [SubmittedBy] = NULL,
+                        [SubmittedOn] = NULL;
+
+                    UPDATE Requests
+                    SET [IsActive] = 0
+                    FROM [dbo].[Requests] Requests
+                    WHERE NOT EXISTS
                     (
                         SELECT 1
-                        FROM [dbo].[Requests] Requests
-                        WHERE NOT EXISTS
-                        (
-                            SELECT 1
-                            FROM #NewCourses NewCourses
-                            WHERE NewCourses.[Number] = Requests.[CourseNumber]
-                        )
-                    )
-                    BEGIN
-                        THROW 50007, 'Course list rebuild would remove one or more courses referenced by existing requests. Reset or archive those requests before rebuilding.', 1;
-                    END;
+                        FROM #NewCourses NewCourses
+                        WHERE NewCourses.[Number] = UPPER(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''))
+                    );
 
                     UPDATE ExistingCourses
                     SET

@@ -96,7 +96,9 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
             return;
         }
 
-        const confirmed = window.confirm(`Rebuild the Course List from ${selectedOption.academicYearSpan}?`);
+        const confirmed = window.confirm(
+            `Rebuild the Course List from ${selectedOption.academicYearSpan} and reset all submissions?`
+        );
 
         if (!confirmed) {
             return;
@@ -123,7 +125,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
 
             const result = await response.json() as CourseRebuildResult;
             setAlert({
-                message: `Course List rebuilt from ${result.academicYearSpan}.`,
+                message: `Course List rebuilt from ${result.academicYearSpan}; submissions were reset.`,
                 type: "alert-info"
             });
         } catch (error) {
@@ -159,7 +161,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
                         value={selectedSpan}
                         onChange={event => setSelectedSpan(event.target.value)}
                     >
-                        {isLoading && <option value="">Loading available spans...</option>}
+                        {isLoading && <option value="">Loading available spans</option>}
                         {!isLoading && spanOptions.length === 0 && <option value="">No academic year spans available</option>}
                         {!isLoading && spanOptions.map(option => (
                             <option key={option.academicYearSpan} value={option.academicYearSpan} disabled={!option.isComplete}>
@@ -195,7 +197,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
                             void rebuildCourses();
                         }}
                     >
-                        {isRebuilding ? "Rebuilding..." : "Rebuild Course List"}
+                        {isRebuilding ? "Rebuilding..." : "Rebuild Course List and Reset Submissions"}
                         <i className="fas fa-sync-alt tacos-btn__icon" aria-hidden="true" />
                     </button>
                 </div>
