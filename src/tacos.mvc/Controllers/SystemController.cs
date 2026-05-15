@@ -201,6 +201,12 @@ namespace tacos.mvc.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult ManageCourseRebuild()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> ResetSubmissions() {
             await _dbContext.Database.ExecuteSqlRawAsync("usp_ResetRequests;");
