@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using tacos.core;
 using tacos.core.Data;
+using tacos.core.Resources;
 using tacos.mvc.Extensions;
 using tacos.mvc.Models;
 using tacos.mvc.services;
@@ -185,15 +186,17 @@ namespace tacos.mvc.Controllers
             // process updates next
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
+                var courseNumber = CourseNumberKey.Normalize(m.CourseNumber);
                 var course = await _context.Courses
-                    .FirstOrDefaultAsync(c => c.Number == m.CourseNumber);
+                    .MatchingCourseNumber(courseNumber)
+                    .FirstOrDefaultAsync();
 
                 // possible create new course
                 if (course == null)
                 {
                     course = new Course()
                     {
-                        Number = m.CourseNumber,
+                        Number = courseNumber,
                         Name = m.CourseName,
                         AverageEnrollment = 0,
                         AverageSectionsPerCourse = 0,
@@ -212,8 +215,9 @@ namespace tacos.mvc.Controllers
                 else
                 {
                     request = await _context.Requests
-                        .FirstOrDefaultAsync(r => r.DepartmentId == model.DepartmentId &&
-                            r.CourseNumber == m.CourseNumber);
+                        .Where(r => r.DepartmentId == model.DepartmentId)
+                        .MatchingCourseNumber(courseNumber)
+                        .FirstOrDefaultAsync();
                 }
 
                 // create request if necessary
@@ -280,9 +284,11 @@ namespace tacos.mvc.Controllers
                 return BadRequest("Matching department not found among user's permission set.");
             }
 
+            var courseNumber = CourseNumberKey.Normalize(model.CourseNumber);
             var course = await _context.Courses
                 .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Number == model.CourseNumber);
+                .MatchingCourseNumber(courseNumber)
+                .FirstOrDefaultAsync();
 
             if (course == null)
             {
@@ -293,7 +299,9 @@ namespace tacos.mvc.Controllers
 
                 course = new Course
                 {
-                    Number = string.IsNullOrWhiteSpace(model.Course.Number) ? model.CourseNumber : model.Course.Number,
+                    Number = string.IsNullOrWhiteSpace(model.Course.Number)
+                        ? courseNumber
+                        : CourseNumberKey.Normalize(model.Course.Number),
                     Name = model.Course.Name,
                     AverageEnrollment = model.Course.AverageEnrollment,
                     AverageSectionsPerCourse = model.Course.AverageSectionsPerCourse,
@@ -347,6 +355,7 @@ namespace tacos.mvc.Controllers
             var requestsNeedingApproval = new List<Request>();
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
+                var courseNumber = CourseNumberKey.Normalize(m.CourseNumber);
                 // find request by id or name, or create a new one
                 Request request;
                 if (m.Id > 0)
@@ -357,8 +366,9 @@ namespace tacos.mvc.Controllers
                 else
                 {
                     request = await _context.Requests
-                        .FirstOrDefaultAsync(r => r.DepartmentId == model.DepartmentId &&
-                            r.CourseNumber == m.CourseNumber);
+                        .Where(r => r.DepartmentId == model.DepartmentId)
+                        .MatchingCourseNumber(courseNumber)
+                        .FirstOrDefaultAsync();
                 }
 
                 // submit request

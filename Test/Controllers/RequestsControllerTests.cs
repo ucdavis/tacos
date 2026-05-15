@@ -63,18 +63,46 @@ namespace Test.Controllers
 
             JsonResultShouldIndicateSuccess(result);
 
-            var savedCourse = await context.Courses.SingleAsync(c => c.Number == "ECS 188");
+            var savedCourse = await context.Courses.SingleAsync(c => c.Number == "ECS188");
             savedCourse.Name.ShouldBe("Special Topics");
 
             var savedRequest = await context.Requests.SingleAsync();
             savedRequest.DepartmentId.ShouldBe(department.Id);
-            savedRequest.CourseNumber.ShouldBe("ECS 188");
+            savedRequest.CourseNumber.ShouldBe("ECS188");
             savedRequest.CourseType.ShouldBe("MAN");
             savedRequest.CalculatedTaTotal.ShouldBe(0);
             savedRequest.CalculatedReaderTotal.ShouldBe(0);
             savedRequest.AnnualizedTaTotal.ShouldBe(0);
             savedRequest.AnnualizedReaderTotal.ShouldBe(0);
             savedRequest.UpdatedBy.ShouldBe(user.UserName);
+        }
+
+        [Fact]
+        public async Task Save_should_resolve_spaced_course_input_to_normalized_course_key()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS188", averageEnrollment: 250);
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            await context.SaveChangesAsync();
+
+            var controller = CreateController(context, user);
+            var model = CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(courseNumber: "ECS 188", courseName: course.Name, courseType: "MAN")
+            );
+
+            var result = await controller.Save(model);
+
+            JsonResultShouldIndicateSuccess(result);
+            (await context.Courses.CountAsync()).ShouldBe(1);
+
+            var savedRequest = await context.Requests.SingleAsync();
+            savedRequest.CourseNumber.ShouldBe("ECS188");
+            savedRequest.CalculatedTaTotal.ShouldBe(0.25);
         }
 
         [Fact]

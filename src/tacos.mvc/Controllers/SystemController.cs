@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using tacos.core;
 using tacos.core.Data;
 using tacos.core.Resources;
+using tacos.mvc.Models;
 using tacos.mvc.Models.SystemViewModels;
 using tacos.mvc.services;
 
@@ -20,12 +22,18 @@ namespace tacos.mvc.Controllers
         private readonly TacoDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly IDirectorySearchService _directorySearchService;
+        private readonly ICourseRebuildService _courseRebuildService;
 
-        public SystemController(TacoDbContext dbContext, UserManager<User> userManager, IDirectorySearchService directorySearchService)
+        public SystemController(
+            TacoDbContext dbContext,
+            UserManager<User> userManager,
+            IDirectorySearchService directorySearchService,
+            ICourseRebuildService courseRebuildService)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _directorySearchService = directorySearchService;
+            _courseRebuildService = courseRebuildService;
         }
 
         [HttpGet]
@@ -200,6 +208,41 @@ namespace tacos.mvc.Controllers
             Message = "Submissions reset";
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CourseRebuildOptions()
+        {
+            try
+            {
+                return Json(await _courseRebuildService.GetAcademicYearSpanOptionsAsync());
+            }
+            catch (DbException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RebuildCourses([FromBody] CourseRebuildRequestModel model)
+        {
+            if (model == null)
+            {
+                return BadRequest("A processing term set is required.");
+            }
+
+            try
+            {
+                return Json(await _courseRebuildService.RebuildCoursesAsync(model.AcademicTermCodes));
+            }
+            catch (CourseRebuildValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (DbException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
