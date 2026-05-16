@@ -29,6 +29,11 @@ namespace tacos.mvc.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
+            if (string.IsNullOrWhiteSpace(id) || id.Length < 4)
+            {
+                return NotFound();
+            }
+
             var courseNumber = CourseNumberKey.Normalize(id);
             var course = await _dbContext.Courses
                 .MatchingCourseNumber(courseNumber)

@@ -147,7 +147,10 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
     return (
         <>
             {alert && (
-                <div className={`alert rounded-none shadow-sm ${alert.type}`} role="status">
+                <div
+                    className={`alert rounded-none shadow-sm ${alert.type}`}
+                    role={alert.type === "alert-error" ? "alert" : "status"}
+                >
                     {alert.message}
                 </div>
             )}

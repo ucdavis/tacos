@@ -12,6 +12,7 @@ using Shouldly;
 using tacos.core;
 using tacos.core.Data;
 using tacos.mvc.Controllers;
+using tacos.mvc.Extensions;
 using tacos.mvc.Models;
 using tacos.mvc.services;
 using Xunit;
@@ -36,6 +37,25 @@ namespace Test.Controllers
 
             var badRequest = result.ShouldBeOfType<BadRequestObjectResult>();
             badRequest.Value.ShouldBe("Matching department not found among user's permission set.");
+        }
+
+        [Fact]
+        public async Task Save_should_return_bad_request_for_blank_course_number()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+            var result = await controller.Save(CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(courseNumber: "   ")
+            ));
+
+            var badRequest = result.ShouldBeOfType<BadRequestObjectResult>();
+            badRequest.Value.ShouldBe("Invalid course number.");
         }
 
         [Fact]
@@ -103,6 +123,19 @@ namespace Test.Controllers
             var savedRequest = await context.Requests.SingleAsync();
             savedRequest.CourseNumber.ShouldBe("ECS188");
             savedRequest.CalculatedTaTotal.ShouldBe(0.25);
+        }
+
+        [Fact]
+        public void MatchingCourseNumber_should_strip_tabs_and_newlines_from_course_rows()
+        {
+            var courses = new[]
+            {
+                CreateCourse("ECS\t188"),
+                CreateCourse("MAT\n021A")
+            }.AsQueryable();
+
+            courses.MatchingCourseNumber("ECS 188").Single().Number.ShouldBe("ECS\t188");
+            courses.MatchingCourseNumber("MAT 021A").Single().Number.ShouldBe("MAT\n021A");
         }
 
         [Fact]
@@ -414,6 +447,25 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Submit_should_return_bad_request_for_blank_course_number()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+            var result = await controller.Submit(CreateSubmissionModel(
+                department.Id,
+                CreateRequestModel(courseNumber: "")
+            ));
+
+            var badRequest = result.ShouldBeOfType<BadRequestObjectResult>();
+            badRequest.Value.ShouldBe("Invalid course number.");
+        }
+
+        [Fact]
         public async Task Submit_should_capture_split_support_fields_in_request_history()
         {
             await using var context = CreateContext();
@@ -564,6 +616,32 @@ namespace Test.Controllers
             totals.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
             totals.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
             totals.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+        }
+
+        [Fact]
+        public async Task Recalculate_should_return_bad_request_for_blank_course_number()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Recalculate(new RequestRecalculationModel
+            {
+                DepartmentId = department.Id,
+                CourseNumber = "",
+                CourseType = "MAN",
+                Exception = true,
+                ExceptionTaTotal = 1.5,
+                ExceptionReaderTotal = 0.25,
+                ExceptionAnnualCount = 3
+            });
+
+            var badRequest = result.ShouldBeOfType<BadRequestObjectResult>();
+            badRequest.Value.ShouldBe("Invalid course number.");
         }
 
         [Fact]

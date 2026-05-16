@@ -563,7 +563,7 @@ namespace tacos.core.Migrations
                     UPDATE NewCourses
                     SET
                         [IsCrossListed] = 1,
-                        [CrossListingsString] = LEFT(CrossListingGroups.[CrossListingsString], 50),
+                        [CrossListingsString] = LEFT(CrossListingGroups.[CrossListingsString], 200),
                         [AverageEnrollment] = COALESCE(GroupEnrollment.[CombinedAverageEnrollment], NewCourses.[AverageEnrollment])
                     FROM #NewCourses NewCourses
                     INNER JOIN #CrossListingGroups CrossListingGroups

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using tacos.core;
 using tacos.core.Data;
 using tacos.core.Resources;
@@ -23,17 +24,20 @@ namespace tacos.mvc.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IDirectorySearchService _directorySearchService;
         private readonly ICourseRebuildService _courseRebuildService;
+        private readonly ILogger<SystemController> _logger;
 
         public SystemController(
             TacoDbContext dbContext,
             UserManager<User> userManager,
             IDirectorySearchService directorySearchService,
-            ICourseRebuildService courseRebuildService)
+            ICourseRebuildService courseRebuildService,
+            ILogger<SystemController> logger)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _directorySearchService = directorySearchService;
             _courseRebuildService = courseRebuildService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -211,7 +215,8 @@ namespace tacos.mvc.Controllers
             }
             catch (DbException ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError(ex, "Database error while retrieving course rebuild options.");
+                return BadRequest("A database error occurred while retrieving course rebuild options.");
             }
         }
 
@@ -233,7 +238,8 @@ namespace tacos.mvc.Controllers
             }
             catch (DbException ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError(ex, "Database error while rebuilding courses.");
+                return BadRequest("A database error occurred while rebuilding courses.");
             }
         }
     }

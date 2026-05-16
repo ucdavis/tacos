@@ -11,7 +11,12 @@ namespace tacos.mvc.Extensions
             var normalizedCourseNumber = CourseNumberKey.Normalize(courseNumber);
 
             return courses
-                .Where(c => c.Number.Replace(" ", "").ToUpper() == normalizedCourseNumber)
+                .Where(c => c.Number
+                    .Replace(" ", "")
+                    .Replace("\t", "")
+                    .Replace("\r", "")
+                    .Replace("\n", "")
+                    .ToUpper() == normalizedCourseNumber)
                 .OrderBy(c => c.Number == normalizedCourseNumber ? 0 : 1);
         }
 
@@ -22,7 +27,12 @@ namespace tacos.mvc.Extensions
             var normalizedCourseNumber = CourseNumberKey.Normalize(courseNumber);
 
             return courseDescriptions
-                .Where(c => c.Course.Replace(" ", "").ToUpper() == normalizedCourseNumber)
+                .Where(c => c.Course
+                    .Replace(" ", "")
+                    .Replace("\t", "")
+                    .Replace("\r", "")
+                    .Replace("\n", "")
+                    .ToUpper() == normalizedCourseNumber)
                 .OrderBy(c => c.Course == normalizedCourseNumber ? 0 : 1);
         }
 
@@ -31,7 +41,12 @@ namespace tacos.mvc.Extensions
             var normalizedCourseNumber = CourseNumberKey.Normalize(courseNumber);
 
             return requests
-                .Where(r => r.CourseNumber.Replace(" ", "").ToUpper() == normalizedCourseNumber)
+                .Where(r => r.CourseNumber
+                    .Replace(" ", "")
+                    .Replace("\t", "")
+                    .Replace("\r", "")
+                    .Replace("\n", "")
+                    .ToUpper() == normalizedCourseNumber)
                 .OrderBy(r => r.CourseNumber == normalizedCourseNumber ? 0 : 1);
         }
     }

@@ -186,10 +186,14 @@ namespace tacos.mvc.Controllers
             // process updates next
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
-                var courseNumber = CourseNumberKey.Normalize(m.CourseNumber);
-                var course = await _context.Courses
-                    .MatchingCourseNumber(courseNumber)
-                    .FirstOrDefaultAsync();
+                var courseLookup = await FindCourseByNormalizedNumber(m.CourseNumber);
+                if (courseLookup.ErrorResult != null)
+                {
+                    return courseLookup.ErrorResult;
+                }
+
+                var courseNumber = courseLookup.CourseNumber;
+                var course = courseLookup.Course;
 
                 // possible create new course
                 if (course == null)
@@ -284,11 +288,14 @@ namespace tacos.mvc.Controllers
                 return BadRequest("Matching department not found among user's permission set.");
             }
 
-            var courseNumber = CourseNumberKey.Normalize(model.CourseNumber);
-            var course = await _context.Courses
-                .AsNoTracking()
-                .MatchingCourseNumber(courseNumber)
-                .FirstOrDefaultAsync();
+            var courseLookup = await FindCourseByNormalizedNumber(model.CourseNumber, asNoTracking: true);
+            if (courseLookup.ErrorResult != null)
+            {
+                return courseLookup.ErrorResult;
+            }
+
+            var courseNumber = courseLookup.CourseNumber;
+            var course = courseLookup.Course;
 
             if (course == null)
             {
@@ -299,9 +306,9 @@ namespace tacos.mvc.Controllers
 
                 course = new Course
                 {
-                    Number = string.IsNullOrWhiteSpace(model.Course.Number)
-                        ? courseNumber
-                        : CourseNumberKey.Normalize(model.Course.Number),
+                    Number = TryNormalizeCourseNumber(model.Course.Number, out var modelCourseNumber)
+                        ? modelCourseNumber
+                        : courseNumber,
                     Name = model.Course.Name,
                     AverageEnrollment = model.Course.AverageEnrollment,
                     AverageSectionsPerCourse = model.Course.AverageSectionsPerCourse,
@@ -349,13 +356,23 @@ namespace tacos.mvc.Controllers
             var now = DateTime.UtcNow;
 
             // save everything
-            await Save(model);
+            var saveResult = await Save(model);
+            if (saveResult is not JsonResult)
+            {
+                return saveResult;
+            }
 
             // process submissions next
             var requestsNeedingApproval = new List<Request>();
             foreach (var m in model.Requests.Where(r => !r.IsDeleted))
             {
-                var courseNumber = CourseNumberKey.Normalize(m.CourseNumber);
+                var courseLookup = await FindCourseByNormalizedNumber(m.CourseNumber);
+                if (courseLookup.ErrorResult != null)
+                {
+                    return courseLookup.ErrorResult;
+                }
+
+                var courseNumber = courseLookup.CourseNumber;
                 // find request by id or name, or create a new one
                 Request request;
                 if (m.Id > 0)
@@ -451,6 +468,40 @@ namespace tacos.mvc.Controllers
             request.CalculatedReaderTotal = supportTotals.CalculatedReaderTotal;
             request.AnnualizedTaTotal = supportTotals.AnnualizedTaTotal;
             request.AnnualizedReaderTotal = supportTotals.AnnualizedReaderTotal;
+        }
+
+        private async Task<(IActionResult ErrorResult, Course Course, string CourseNumber)> FindCourseByNormalizedNumber(
+            string rawCourseNumber,
+            bool asNoTracking = false)
+        {
+            if (!TryNormalizeCourseNumber(rawCourseNumber, out var courseNumber))
+            {
+                return (BadRequest("Invalid course number."), null, null);
+            }
+
+            var courses = _context.Courses.AsQueryable();
+            if (asNoTracking)
+            {
+                courses = courses.AsNoTracking();
+            }
+
+            var course = await courses
+                .MatchingCourseNumber(courseNumber)
+                .FirstOrDefaultAsync();
+
+            return (null, course, courseNumber);
+        }
+
+        private static bool TryNormalizeCourseNumber(string rawCourseNumber, out string courseNumber)
+        {
+            courseNumber = null;
+            if (string.IsNullOrWhiteSpace(rawCourseNumber))
+            {
+                return false;
+            }
+
+            courseNumber = CourseNumberKey.Normalize(rawCourseNumber);
+            return !string.IsNullOrWhiteSpace(courseNumber);
         }
     }
 }
