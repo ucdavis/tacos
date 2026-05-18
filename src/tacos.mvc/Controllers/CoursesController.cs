@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tacos.core;
+using tacos.core.Resources;
+using tacos.mvc.Extensions;
 using tacos.mvc.Models.CourseViewModels;
 
 namespace tacos.mvc.Controllers
@@ -28,8 +29,15 @@ namespace tacos.mvc.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
+            if (string.IsNullOrWhiteSpace(id) || id.Length < 4)
+            {
+                return NotFound();
+            }
+
+            var courseNumber = CourseNumberKey.Normalize(id);
             var course = await _dbContext.Courses
-                .SingleOrDefaultAsync(c => c.Number == id);
+                .MatchingCourseNumber(courseNumber)
+                .FirstOrDefaultAsync();
 
             if (course == null)
             {
@@ -37,7 +45,8 @@ namespace tacos.mvc.Controllers
             }
 
             var description = await _dbContext.CourseDescriptions
-                .SingleOrDefaultAsync(c => c.Course == id);
+                .MatchingCourseNumber(courseNumber)
+                .FirstOrDefaultAsync();
 
             var model = new CourseDetailsViewModel
             {
@@ -57,12 +66,11 @@ namespace tacos.mvc.Controllers
                 return NotFound();
             }
 
-            // remove whitespaces
-            var parsedCourseNumber = Regex.Replace(courseNumber, @"\s", "");
+            var parsedCourseNumber = CourseNumberKey.Normalize(courseNumber);
 
             var course = await _dbContext.Courses
-                .Where(x => parsedCourseNumber == x.Number)
-                .SingleOrDefaultAsync();
+                .MatchingCourseNumber(parsedCourseNumber)
+                .FirstOrDefaultAsync();
 
             if (course == null)
             {

@@ -1,4 +1,5 @@
 using System;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -6,9 +7,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using tacos.core;
 using tacos.core.Data;
 using tacos.core.Resources;
+using tacos.mvc.Models;
 using tacos.mvc.Models.SystemViewModels;
 using tacos.mvc.services;
 
@@ -20,12 +23,21 @@ namespace tacos.mvc.Controllers
         private readonly TacoDbContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly IDirectorySearchService _directorySearchService;
+        private readonly ICourseRebuildService _courseRebuildService;
+        private readonly ILogger<SystemController> _logger;
 
-        public SystemController(TacoDbContext dbContext, UserManager<User> userManager, IDirectorySearchService directorySearchService)
+        public SystemController(
+            TacoDbContext dbContext,
+            UserManager<User> userManager,
+            IDirectorySearchService directorySearchService,
+            ICourseRebuildService courseRebuildService,
+            ILogger<SystemController> logger)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _directorySearchService = directorySearchService;
+            _courseRebuildService = courseRebuildService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -189,17 +201,46 @@ namespace tacos.mvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult ManageSubmissions() {
+        public IActionResult ManageCourseRebuild()
+        {
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> CourseRebuildOptions()
+        {
+            try
+            {
+                return Json(await _courseRebuildService.GetAcademicYearSpanOptionsAsync());
+            }
+            catch (DbException ex)
+            {
+                _logger.LogError(ex, "Database error while retrieving course rebuild options.");
+                return BadRequest("A database error occurred while retrieving course rebuild options.");
+            }
+        }
+
         [HttpPost]
-        public async Task<IActionResult> ResetSubmissions() {
-            await _dbContext.Database.ExecuteSqlRawAsync("usp_ResetRequests;");
+        public async Task<IActionResult> RebuildCourses([FromBody] CourseRebuildRequestModel model)
+        {
+            if (model == null)
+            {
+                return BadRequest("A processing term set is required.");
+            }
 
-            Message = "Submissions reset";
-
-            return RedirectToAction("Index");
+            try
+            {
+                return Json(await _courseRebuildService.RebuildCoursesAsync(model.AcademicTermCodes));
+            }
+            catch (CourseRebuildValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (DbException ex)
+            {
+                _logger.LogError(ex, "Database error while rebuilding courses.");
+                return BadRequest("A database error occurred while rebuilding courses.");
+            }
         }
     }
 }

@@ -1,0 +1,11 @@
+@{
+    ViewBag.Title = "Rebuild Course List and Reset Submissions";
+}
+
+<div class="tacos-page-shell tacos-page-stack">
+    <div class="tacos-page-header">
+        <h2 class="tacos-page-heading">Rebuild Course List and Reset Submissions</h2>
+    </div>
+
+    <div data-course-rebuild-root="true" data-options-url="@Url.Action("CourseRebuildOptions", "System")" data-rebuild-url="@Url.Action("RebuildCourses", "System")"></div>
+</div>
