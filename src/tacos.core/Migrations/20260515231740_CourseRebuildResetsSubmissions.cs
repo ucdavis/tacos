@@ -30,7 +30,7 @@ namespace tacos.core.Migrations
         SET [CourseNumber] = NewCourses.[Number]
         FROM [dbo].[Requests] Requests
         INNER JOIN #NewCourses NewCourses
-            ON UPPER(REPLACE(LTRIM(RTRIM(NewCourses.[Number])), N' ', N'')) = UPPER(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''));
+            ON UPPER(REPLACE(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(NewCourses.[Number])), N' ', N''), NCHAR(9), N''), NCHAR(10), N''), NCHAR(13), N'')) = UPPER(REPLACE(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''), NCHAR(9), N''), NCHAR(10), N''), NCHAR(13), N''));
 
         UPDATE [dbo].[Requests]
         SET
@@ -54,7 +54,7 @@ namespace tacos.core.Migrations
         (
             SELECT 1
             FROM #NewCourses NewCourses
-            WHERE UPPER(REPLACE(LTRIM(RTRIM(NewCourses.[Number])), N' ', N'')) = UPPER(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''))
+            WHERE UPPER(REPLACE(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(NewCourses.[Number])), N' ', N''), NCHAR(9), N''), NCHAR(10), N''), NCHAR(13), N'')) = UPPER(REPLACE(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''), NCHAR(9), N''), NCHAR(10), N''), NCHAR(13), N''))
         );
         """;
 
@@ -67,7 +67,7 @@ namespace tacos.core.Migrations
             (
                 SELECT 1
                 FROM #NewCourses NewCourses
-                WHERE UPPER(REPLACE(LTRIM(RTRIM(NewCourses.[Number])), N' ', N'')) = UPPER(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''))
+                WHERE UPPER(REPLACE(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(NewCourses.[Number])), N' ', N''), NCHAR(9), N''), NCHAR(10), N''), NCHAR(13), N'')) = UPPER(REPLACE(REPLACE(REPLACE(REPLACE(LTRIM(RTRIM(Requests.[CourseNumber])), N' ', N''), NCHAR(9), N''), NCHAR(10), N''), NCHAR(13), N''))
             )
         )
         BEGIN
