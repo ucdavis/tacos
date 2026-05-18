@@ -53,7 +53,7 @@
                         <a class="tacos-site-nav__link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Approval" ? "tacos-site-nav__link--active" : "")" asp-controller="Approval" asp-action="index">Approvals</a>
                     </li>
                     <li>
-                        <a class="tacos-site-nav__link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "System" ? "tacos-site-nav__link--active" : "")" asp-controller="system" asp-action="Index">Users</a>
+                        <a class="tacos-site-nav__link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "System" ? "tacos-site-nav__link--active" : "")" asp-controller="system" asp-action="Index">Admin</a>
                     </li>
                 }
                 </ul>
