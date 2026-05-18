@@ -83,7 +83,9 @@ namespace tacos.core.Migrations
                                 AvailableTermCodes.[AcademicYear]
                             FROM AvailableTermCodes
                             WHERE AvailableTermCodes.[AcademicTermCode] = RequiredTerms.[AcademicTermCode]
-                            ORDER BY AvailableTermCodes.[AcademicYear]
+                            ORDER BY
+                                CASE WHEN AvailableTermCodes.[AcademicYear] IS NULL THEN 1 ELSE 0 END,
+                                AvailableTermCodes.[AcademicYear]
                         ) SourceYears
                     ),
                     AcademicYearLabels AS
