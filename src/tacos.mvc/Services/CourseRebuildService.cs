@@ -99,7 +99,7 @@ namespace tacos.mvc.services
 
             return new CourseRebuildResultModel
             {
-                AcademicYearSpan = processingWindow.AcademicYearSpan,
+                AcademicYearSpan = matchingOption.AcademicYearSpan,
                 StartingAcademicYear = processingWindow.StartingAcademicYear,
                 AcademicTermCodes = processingWindow.AcademicTermCodes.ToList()
             };

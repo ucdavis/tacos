@@ -24,7 +24,7 @@ namespace Test.Services
             var options = await service.GetAcademicYearSpanOptionsAsync();
 
             options.Count.ShouldBe(2);
-            options[0].AcademicYearSpan.ShouldBe("2025-26");
+            options[0].AcademicYearSpan.ShouldBe("2024-25 and 2025-26");
             options[0].IsComplete.ShouldBeTrue();
             options[0].Terms.Select(t => t.AcademicTermCode).ShouldBe(new[]
             {
@@ -35,7 +35,7 @@ namespace Test.Services
                 "202601",
                 "202603"
             });
-            options[1].AcademicYearSpan.ShouldBe("2024-25");
+            options[1].AcademicYearSpan.ShouldBe("2023-24 and 2024-25");
             options[1].IsComplete.ShouldBeFalse();
         }
 
@@ -68,7 +68,7 @@ namespace Test.Services
                 "202601",
                 "202603"
             });
-            result.AcademicYearSpan.ShouldBe("2025-26");
+            result.AcademicYearSpan.ShouldBe("2024-25 and 2025-26");
             result.StartingAcademicYear.ShouldBe(2025);
         }
 
@@ -171,7 +171,7 @@ namespace Test.Services
                 $"{startingAcademicYear + 1}01",
                 $"{startingAcademicYear + 1}03"
             };
-            var span = $"{startingAcademicYear}-{(startingAcademicYear + 1) % 100:00}";
+            var span = $"{startingAcademicYear - 1}-{startingAcademicYear % 100:00} and {startingAcademicYear}-{(startingAcademicYear + 1) % 100:00}";
 
             for (var i = 0; i < termCodes.Length; i++)
             {
