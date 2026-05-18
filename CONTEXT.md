@@ -33,7 +33,7 @@ An **Academic Term Code** present in **CourseOfferingsRaw** and therefore eligib
 _Avoid_: Manually typed term code
 
 **Academic Year Span**:
-A human-readable academic year label such as `2024-25`.
+A human-readable label composed from the `AcademicYear` values in **CourseOfferingsRaw**, such as `2024-25 and 2025-26`.
 _Avoid_: Ending-year-only label
 
 **Most Recent Academic Year**:
@@ -71,8 +71,8 @@ _Avoid_: Duplicate course
 - A valid **Processing Window** contains exactly two academic years, each with the required `10`, `01`, and `03` terms.
 - Users select **Available Term Codes** directly or choose an **Academic Year Span** helper that derives the six-code **Processing Window**.
 - The frontend previews the six **Academic Term Codes** represented by each **Academic Year Span** selection.
-- The frontend lists **Academic Year Span** helpers derived from **Available Term Codes**.
-- When users choose an **Academic Year Span**, that span is the later year in the two-year **Processing Window**.
+- The frontend lists **Academic Year Span** helpers derived from **CourseOfferingsRaw** `AcademicYear` values for the selected term codes.
+- When users choose an **Academic Year Span**, the underlying processing key remains the later year in the two-year **Processing Window**.
 - An **Academic Year Span** helper is valid only when all six implied **Academic Term Codes** are present in **CourseOfferingsRaw**.
 - `WasCourseTaughtInMostRecentYear` is true when a course appears in the **Most Recent Academic Year**.
 - `IsCourseTaughtOnceEveryTwoYears` is true when a course is an **Every-Other-Year Course**.
