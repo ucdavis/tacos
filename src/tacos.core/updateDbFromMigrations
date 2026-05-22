@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+export Database__CommandTimeoutSeconds="${Database__CommandTimeoutSeconds:-180}"
+
+dotnet ef database update "$@" \
+    --project "$script_dir/tacos.core.csproj" \
+    --startup-project "$script_dir/../tacos.mvc/tacos.mvc.csproj"

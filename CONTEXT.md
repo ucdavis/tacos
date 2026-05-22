@@ -8,7 +8,7 @@ Tacos uses catalog and offering data to help departments plan course support req
 An enrollment and section summary for a course in a specific academic term.
 _Avoid_: DESII course
 
-**CourseOfferingsRaw**:
+**CoursesRaw**:
 The canonical local source of raw course offering rows used to rebuild the course list.
 _Avoid_: DESII_Courses
 
@@ -29,11 +29,11 @@ Exactly two complete academic years of selected terms used to rebuild the course
 _Avoid_: Arbitrary term subset
 
 **Available Term Code**:
-An **Academic Term Code** present in **CourseOfferingsRaw** and therefore eligible for a rebuild selection.
+An **Academic Term Code** present in **CoursesRaw** and therefore eligible for a rebuild selection.
 _Avoid_: Manually typed term code
 
 **Academic Year Span**:
-A human-readable label composed from the `AcademicYear` values in **CourseOfferingsRaw**, such as `2024-25 and 2025-26`.
+A human-readable label composed from the `AcademicYear` values in **CoursesRaw**, such as `2024-25 and 2025-26`.
 _Avoid_: Ending-year-only label
 
 **Most Recent Academic Year**:
@@ -63,17 +63,17 @@ _Avoid_: Duplicate course
 ## Relationships
 
 - A **Course Offering** belongs to exactly one academic term.
-- **CourseOfferingsRaw** contains many **Course Offerings**.
-- **CourseOfferingsRaw** is populated by an external process outside the course rebuild workflow.
+- **CoursesRaw** contains many **Course Offerings**.
+- **CoursesRaw** is populated by an external process outside the course rebuild workflow.
 - **CourseDescription** is populated by an external process outside the course rebuild workflow.
-- The **Course List** is rebuilt from **CourseOfferingsRaw** rows whose academic terms are in the **Processing Window** and from active catalog data.
+- The **Course List** is rebuilt from **CoursesRaw** rows whose academic terms are in the **Processing Window** and from active catalog data.
 - The frontend may group **Academic Term Codes** by academic year or quarter, but processing uses the exact **Processing Term Set** provided by the user.
 - A valid **Processing Window** contains exactly two academic years, each with the required `10`, `01`, and `03` terms.
 - Users select **Available Term Codes** directly or choose an **Academic Year Span** helper that derives the six-code **Processing Window**.
 - The frontend previews the six **Academic Term Codes** represented by each **Academic Year Span** selection.
-- The frontend lists **Academic Year Span** helpers derived from **CourseOfferingsRaw** `AcademicYear` values for the selected term codes.
+- The frontend lists **Academic Year Span** helpers derived from **CoursesRaw** `AcademicYear` values for the selected term codes.
 - When users choose an **Academic Year Span**, the underlying processing key remains the later year in the two-year **Processing Window**.
-- An **Academic Year Span** helper is valid only when all six implied **Academic Term Codes** are present in **CourseOfferingsRaw**.
+- An **Academic Year Span** helper is valid only when all six implied **Academic Term Codes** are present in **CoursesRaw**.
 - `WasCourseTaughtInMostRecentYear` is true when a course appears in the **Most Recent Academic Year**.
 - `IsCourseTaughtOnceEveryTwoYears` is true when a course is an **Every-Other-Year Course**.
 - **Catalog-Only Courses** remain selectable in the **Course List** with zero offering metrics.
@@ -86,10 +86,10 @@ _Avoid_: Duplicate course
 ## Example Dialogue
 
 > **Dev:** "Should the processor read from DESII_Courses?"
-> **Domain expert:** "No. DESII_Courses is legacy language. The local source is CourseOfferingsRaw."
+> **Domain expert:** "No. DESII_Courses is legacy language. The local source is CoursesRaw."
 >
-> **Dev:** "Does the rebuild workflow load CourseOfferingsRaw?"
-> **Domain expert:** "No. CourseOfferingsRaw is populated separately; the rebuild only consumes it."
+> **Dev:** "Does the rebuild workflow load CoursesRaw?"
+> **Domain expert:** "No. CoursesRaw is populated separately; the rebuild only consumes it."
 >
 > **Dev:** "Does the rebuild workflow refresh CourseDescription?"
 > **Domain expert:** "No. CourseDescription is populated separately; the rebuild only consumes it."
@@ -101,7 +101,7 @@ _Avoid_: Duplicate course
 > **Domain expert:** "No. The selected terms must form two complete academic years."
 >
 > **Dev:** "Can admins type any term code?"
-> **Domain expert:** "No. They choose from term codes already present in CourseOfferingsRaw, with UI help for selecting a complete window."
+> **Domain expert:** "No. They choose from term codes already present in CoursesRaw, with UI help for selecting a complete window."
 >
 > **Dev:** "Should the UI show only an ending year like 2025?"
 > **Domain expert:** "No. Show the academic year span, such as 2024-25, and preview the six term codes the selection implies."
@@ -126,9 +126,9 @@ _Avoid_: Duplicate course
 
 ## Flagged Ambiguities
 
-- "DESII_Courses" was used as the historical source-table name for offering rows; resolved: new work should use **CourseOfferingsRaw**.
+- "DESII_Courses" was used as the historical source-table name for offering rows; resolved: new work should use **CoursesRaw**.
 - "Which terms to use" means an explicit **Processing Term Set**, not a backend-derived date window.
 - "Frontend-selected terms" does not mean an arbitrary subset; resolved: selected terms must form a valid **Processing Window**.
-- "Available terms" means terms present in **CourseOfferingsRaw**, not every possible Banner term code.
+- "Available terms" means terms present in **CoursesRaw**, not every possible Banner term code.
 - `WasCourseTaughtInMostRecentYear` previously had conflicting legacy SQL behavior; resolved: the flag is literal.
 - Course identifiers were inconsistently shown with and without spaces; resolved: **Course Number** is no-space uppercase in both `Courses.Number` and `CourseDescription.Course`, and UI/API input may be normalized into that form.
