@@ -1,4 +1,4 @@
-CREATE PROCEDURE dbo.usp_LoadCourseDescription
+CREATE PROCEDURE dbo.usp_LoadCourseDescriptionRaw
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -6,9 +6,9 @@ BEGIN
 
     BEGIN TRANSACTION;
 
-    TRUNCATE TABLE dbo.CourseDescription;
+    TRUNCATE TABLE dbo.CourseDescriptionRaw;
 
-    INSERT INTO dbo.CourseDescription
+    INSERT INTO dbo.CourseDescriptionRaw
     (
         Course,
         SubjectCode,

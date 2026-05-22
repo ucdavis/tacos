@@ -74,6 +74,7 @@
     <Build Include="dbo\Tables\AspNetRoles.sql" />
     <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
     <Build Include="dbo\Tables\Courses.sql" />
+    <Build Include="dbo\Tables\CourseDescriptionRaw.sql" />
     <Build Include="dbo\Tables\CoursesRaw.sql" />
     <Build Include="dbo\Tables\Departments.sql" />
     <Build Include="dbo\Tables\DepartmentRoles.sql" />
