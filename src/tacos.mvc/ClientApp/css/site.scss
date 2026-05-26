@@ -609,6 +609,10 @@ hr {
   color: #061525;
 }
 
+.tacos-course-detail__actions {
+  margin-bottom: 1.5rem;
+}
+
 .tacos-course-detail__hero {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
