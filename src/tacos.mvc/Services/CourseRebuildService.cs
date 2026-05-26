@@ -111,6 +111,8 @@ namespace tacos.mvc.services
 
     public class CourseRebuildSqlGateway : ICourseRebuildSqlGateway
     {
+        private const int DefaultCommandTimeoutSeconds = 300;
+
         private readonly TacoDbContext _dbContext;
 
         public CourseRebuildSqlGateway(TacoDbContext dbContext)
@@ -135,6 +137,7 @@ namespace tacos.mvc.services
                 using var command = connection.CreateCommand();
                 command.CommandText = "dbo.usp_GetCourseRebuildAcademicYearSpanOptions";
                 command.CommandType = CommandType.StoredProcedure;
+                ApplyCommandTimeout(command);
 
                 await using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
@@ -175,6 +178,7 @@ namespace tacos.mvc.services
                 using var command = connection.CreateCommand();
                 command.CommandText = "dbo.usp_RebuildCoursesFromProcessingWindow";
                 command.CommandType = CommandType.StoredProcedure;
+                ApplyCommandTimeout(command);
 
                 var termCodeTable = new DataTable();
                 termCodeTable.Columns.Add("AcademicTermCode", typeof(string));
@@ -216,6 +220,7 @@ namespace tacos.mvc.services
                 using var command = connection.CreateCommand();
                 command.CommandText = "dbo.usp_ReplaceCourseDescriptionsFromRaw";
                 command.CommandType = CommandType.StoredProcedure;
+                ApplyCommandTimeout(command);
 
                 await command.ExecuteNonQueryAsync();
             }
@@ -226,6 +231,12 @@ namespace tacos.mvc.services
                     await connection.CloseAsync();
                 }
             }
+        }
+
+        private void ApplyCommandTimeout(SqlCommand command)
+        {
+            command.CommandTimeout = _dbContext.Database.GetCommandTimeout()
+                ?? DefaultCommandTimeoutSeconds;
         }
 
         private SqlConnection GetSqlConnection()
