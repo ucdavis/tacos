@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -5,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tacos.core.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(TacoDbContext))]
+    [Migration("20260526111118_ReplaceCourseDescriptionsFromRawProcedure")]
     public partial class ReplaceCourseDescriptionsFromRawProcedure : Migration
     {
         /// <inheritdoc />
