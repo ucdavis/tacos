@@ -41,6 +41,9 @@
                 <li>
                     <a class="tacos-site-nav__link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Courses" ? "tacos-site-nav__link--active" : "")" asp-controller="Courses" asp-action="index">Courses</a>
                 </li>
+                <li>
+                    <a class="tacos-site-nav__link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Faqs" ? "tacos-site-nav__link--active" : "")" asp-controller="Faqs" asp-action="index">FAQ</a>
+                </li>
                 @if (User.IsInRole("Reviewer"))
                 {
                     <li>
