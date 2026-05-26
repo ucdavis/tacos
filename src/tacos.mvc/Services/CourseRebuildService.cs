@@ -30,6 +30,8 @@ namespace tacos.mvc.services
     {
         Task<IReadOnlyList<CourseRebuildAcademicYearSpanTermRow>> GetAcademicYearSpanTermRowsAsync();
 
+        Task ReplaceCourseDescriptionsFromRawAsync();
+
         Task RebuildCoursesAsync(IReadOnlyList<string> academicTermCodes);
     }
 
@@ -95,6 +97,7 @@ namespace tacos.mvc.services
                 throw new CourseRebuildValidationException("Selected processing term codes do not match an available academic year span.");
             }
 
+            await _sqlGateway.ReplaceCourseDescriptionsFromRawAsync();
             await _sqlGateway.RebuildCoursesAsync(processingWindow.AcademicTermCodes);
 
             return new CourseRebuildResultModel
@@ -186,6 +189,33 @@ namespace tacos.mvc.services
                     TypeName = "dbo.AcademicTermCodeList",
                     Value = termCodeTable
                 });
+
+                await command.ExecuteNonQueryAsync();
+            }
+            finally
+            {
+                if (shouldCloseConnection)
+                {
+                    await connection.CloseAsync();
+                }
+            }
+        }
+
+        public async Task ReplaceCourseDescriptionsFromRawAsync()
+        {
+            var connection = GetSqlConnection();
+            var shouldCloseConnection = connection.State != ConnectionState.Open;
+
+            if (shouldCloseConnection)
+            {
+                await connection.OpenAsync();
+            }
+
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "dbo.usp_ReplaceCourseDescriptionsFromRaw";
+                command.CommandType = CommandType.StoredProcedure;
 
                 await command.ExecuteNonQueryAsync();
             }

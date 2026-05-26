@@ -58,6 +58,7 @@ namespace Test.Services
                 "202503"
             });
 
+            gateway.Operations.ShouldBe(new[] { "ReplaceCourseDescriptionsFromRaw", "RebuildCourses" });
             gateway.RebuildCalls.Count.ShouldBe(1);
             gateway.RebuildCalls[0].ShouldBe(new[]
             {
@@ -92,6 +93,7 @@ namespace Test.Services
             }));
 
             gateway.RebuildCalls.ShouldBeEmpty();
+            gateway.ReplaceCourseDescriptionCalls.ShouldBe(0);
         }
 
         [Fact]
@@ -111,6 +113,7 @@ namespace Test.Services
             }));
 
             gateway.RebuildCalls.ShouldBeEmpty();
+            gateway.ReplaceCourseDescriptionCalls.ShouldBe(0);
         }
 
         [Fact]
@@ -133,6 +136,7 @@ namespace Test.Services
             }));
 
             gateway.RebuildCalls.ShouldBeEmpty();
+            gateway.ReplaceCourseDescriptionCalls.ShouldBe(0);
         }
 
         [Fact]
@@ -155,6 +159,7 @@ namespace Test.Services
             }));
 
             gateway.RebuildCalls.ShouldBeEmpty();
+            gateway.ReplaceCourseDescriptionCalls.ShouldBe(0);
         }
 
         private static IEnumerable<CourseRebuildAcademicYearSpanTermRow> CreateSpanRows(
@@ -194,6 +199,10 @@ namespace Test.Services
             public IReadOnlyList<CourseRebuildAcademicYearSpanTermRow> Rows { get; set; }
                 = new List<CourseRebuildAcademicYearSpanTermRow>();
 
+            public IList<string> Operations { get; } = new List<string>();
+
+            public int ReplaceCourseDescriptionCalls { get; private set; }
+
             public IList<IReadOnlyList<string>> RebuildCalls { get; } = new List<IReadOnlyList<string>>();
 
             public Task<IReadOnlyList<CourseRebuildAcademicYearSpanTermRow>> GetAcademicYearSpanTermRowsAsync()
@@ -201,8 +210,16 @@ namespace Test.Services
                 return Task.FromResult(Rows);
             }
 
+            public Task ReplaceCourseDescriptionsFromRawAsync()
+            {
+                Operations.Add("ReplaceCourseDescriptionsFromRaw");
+                ReplaceCourseDescriptionCalls++;
+                return Task.CompletedTask;
+            }
+
             public Task RebuildCoursesAsync(IReadOnlyList<string> academicTermCodes)
             {
+                Operations.Add("RebuildCourses");
                 RebuildCalls.Add(academicTermCodes.ToList());
                 return Task.CompletedTask;
             }
