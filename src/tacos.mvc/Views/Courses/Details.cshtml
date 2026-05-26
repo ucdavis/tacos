@@ -1,76 +1,169 @@
+@using System.Globalization
 @model tacos.mvc.Models.CourseViewModels.CourseDetailsViewModel
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+
 @{
+    ViewData["Title"] = Model.Course.Number;
+
+    var hasDescription = !string.IsNullOrWhiteSpace(Model.Description?.Description);
+    var hasLearningActivities = Model.LearningActivities.Any();
+    var hasAdditionalInformation =
+        !string.IsNullOrWhiteSpace(Model.Description?.College)
+        || !string.IsNullOrWhiteSpace(Model.Description?.Department)
+        || !string.IsNullOrWhiteSpace(Model.Description?.AbbreviatedTitle)
+        || !string.IsNullOrWhiteSpace(Model.Description?.Quarters)
+        || !string.IsNullOrWhiteSpace(Model.Description?.QuartersOffered);
+
+    string FormatNumber(double value)
+    {
+        return value.ToString("0.##", CultureInfo.InvariantCulture);
+    }
 }
 
+<div class="tacos-course-detail-page">
+<div class="tacos-page-shell tacos-course-detail">
+    <header class="tacos-course-detail__hero">
+        <div class="tacos-course-detail__hero-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 5.5C4 4.7 4.7 4 5.5 4H10c1.1 0 2 .9 2 2v14c0-1.1-.9-2-2-2H5.5C4.7 18 4 17.3 4 16.5v-11Z" />
+                <path d="M20 5.5C20 4.7 19.3 4 18.5 4H14c-1.1 0-2 .9-2 2v14c0-1.1.9-2 2-2h4.5c.8 0 1.5-.7 1.5-1.5v-11Z" />
+            </svg>
+        </div>
+        <div>
+            <p class="tacos-course-detail__eyebrow">Course Description</p>
+            <h1 class="tacos-course-detail__title">@Model.Course.Name</h1>
+            <span class="tacos-course-detail__badge">@Model.Course.Number</span>
+        </div>
+    </header>
 
-<div class="mx-auto max-w-6xl px-4 py-6">
-    <h3>Course Description Information: @Model.Course.Number</h3>
+    <section class="tacos-course-detail__stats" aria-label="Course statistics">
+        <article class="tacos-course-detail__stat-card">
+            <div class="tacos-course-detail__stat-label">
+                <i class="fas fa-users" aria-hidden="true"></i>
+                <span>Average Enrollment</span>
+            </div>
+            <div class="tacos-course-detail__stat-value">@FormatNumber(Model.Course.AverageEnrollment)</div>
+        </article>
 
-    <dl>
-        <dt>Course Number</dt>
-        <dd>@Model.Course.Number</dd>
+        <article class="tacos-course-detail__stat-card">
+            <div class="tacos-course-detail__stat-label">
+                <i class="fas fa-th-large" aria-hidden="true"></i>
+                <span>Sections per Course</span>
+            </div>
+            <div class="tacos-course-detail__stat-value">@FormatNumber(Model.Course.AverageSectionsPerCourse)</div>
+        </article>
 
-        <dt>Name</dt>
-        <dd>@Model.Course.Name</dd>
+        <article class="tacos-course-detail__stat-card">
+            <div class="tacos-course-detail__stat-label">
+                <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                <span>Times Offered / Year</span>
+            </div>
+            <div class="tacos-course-detail__stat-value" aria-label="@FormatNumber(Model.Course.TimesOfferedPerYear) times">@FormatNumber(Model.Course.TimesOfferedPerYear)<span aria-hidden="true">&times;</span></div>
+        </article>
+    </section>
 
-        <dt>Average Enrollment</dt>
-        <dd>@Model.Course.AverageEnrollment</dd>
+    <section class="tacos-course-detail__card tacos-course-detail__card--full">
+        <header class="tacos-course-detail__card-header">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            <h2>Course Description</h2>
+        </header>
+        <div class="tacos-course-detail__card-body">
+            @if (hasDescription)
+            {
+                <p>@Model.Description.Description</p>
+            }
+            else
+            {
+                <p class="tacos-course-detail__empty">No course description available.</p>
+            }
+        </div>
+    </section>
 
-        <dt>Average Sections per Course</dt>
-        <dd>@Model.Course.AverageSectionsPerCourse</dd>
-
-        <dt>Times Offered per Year</dt>
-        <dd>@Model.Course.TimesOfferedPerYear</dd>
-    </dl>
-
-    @if (Model.Description != null)
+    @if (hasLearningActivities || Model.ShowWritingExperience)
     {
-
-        <h4>Additional Information</h4>
-
-        <dl>
-            <dt>College</dt>
-            <dd>@Model.Description.College</dd>
-
-            <dt>Department</dt>
-            <dd>@Model.Description.Department</dd>
-
-            <dt>Abbreviated Title</dt>
-            <dd>@Model.Description.AbbreviatedTitle</dd>
-
-            <dt>Description</dt>
-            <dd>@Model.Description.Description</dd>
-
-            @if (!string.IsNullOrWhiteSpace(Model.Description.Quarters))
+        <div class="tacos-course-detail__split @(hasLearningActivities && Model.ShowWritingExperience ? "" : "tacos-course-detail__split--single")">
+            @if (hasLearningActivities)
             {
-                <dt>Quarter Offerings</dt>
-                <dd>@Model.Description.Quarters</dd>
-            }
-
-            @if (!string.IsNullOrWhiteSpace(Model.Description.QuartersOffered))
-            {
-                <dt>Yearly Offerings</dt>
-                <dd>@Model.Description.QuartersOffered</dd>
-            }
-
-            @if (Model.LearningActivities.Any())
-            {
-                <dt>Learning activities</dt>
-                <dd>@string.Join(", ", Model.LearningActivities)</dd>
+                <section class="tacos-course-detail__card">
+                    <header class="tacos-course-detail__simple-header">
+                        <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                        <h2>Learning Activities</h2>
+                    </header>
+                    <div class="tacos-course-detail__pills">
+                        @foreach (var activity in Model.LearningActivities)
+                        {
+                            var isLaboratory = activity.Contains("Laboratory", StringComparison.OrdinalIgnoreCase);
+                            <span class="tacos-course-detail__pill @(isLaboratory ? "tacos-course-detail__pill--green" : "tacos-course-detail__pill--blue")">
+                                <i class="fas @(isLaboratory ? "fa-flask" : "fa-book")" aria-hidden="true"></i>
+                                @activity
+                            </span>
+                        }
+                    </div>
+                </section>
             }
 
             @if (Model.ShowWritingExperience)
             {
-                <dt hidden>General Education</dt>
-                <dd>Writing Experience</dd>
+                <section class="tacos-course-detail__card">
+                    <header class="tacos-course-detail__simple-header">
+                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                        <h2>Requirements</h2>
+                    </header>
+                    <div class="tacos-course-detail__pills">
+                        <span class="tacos-course-detail__pill tacos-course-detail__pill--gold">
+                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                            Writing Experience
+                        </span>
+                    </div>
+                </section>
             }
-        </dl>
+        </div>
     }
-    else
-    {
-        <p>No additional information found.</p>
-    }
+
+    <section class="tacos-course-detail__card tacos-course-detail__card--full">
+        <header class="tacos-course-detail__card-header">
+            <i class="far fa-building" aria-hidden="true"></i>
+            <h2>Additional Information</h2>
+        </header>
+        <div class="tacos-course-detail__card-body tacos-course-detail__card-body--compact">
+            @if (hasAdditionalInformation)
+            {
+                <dl class="tacos-course-detail__details">
+                    @if (!string.IsNullOrWhiteSpace(Model.Description.College))
+                    {
+                        <dt>College</dt>
+                        <dd>@Model.Description.College</dd>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description.Department))
+                    {
+                        <dt>Department</dt>
+                        <dd>@Model.Description.Department</dd>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description.AbbreviatedTitle))
+                    {
+                        <dt>Abbreviated Title</dt>
+                        <dd>@Model.Description.AbbreviatedTitle</dd>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description.Quarters))
+                    {
+                        <dt>Quarter Offerings</dt>
+                        <dd>@Model.Description.Quarters</dd>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description.QuartersOffered))
+                    {
+                        <dt>Yearly Offerings</dt>
+                        <dd>@Model.Description.QuartersOffered</dd>
+                    }
+                </dl>
+            }
+            else
+            {
+                <p class="tacos-course-detail__empty">No additional information found.</p>
+            }
+        </div>
+    </section>
+</div>
 </div>
