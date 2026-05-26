@@ -634,6 +634,109 @@ hr {
   text-decoration: underline;
 }
 
+.tacos-faq {
+  max-width: 58rem;
+
+  p,
+  li {
+    line-height: 1.6;
+  }
+
+  p,
+  ol,
+  ul {
+    margin-bottom: 0;
+  }
+
+  ol,
+  ul {
+    padding-left: 1.5rem;
+  }
+
+  li + li {
+    margin-top: 0.5rem;
+  }
+}
+
+.tacos-faq__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.tacos-faq__item {
+  border-top: 1px solid #d6d6d6;
+}
+
+.tacos-faq__item:last-child {
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.tacos-faq__item > summary {
+  align-items: flex-start;
+  color: $primary-color;
+  cursor: pointer;
+  display: flex;
+  font-size: 1.15rem;
+  font-weight: 700;
+  gap: 1rem;
+  justify-content: space-between;
+  line-height: 1.35;
+  list-style: none;
+  padding: 1rem 0;
+}
+
+.tacos-faq__item > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tacos-faq__item > summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.tacos-faq__item[open] > summary::after {
+  content: "-";
+}
+
+.tacos-faq__item > summary:hover,
+.tacos-faq__item > summary:focus,
+.tacos-faq__item > summary:focus-visible {
+  color: #2f5b8c;
+}
+
+.tacos-faq__item > summary:focus-visible {
+  outline: 2px solid rgba(0, 123, 255, 0.25);
+  outline-offset: 0.25rem;
+}
+
+.tacos-faq__answer {
+  padding: 0 0 1.5rem;
+}
+
+.tacos-faq__answer > * + * {
+  margin-top: 0.75rem;
+}
+
+.tacos-faq__question {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 640px) {
+  .tacos-faq__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tacos-faq__header .tacos-btn {
+    width: 100%;
+  }
+}
+
 .tacos-admin-panel {
   max-width: 42rem;
 }
