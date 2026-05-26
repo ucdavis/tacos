@@ -55,6 +55,18 @@
                 <dt>Yearly Offerings</dt>
                 <dd>@Model.Description.QuartersOffered</dd>
             }
+
+            @if (Model.LearningActivities.Any())
+            {
+                <dt>Learning activities</dt>
+                <dd>@string.Join(", ", Model.LearningActivities)</dd>
+            }
+
+            @if (Model.ShowWritingExperience)
+            {
+                <dt hidden>General Education</dt>
+                <dd>Writing Experience</dd>
+            }
         </dl>
     }
     else
