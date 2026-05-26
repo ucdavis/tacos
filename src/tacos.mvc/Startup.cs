@@ -37,8 +37,18 @@ namespace tacos.mvc
             services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
 
             // setup entity framework
-            services.AddDbContextPool<TacoDbContext>(o => 
-                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            var databaseCommandTimeoutSeconds = Configuration.GetValue<int?>("Database:CommandTimeoutSeconds");
+
+            services.AddDbContextPool<TacoDbContext>(o =>
+                o.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                    {
+                        if (databaseCommandTimeoutSeconds.HasValue)
+                        {
+                            sqlOptions.CommandTimeout(databaseCommandTimeoutSeconds.Value);
+                        }
+                    }));
 
             services.AddIdentity<User, IdentityRole>()
                             .AddEntityFrameworkStores<TacoDbContext>()

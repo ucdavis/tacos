@@ -30,6 +30,8 @@ namespace tacos.mvc.services
     {
         Task<IReadOnlyList<CourseRebuildAcademicYearSpanTermRow>> GetAcademicYearSpanTermRowsAsync();
 
+        Task ReplaceCourseDescriptionsFromRawAsync();
+
         Task RebuildCoursesAsync(IReadOnlyList<string> academicTermCodes);
     }
 
@@ -95,6 +97,7 @@ namespace tacos.mvc.services
                 throw new CourseRebuildValidationException("Selected processing term codes do not match an available academic year span.");
             }
 
+            await _sqlGateway.ReplaceCourseDescriptionsFromRawAsync();
             await _sqlGateway.RebuildCoursesAsync(processingWindow.AcademicTermCodes);
 
             return new CourseRebuildResultModel
@@ -108,6 +111,8 @@ namespace tacos.mvc.services
 
     public class CourseRebuildSqlGateway : ICourseRebuildSqlGateway
     {
+        private const int DefaultCommandTimeoutSeconds = 300;
+
         private readonly TacoDbContext _dbContext;
 
         public CourseRebuildSqlGateway(TacoDbContext dbContext)
@@ -132,6 +137,7 @@ namespace tacos.mvc.services
                 using var command = connection.CreateCommand();
                 command.CommandText = "dbo.usp_GetCourseRebuildAcademicYearSpanOptions";
                 command.CommandType = CommandType.StoredProcedure;
+                ApplyCommandTimeout(command);
 
                 await using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())
@@ -172,6 +178,7 @@ namespace tacos.mvc.services
                 using var command = connection.CreateCommand();
                 command.CommandText = "dbo.usp_RebuildCoursesFromProcessingWindow";
                 command.CommandType = CommandType.StoredProcedure;
+                ApplyCommandTimeout(command);
 
                 var termCodeTable = new DataTable();
                 termCodeTable.Columns.Add("AcademicTermCode", typeof(string));
@@ -196,6 +203,40 @@ namespace tacos.mvc.services
                     await connection.CloseAsync();
                 }
             }
+        }
+
+        public async Task ReplaceCourseDescriptionsFromRawAsync()
+        {
+            var connection = GetSqlConnection();
+            var shouldCloseConnection = connection.State != ConnectionState.Open;
+
+            if (shouldCloseConnection)
+            {
+                await connection.OpenAsync();
+            }
+
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "dbo.usp_ReplaceCourseDescriptionsFromRaw";
+                command.CommandType = CommandType.StoredProcedure;
+                ApplyCommandTimeout(command);
+
+                await command.ExecuteNonQueryAsync();
+            }
+            finally
+            {
+                if (shouldCloseConnection)
+                {
+                    await connection.CloseAsync();
+                }
+            }
+        }
+
+        private void ApplyCommandTimeout(SqlCommand command)
+        {
+            command.CommandTimeout = _dbContext.Database.GetCommandTimeout()
+                ?? DefaultCommandTimeoutSeconds;
         }
 
         private SqlConnection GetSqlConnection()

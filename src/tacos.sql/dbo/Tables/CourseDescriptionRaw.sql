@@ -1,0 +1,47 @@
+﻿CREATE TABLE [dbo].[CourseDescriptionRaw] (
+    [Course] [nvarchar](20) NULL,
+    [SubjectCode] [nvarchar](20) NULL,
+    [CourseNumber] [nvarchar](20) NULL,
+    [CrossListing] [nvarchar](200) NULL,
+    [Title] [nvarchar](255) NULL,
+    [AbbreviatedTitle] [nvarchar](100) NULL,
+    [CourseDescription] [nvarchar](max) NULL,
+    [College] [nvarchar](100) NULL,
+    [Department] [nvarchar](200) NULL,
+    [Status] [nvarchar](50) NULL,
+    [CreatedOn] [datetime2](6) NULL,
+    [UpdatedOn] [datetime2](6) NULL,
+    [FirstLearningActivity] [nvarchar](100) NULL,
+    [FirstContactHoursPeriod] [nvarchar](50) NULL,
+    [SecondLearningActivity] [nvarchar](100) NULL,
+    [SecondContactHoursPeriod] [nvarchar](50) NULL,
+    [ThirdLearningActivity] [nvarchar](100) NULL,
+    [ThirdContactHoursPeriod] [nvarchar](50) NULL,
+    [FourthLearningActivity] [nvarchar](100) NULL,
+    [FourthContactHoursPeriod] [nvarchar](50) NULL,
+    [Ge2ArtsHumanities] [nvarchar](100) NULL,
+    [Ge2ScienceEngineering] [nvarchar](100) NULL,
+    [Ge2SocialSciences] [nvarchar](100) NULL,
+    [Ge2Diversity] [nvarchar](100) NULL,
+    [Ge2WritingExperience] [nvarchar](100) NULL,
+    [Ge3ArtsHumanities] [nvarchar](100) NULL,
+    [Ge3ScienceEngineering] [nvarchar](100) NULL,
+    [Ge3SocialSciences] [nvarchar](100) NULL,
+    [Ge3AmericanCultures] [nvarchar](100) NULL,
+    [Ge3DomesticDiversity] [nvarchar](100) NULL,
+    [Ge3OralLiteracy] [nvarchar](100) NULL,
+    [Ge3QuantitativeLiteracy] [nvarchar](100) NULL,
+    [Ge3ScientificLiteracy] [nvarchar](100) NULL,
+    [Ge3VisualLiteracy] [nvarchar](100) NULL,
+    [Ge3WorldCultures] [nvarchar](100) NULL,
+    [Ge3WritingExperience] [nvarchar](100) NULL,
+    [Quarters] [nvarchar](300) NULL,
+    [QuartersOffered] [nvarchar](100) NULL,
+    [EffectiveTerm] [nvarchar](6) NULL,
+    [Effective] [nvarchar](100) NULL
+);
+
+GO
+
+CREATE NONCLUSTERED INDEX [IX_CourseDescriptionRaw_Course_Status]
+    ON [dbo].[CourseDescriptionRaw] ([Course], [Status]);

@@ -655,6 +655,34 @@ hr {
   margin-top: 0.75rem;
 }
 
+.tacos-rebuild-alert {
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tacos-rebuild-alert__content {
+  line-height: 1.45;
+}
+
+.tacos-rebuild-alert__title {
+  margin-bottom: 0.15rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.tacos-rebuild-alert__taco {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.tacos-rebuild-alert--success {
+  border-left: 5px solid #2e7d32;
+  background-color: #e8f5e9;
+  color: #173d1b;
+}
+
 .tacos-term-preview {
   margin-bottom: 1.5rem;
 }

@@ -23,7 +23,8 @@ interface ManageCourseRebuildPageProps {
 
 type AlertState = {
     message: string;
-    type: "alert-error" | "alert-info";
+    title?: string;
+    type: "alert-error" | "alert-info" | "alert-success";
 };
 
 function errorMessage(error: unknown, fallback: string): string {
@@ -97,7 +98,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
         }
 
         const confirmed = window.confirm(
-            `Rebuild the Course List from ${selectedOption.academicYearSpan} and reset all submissions? This can take a minute; stay on this page until it finishes.`
+            `Rebuild the Course List from ${selectedOption.academicYearSpan} and reset all submissions? This usually takes a minute or two; stay on this page until it finishes.`
         );
 
         if (!confirmed) {
@@ -107,7 +108,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
         const academicTermCodes = selectedOption.terms.map(term => term.academicTermCode);
 
         setAlert({
-            message: "Rebuilding courses and resetting submissions. This can take a minute; stay on this page until it finishes.",
+            message: "Rebuilding courses and resetting submissions. This usually takes a minute or two; stay on this page until it finishes.",
             type: "alert-info"
         });
         setIsRebuilding(true);
@@ -128,8 +129,9 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
 
             const result = await response.json() as CourseRebuildResult;
             setAlert({
+                title: "All set",
                 message: `Course List rebuilt from ${result.academicYearSpan}; submissions were reset.`,
-                type: "alert-info"
+                type: "alert-success"
             });
         } catch (error) {
             setAlert({
@@ -148,10 +150,23 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
         <>
             {alert && (
                 <div
-                    className={`alert rounded-none shadow-sm ${alert.type}`}
+                    className={`alert rounded-none shadow-sm tacos-rebuild-alert ${alert.type} ${
+                        alert.type === "alert-success" ? "tacos-rebuild-alert--success" : ""
+                    }`}
                     role={alert.type === "alert-error" ? "alert" : "status"}
                 >
-                    {alert.message}
+                    {alert.type === "alert-success" && (
+                        <img
+                            className="tacos-rebuild-alert__taco"
+                            src="/tacoAnimation.gif"
+                            alt=""
+                            aria-hidden="true"
+                        />
+                    )}
+                    <div className="tacos-rebuild-alert__content">
+                        {alert.title && <div className="tacos-rebuild-alert__title">{alert.title}</div>}
+                        <div>{alert.message}</div>
+                    </div>
                 </div>
             )}
 

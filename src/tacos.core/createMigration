@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ $# -lt 1 ]]; then
+    echo "Usage: ./createMigration <MigrationName> [dotnet ef args...]"
+    exit 1
+fi
+
+migration_name="$1"
+shift
+
+dotnet ef migrations add "$migration_name" \
+    --project "$script_dir/tacos.core.csproj" \
+    --startup-project "$script_dir/../tacos.mvc/tacos.mvc.csproj" \
+    "$@"
