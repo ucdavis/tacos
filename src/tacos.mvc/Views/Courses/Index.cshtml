@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Courses";
     var searchClass = Model.HasSearched ? "tacos-course-search tacos-course-search--compact" : "tacos-course-search";
-    var suggestions = new[] { "PMI", "ENL", "MIC", "ANT", "DVM" };
 }
 
 <div class="tacos-page-shell tacos-course-page">
@@ -25,17 +24,12 @@
                 name="q"
                 value="@Model.Query"
                 placeholder="Try PMI, ENL, MIC170, or ANS 002"
+                autofocus
                 autocomplete="off" />
             <button class="tacos-btn tacos-btn--primary tacos-course-search__button" type="submit">
                 Search
             </button>
         </form>
-        <div class="tacos-course-search__chips" aria-label="Common subject searches">
-            @foreach (var suggestion in suggestions)
-            {
-                <a asp-controller="Courses" asp-action="Index" asp-route-q="@suggestion">@suggestion</a>
-            }
-        </div>
     </section>
 
     @if (Model.HasSearched)
@@ -117,8 +111,11 @@
                         "sortable": false
                     }],
                 "order": [[0, "asc"]],
+                "language": {
+                    "search": "Filter:"
+                },
                 "dom":
-                    "<'tacos-datatable-toolbar'<'tacos-datatable-toolbar__length'l>>" +
+                    "<'tacos-datatable-toolbar'<'tacos-datatable-toolbar__length'l><'tacos-datatable-toolbar__actions'f>>" +
                     "<'tacos-datatable-table'tr>" +
                     "<'tacos-datatable-footer'<'tacos-datatable-footer__info'i><'tacos-datatable-footer__pagination'p>>"
             });
