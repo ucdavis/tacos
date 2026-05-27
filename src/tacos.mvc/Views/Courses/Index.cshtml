@@ -1,51 +1,126 @@
-@model IList<tacos.core.Data.Course>
+@using System.Linq
+@model tacos.mvc.Models.CourseViewModels.CourseIndexViewModel
 
-<div class="tacos-page-shell">
-    <div>
-        <table id="coursesTable" class="table tacos-page-table w-full">
-            <thead>
-                <tr>
-                    <th>Number</th>
-                    <th>Name</th>
-                    <th>Average Enrollment</th>
-                    <th>Average Sections</th>
-                    <th>Times Offered / Year</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var course in Model)
+@{
+    ViewData["Title"] = "Courses";
+    var searchClass = Model.HasSearched ? "tacos-course-search tacos-course-search--compact" : "tacos-course-search";
+    var suggestions = new[] { "PMI", "ENL", "MIC", "ANT", "DVM" };
+}
+
+<div class="tacos-page-shell tacos-course-page">
+    <section class="@searchClass" aria-labelledby="courseSearchHeading">
+        <div class="tacos-course-search__icon" aria-hidden="true">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="tacos-course-search__copy">
+            <h1 id="courseSearchHeading">Find a course</h1>
+            <p>Search by course number or subject code.</p>
+        </div>
+        <form class="tacos-course-search__form" asp-controller="Courses" asp-action="Index" method="get">
+            <label class="sr-only" for="courseSearchQuery">Course search</label>
+            <input
+                id="courseSearchQuery"
+                class="tacos-course-search__input"
+                type="search"
+                name="q"
+                value="@Model.Query"
+                placeholder="Try PMI, ENL, MIC170, or ANS 002"
+                autocomplete="off" />
+            <button class="tacos-btn tacos-btn--primary tacos-course-search__button" type="submit">
+                Search
+            </button>
+        </form>
+        <div class="tacos-course-search__chips" aria-label="Common subject searches">
+            @foreach (var suggestion in suggestions)
             {
-                <tr>
-                    <td>@course.Number</td>
-                    <td>@course.Name</td>
-                    <td>@course.AverageEnrollment</td>
-                    <td>@course.AverageSectionsPerCourse</td>
-                    <td>@course.TimesOfferedPerYear</td>
-                    <td>
-                        <a class="tacos-btn tacos-btn--primary" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Number">
-                            <i class="fas fa-info tacos-inline-icon-start"></i> Details
-                        </a>
-                    </td>
-                </tr>
+                <a asp-controller="Courses" asp-action="Index" asp-route-q="@suggestion">@suggestion</a>
             }
-            </tbody>
-        </table>
-    </div>
+        </div>
+    </section>
+
+    @if (Model.HasSearched)
+    {
+        <section class="tacos-course-results" aria-live="polite">
+            <div class="tacos-course-results__header">
+                <div>
+                    <h2 class="tacos-page-heading">Search results</h2>
+                    @if (Model.IsValidSearch)
+                    {
+                        <p class="tacos-page-meta">@Model.Courses.Count course@(Model.Courses.Count == 1 ? "" : "s") found for &ldquo;@Model.Query&rdquo;.</p>
+                    }
+                    else
+                    {
+                        <p class="tacos-page-meta">@Model.ValidationMessage</p>
+                    }
+                </div>
+            </div>
+
+            @if (Model.IsValidSearch && Model.Courses.Any())
+            {
+                <div>
+                    <table id="coursesTable" class="table tacos-page-table w-full">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Name</th>
+                                <th>Average Enrollment</th>
+                                <th>Average Sections</th>
+                                <th>Times Offered / Year</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var course in Model.Courses)
+                        {
+                            <tr>
+                                <td>@course.Number</td>
+                                <td>@course.Name</td>
+                                <td>@course.AverageEnrollment</td>
+                                <td>@course.AverageSectionsPerCourse</td>
+                                <td>@course.TimesOfferedPerYear</td>
+                                <td>
+                                    <a class="tacos-btn tacos-btn--primary" asp-controller="Courses" asp-action="Details" asp-route-id="@course.Number">
+                                        <i class="fas fa-info tacos-inline-icon-start"></i> Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="tacos-course-results__empty">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <p>No courses found. Try a subject code like ENL or a course number like ANS 002.</p>
+                </div>
+            }
+        </section>
+    }
 </div>
 
 @section scripts
 {
     <script>
         $(function () {
-            $('#coursesTable').DataTable({
+            var $coursesTable = $('#coursesTable');
+
+            if (!$coursesTable.length) {
+                return;
+            }
+
+            $coursesTable.DataTable({
                 "columnDefs": [
                     {
                         "targets": [-1],
                         "sortable": false
                     }],
-                "order": [[1, "desc"]],
-                "dom": window.TacosDataTables.dom.standard
+                "order": [[0, "asc"]],
+                "dom":
+                    "<'tacos-datatable-toolbar'<'tacos-datatable-toolbar__length'l>>" +
+                    "<'tacos-datatable-table'tr>" +
+                    "<'tacos-datatable-footer'<'tacos-datatable-footer__info'i><'tacos-datatable-footer__pagination'p>>"
             });
         });
     </script>
