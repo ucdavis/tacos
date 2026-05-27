@@ -597,6 +597,369 @@ hr {
   line-height: 1.2;
 }
 
+.tacos-course-detail-page {
+  min-height: calc(100vh - 6rem);
+  background-color: #f3f4f6;
+}
+
+.tacos-course-detail {
+  max-width: 1320px;
+  padding-top: 2.5rem;
+  padding-bottom: 5rem;
+  color: #061525;
+}
+
+.tacos-course-detail__actions {
+  margin-bottom: 1.5rem;
+}
+
+.tacos-course-detail__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 2.5rem;
+}
+
+.tacos-course-detail__hero-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.75rem;
+  height: 4.75rem;
+  border-radius: 1.25rem;
+  background-color: #004b73;
+  color: #fff;
+  font-size: 2rem;
+}
+
+.tacos-course-detail__hero-icon svg {
+  width: 2.45rem;
+  height: 2.45rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.tacos-course-detail__eyebrow {
+  margin: 0 0 0.2rem;
+  color: #717285;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.tacos-course-detail__title {
+  margin: 0 0 0.45rem;
+  color: #062d60;
+  font-size: 2.7rem;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.tacos-course-detail__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.16rem 1rem 0.22rem;
+  border-radius: 999px;
+  background-color: #dce3ed;
+  color: #062d60;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tacos-course-detail__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
+}
+
+.tacos-course-detail__stat-card,
+.tacos-course-detail__card {
+  border: 1px solid #dfe3e8;
+  border-radius: 1rem;
+  background-color: #fff;
+  box-shadow: 0 1px 5px rgba(15, 23, 42, 0.16);
+}
+
+.tacos-course-detail__stat-card {
+  min-height: 10.25rem;
+  padding: 2rem 2.25rem;
+}
+
+.tacos-course-detail__stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: #717285;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.tacos-course-detail__stat-label i {
+  width: 1.45rem;
+  color: #717285;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.tacos-course-detail__stat-value {
+  margin-top: 1.45rem;
+  color: #062d60;
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tacos-course-detail__card {
+  overflow: hidden;
+}
+
+.tacos-course-detail__card--full {
+  margin-bottom: 2.25rem;
+}
+
+.tacos-course-detail__card-header,
+.tacos-course-detail__simple-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.tacos-course-detail__card-header {
+  min-height: 5rem;
+  padding: 1.3rem 2.25rem;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+.tacos-course-detail__card-header i,
+.tacos-course-detail__simple-header i {
+  width: 1.4rem;
+  color: #717285;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.tacos-course-detail__card-header h2,
+.tacos-course-detail__simple-header h2 {
+  margin: 0;
+  color: #061525;
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.tacos-course-detail__card-body {
+  padding: 1.7rem 2.25rem;
+}
+
+.tacos-course-detail__card-body p {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.55;
+}
+
+.tacos-course-detail__card-body--compact {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.tacos-course-detail__empty {
+  color: #717285;
+}
+
+.tacos-course-detail__split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.25rem;
+}
+
+.tacos-course-detail__split--single {
+  grid-template-columns: 1fr;
+}
+
+.tacos-course-detail__split .tacos-course-detail__card {
+  min-height: 10.5rem;
+  padding: 2.25rem;
+}
+
+.tacos-course-detail__simple-header {
+  margin-bottom: 1.35rem;
+}
+
+.tacos-course-detail__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.tacos-course-detail__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  max-width: 100%;
+  min-height: 3.1rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.8rem;
+  background-color: #e9eef3;
+  color: #062d60;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.tacos-course-detail__pill i {
+  flex: 0 0 auto;
+  font-size: 1rem;
+}
+
+.tacos-course-detail__pill--green {
+  background-color: #e7f2ef;
+  color: #218367;
+}
+
+.tacos-course-detail__pill--gold {
+  background-color: #fbf0d4;
+  color: #916200;
+}
+
+.tacos-course-detail__details {
+  margin: 0;
+}
+
+.tacos-course-detail__details dt,
+.tacos-course-detail__details dd {
+  margin: 0;
+  padding: 1.45rem 0;
+  border-bottom: 1px solid #dfe3e8;
+  font-size: 1.35rem;
+  line-height: 1.35;
+}
+
+.tacos-course-detail__details dt {
+  float: left;
+  clear: left;
+  width: 16rem;
+  color: #717285;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tacos-course-detail__details dd {
+  min-height: 4.5rem;
+  padding-left: 18rem;
+  color: #061525;
+}
+
+.tacos-course-detail__details dd:last-child {
+  border-bottom: 0;
+}
+
+.tacos-course-detail__details dt:has(+ dd:last-child) {
+  border-bottom: 0;
+}
+
+@supports not selector(:has(+ *)) {
+  .tacos-course-detail__details dt:last-of-type {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .tacos-course-detail__stats,
+  .tacos-course-detail__split {
+    grid-template-columns: 1fr;
+  }
+
+  .tacos-course-detail__stat-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .tacos-course-detail {
+    padding-top: 1.5rem;
+  }
+
+  .tacos-course-detail__hero {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .tacos-course-detail__hero-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1rem;
+    font-size: 1.65rem;
+  }
+
+  .tacos-course-detail__eyebrow {
+    font-size: 1rem;
+  }
+
+  .tacos-course-detail__title {
+    font-size: 2rem;
+  }
+
+  .tacos-course-detail__stat-card,
+  .tacos-course-detail__split .tacos-course-detail__card,
+  .tacos-course-detail__card-header,
+  .tacos-course-detail__card-body {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+
+  .tacos-course-detail__stat-label,
+  .tacos-course-detail__card-body p {
+    font-size: 1.15rem;
+  }
+
+  .tacos-course-detail__stat-value {
+    font-size: 2.35rem;
+  }
+
+  .tacos-course-detail__card-header h2,
+  .tacos-course-detail__simple-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .tacos-course-detail__pill {
+    width: 100%;
+    font-size: 1.05rem;
+  }
+
+  .tacos-course-detail__details dt,
+  .tacos-course-detail__details dd {
+    float: none;
+    width: auto;
+    min-height: 0;
+    padding: 1rem 0;
+    border-bottom: 0;
+    font-size: 1.05rem;
+  }
+
+  .tacos-course-detail__details dt {
+    padding-bottom: 0.25rem;
+  }
+
+  .tacos-course-detail__details dd {
+    padding-top: 0;
+    padding-left: 0;
+    border-bottom: 1px solid #dfe3e8;
+  }
+}
+
 .tacos-section-heading {
   margin: 0 0 1rem;
   color: #0b3262;
