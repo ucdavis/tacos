@@ -7,7 +7,7 @@
     var departments = ViewBag.Departments as IList<Department>;
 }
 
-<div class="tacos-page-shell tacos-page-stack">
+<div class="container tacos-page-stack">
 
     @{
         var departmentSelectItems = departments.Select(d => new SelectListItem()

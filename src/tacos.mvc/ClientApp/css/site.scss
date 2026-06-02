@@ -272,27 +272,77 @@ hr {
   margin: 0;
 }
 
-.tacos-page-shell {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 2.75rem 1rem 1.5rem;
-}
-
-.tacos-page-shell--full {
-  max-width: none;
-}
-
-.tacos-page-shell--flash {
-  padding-top: 1rem;
-  padding-bottom: 0;
-}
-
 .tacos-page-stack > * + * {
   margin-top: 1.5rem;
 }
 
 .tacos-page-stack > .tacos-page-divider + * {
   margin-top: 0.75rem;
+}
+
+.tacos-circle-footer {
+  position: relative;
+  min-height: 10rem;
+  margin-top: 4rem;
+  overflow: hidden;
+}
+
+.tacos-circle-footer__gold,
+.tacos-circle-footer__blue {
+  display: none;
+  position: absolute;
+}
+
+.tacos-circle-footer__gold {
+  left: -8rem;
+  top: 0;
+}
+
+.tacos-circle-footer__blue {
+  right: -8rem;
+  bottom: -15.5rem;
+}
+
+.tacos-circle-footer__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+}
+
+.tacos-circle-footer__content a {
+  display: inline-flex;
+  justify-content: center;
+  max-width: min(100%, 26rem);
+}
+
+.tacos-circle-footer__logo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tacos-circle-footer__credit {
+  margin: 0.5rem 0 0;
+  color: $secondary-font;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.tacos-circle-footer__credit a {
+  margin-left: 0.25rem;
+  color: inherit;
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .tacos-circle-footer__gold,
+  .tacos-circle-footer__blue {
+    display: block;
+  }
 }
 
 .tacos-page-divider {
@@ -499,7 +549,6 @@ hr {
 }
 
 .tacos-course-detail {
-  max-width: 1320px;
   padding-top: 2.5rem;
   padding-bottom: 5rem;
   color: #061525;

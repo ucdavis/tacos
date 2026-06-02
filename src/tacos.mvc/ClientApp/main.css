@@ -4,7 +4,7 @@
 @source "../Views";
 
 @theme {
-  --color-light-bg-100: oklch(100% 0 0);
+  --color-light-bg-100: #fff;
   --color-light-bg-200: #f8f8f8;
   --color-light-bg-300: #e9e9e9;
   --color-main-border: #e9e3ee;
@@ -21,7 +21,7 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "readable";
+  name: "tacos";
   --color-base-100: var(--color-light-bg-100);
   --color-base-200: var(--color-light-bg-200);
   --color-base-300: var(--color-light-bg-300);
@@ -46,7 +46,7 @@ h2 {
 }
 
 html {
-  background-color: var(--color-light-bg-200);
+  background-color: var(--color-light-bg-100);
 }
 
 .container {
