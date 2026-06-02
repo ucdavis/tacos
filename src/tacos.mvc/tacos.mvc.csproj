@@ -7,6 +7,7 @@
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
     <SpaRoot>ClientApp\</SpaRoot>
+    <DotNetWatchContentFiles>false</DotNetWatchContentFiles>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
   </PropertyGroup>
 
