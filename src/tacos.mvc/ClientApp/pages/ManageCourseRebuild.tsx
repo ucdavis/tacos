@@ -222,7 +222,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
                 <div className="tacos-action-row">
                     <button
                         id="rebuildCoursesButton"
-                        className="tacos-btn tacos-btn--danger"
+                        className="btn btn-error gap-2"
                         type="button"
                         disabled={isRebuildDisabled}
                         onClick={() => {
@@ -230,7 +230,7 @@ export function ManageCourseRebuildPage({ optionsUrl, rebuildUrl }: ManageCourse
                         }}
                     >
                         {isRebuilding ? "Rebuilding..." : "Rebuild Course List and Reset Submissions"}
-                        <i className="fas fa-sync-alt tacos-btn__icon" aria-hidden="true" />
+                        <i className="fas fa-sync-alt" aria-hidden="true" />
                     </button>
                 </div>
             </section>
