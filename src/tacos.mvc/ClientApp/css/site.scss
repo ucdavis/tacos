@@ -187,85 +187,6 @@ form .form-control.focus {
   color: $secondary-font;
 }
 
-.tacos-home-panel {
-  background-color: #eef1f6;
-  padding: 5.5rem 1rem 6rem;
-}
-
-.tacos-home-panel__content {
-  max-width: 72rem;
-  margin: 0 auto;
-}
-
-.tacos-home-panel__intro {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.tacos-home-panel__title {
-  color: #002f6c;
-  font-size: clamp(3.5rem, 6vw, 4.75rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 0 0 1.5rem;
-}
-
-.tacos-home-panel__subtitle {
-  color: #4d4d4d;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0;
-}
-
-.tacos-home-panel__body {
-  max-width: 70rem;
-  margin: 0 auto;
-  color: $primary-font;
-  font-size: 1.15rem;
-  line-height: 1.75;
-}
-
-.tacos-home-panel__body p {
-  margin: 0 0 1.25rem;
-}
-
-.tacos-home-panel__section-title {
-  color: #0b3262;
-  font-size: 2.1rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 1rem;
-}
-
-.tacos-home-panel__section-title--link a {
-  color: #0f6ddf;
-  text-decoration: none;
-}
-
-.tacos-home-panel__section-title--link a:hover,
-.tacos-home-panel__section-title--link a:focus,
-.tacos-home-panel__section-title--link a:focus-visible {
-  color: #0f6ddf;
-  text-decoration: underline;
-}
-
-.tacos-home-panel__timeline {
-  list-style: none;
-  margin: 0 0 1.75rem;
-  padding: 0;
-}
-
-.tacos-home-panel__timeline li {
-  margin-bottom: 0.15rem;
-}
-
-.tacos-home-panel__actions {
-  margin-top: 2.25rem;
-  text-align: center;
-}
-
 hr {
   border: 0;
   border-top: 1px solid #d3dbe5;
@@ -1265,30 +1186,6 @@ hr {
 
 .tacos-department-roles-table tbody td {
   vertical-align: middle;
-}
-
-@media (max-width: 767px) {
-  .tacos-home-panel {
-    padding-top: 3rem;
-    padding-bottom: 3.5rem;
-  }
-
-  .tacos-home-panel__intro {
-    margin-bottom: 2rem;
-  }
-
-  .tacos-home-panel__subtitle {
-    font-size: 1.4rem;
-  }
-
-  .tacos-home-panel__body {
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-
-  .tacos-home-panel__section-title {
-    font-size: 1.8rem;
-  }
 }
 
 body.tacos-modal-open {

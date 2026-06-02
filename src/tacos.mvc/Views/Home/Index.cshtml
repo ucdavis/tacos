@@ -1,42 +1,47 @@
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<section class="tacos-home-panel">
-    <div class="tacos-home-panel__content">
-        <div class="tacos-home-panel__intro">
-            <h1 class="tacos-home-panel__title">TA/Reader Calculation App</h1>
-            <p class="tacos-home-panel__subtitle">CA&amp;ES TA/Reader funding request system</p>
-        </div>
+<section class="container flex flex-col gap-8 pt-8 pb-12 md:gap-10 md:pt-12 md:pb-16">
+    <div class="grid grid-cols-1 gap-8 border-b border-base-300 pb-8 md:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] md:gap-12 md:pb-10">
+        <div class="min-w-0">
+            <p class="mb-3 text-sm font-extrabold leading-tight text-info uppercase">CA&amp;ES funding requests</p>
+            <h1 class="m-0 max-w-3xl text-[2.5rem] font-extrabold leading-[1.05] text-primary md:text-[clamp(2.75rem,5vw,4.25rem)]">TA/Reader Calculation App</h1>
+            <p class="mt-4 max-w-2xl text-lg leading-normal text-base-content/75 md:text-xl">Review course data, submit annual requests, and track exception approvals for TA/Reader support.</p>
 
-        <div class="tacos-home-panel__body">
-            <h4 class="tacos-home-panel__section-title tacos-home-panel__section-title--link">
-                <a href="/CAES-TA-Reader-Criteria-Fall-2026.pdf">
-                    CA&amp;ES TA/Reader Criteria
+            <div class="mt-7 flex flex-wrap gap-3">
+                <a asp-controller="Requests" asp-action="index" class="btn btn-primary">
+                    View Requests
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
-            </h4>
-            <p>
-                Criteria for central TA/Reader funding are updated regularly by a committee of CA&amp;ES Faculty.
-            </p>
-            <p>
-                Requests for additional TA or Reader support for courses with unusually special circumstances will be considered using the exception request process.
-            </p>
-
-            <h4 class="tacos-home-panel__section-title">Annual Timeline</h4>
-            <ul class="tacos-home-panel__timeline">
-                <li>March – Annual data refresh</li>
-                <li>April – Call for departments to begin reviewing and entering annual TA/Reader submissions</li>
-                <li>August – Deadline for departments to review and finalize annual TA/Reader submissions</li>
-                <li>September-October – Dean’s Office plans to allocate annual TA/Reader funding to departments</li>
-            </ul>
-
-            <p>
-                Ad-hoc exception requests for changed circumstances (example: adding a new section to reduce waitlist) may be submitted throughout the year and funding will be allocated upon approval.
-            </p>
-
-            <div class="tacos-home-panel__actions">
-                <a asp-controller="Requests" asp-action="index" class="btn btn-secondary">View My Existing Requests</a>
             </div>
         </div>
+
+        <div class="min-w-0 pt-1 text-base leading-relaxed text-base-content">
+            <h2 class="mb-4 text-3xl font-extrabold leading-tight text-primary">CA&amp;ES TA/Reader Criteria</h2>
+            <p class="mb-4">
+                Criteria for central TA/Reader funding are updated regularly by a committee of CA&amp;ES Faculty.
+            </p>
+            <p class="mb-4">
+                Requests for additional TA or Reader support for courses with unusually special circumstances will be considered using the exception request process.
+            </p>
+            <a class="link link-primary font-semibold" href="/CAES-TA-Reader-Criteria-Fall-2026.pdf">
+                Read the current criteria
+            </a>
+        </div>
+    </div>
+
+    <div class="min-w-0 text-base-content">
+        <h2 class="mb-4 text-3xl font-extrabold leading-tight text-primary">Annual Timeline</h2>
+        <ol class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <li class="min-w-0 border-t-4 border-secondary pt-4 leading-normal text-base-content/75"><span class="mb-2 block font-extrabold text-primary">March</span> Annual data refresh</li>
+            <li class="min-w-0 border-t-4 border-secondary pt-4 leading-normal text-base-content/75"><span class="mb-2 block font-extrabold text-primary">April</span> Departments begin reviewing and entering annual TA/Reader submissions</li>
+            <li class="min-w-0 border-t-4 border-secondary pt-4 leading-normal text-base-content/75"><span class="mb-2 block font-extrabold text-primary">August</span> Deadline for departments to review and finalize annual TA/Reader submissions</li>
+            <li class="min-w-0 border-t-4 border-secondary pt-4 leading-normal text-base-content/75"><span class="mb-2 block font-extrabold text-primary">September-October</span> Dean's Office plans annual TA/Reader funding allocations</li>
+        </ol>
+
+        <p class="mt-7 max-w-4xl text-lg leading-relaxed text-base-content/75">
+            Ad-hoc exception requests for changed circumstances may be submitted throughout the year and funded upon approval.
+        </p>
     </div>
 </section>
