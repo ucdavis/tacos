@@ -15,8 +15,6 @@ html {
 // Duplicating them here with local relative URLs causes dev font requests to
 // fall through to the ASP.NET SPA proxy.
 
-
-
 .tacos-section-gap {
   margin-bottom: 1.5rem;
 }
@@ -61,7 +59,9 @@ html {
   background-clip: padding-box;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 
   &:focus {
     border-color: $legacy-secondary-color;
@@ -242,7 +242,7 @@ hr {
 
 .tacos-circle-footer__logo {
   display: block;
-  width: 100%;
+  width: 66%;
   height: auto;
 }
 
@@ -1454,23 +1454,23 @@ dialog.tacos-dialog .tacos-dialog__backdrop button {
 }
 
 .table {
-    font-size: 1rem;
-    margin-top: 3rem;
-    margin-bottom: 5rem;
-    border-radius: 0;
+  font-size: 1rem;
+  margin-top: 3rem;
+  margin-bottom: 5rem;
+  border-radius: 0;
 
-    thead,
-    tbody,
-    tfoot {
-        font-size: inherit;
-        color: $primary-font;
-    }
+  thead,
+  tbody,
+  tfoot {
+    font-size: inherit;
+    color: $primary-font;
+  }
 
-    th,
-    td {
-        font-size: inherit;
-        vertical-align: baseline;
-    }
+  th,
+  td {
+    font-size: inherit;
+    vertical-align: baseline;
+  }
 }
 
 dt {
@@ -1533,7 +1533,8 @@ dd {
   inset: 0;
   z-index: -1;
   content: "";
-  background: url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
+  background:
+    url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
     linear-gradient(to right, #183357, #d9b337);
   background-repeat: no-repeat;
   background-size: cover;
@@ -1568,7 +1569,6 @@ dd {
 .requests-table-scroll {
   overflow-x: auto;
 }
-
 
 table.requests {
   margin-top: 0;
