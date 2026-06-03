@@ -41,10 +41,6 @@
   --color-warning-content: var(--color-light-font);
 }
 
-h2 {
-  @apply text-2xl font-bold;
-}
-
 html {
   background-color: var(--color-light-bg-100);
 }

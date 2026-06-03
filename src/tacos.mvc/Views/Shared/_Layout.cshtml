@@ -45,8 +45,8 @@
             </div>
         </div>
 
-        <div id="siteNavigation" class="hidden w-full border-t border-base-300 pt-1 lg:flex">
-            <nav class="tabs tabs-border tabs-sm w-full flex-nowrap overflow-x-auto" aria-label="Primary navigation">
+        <div id="siteNavigation" class="hidden w-full border-base-300 pt-1 lg:flex">
+            <nav class="tabs tabs-border tabs-lg w-full flex-nowrap overflow-x-auto" aria-label="Primary navigation">
                 <a class="tab @(currentController == "Requests" ? "tab-active text-primary font-semibold" : "")" asp-controller="Requests" asp-action="index" aria-current="@(currentController == "Requests" ? "page" : null)">Requests</a>
                 <a class="tab @(currentController == "Courses" ? "tab-active text-primary font-semibold" : "")" asp-controller="Courses" asp-action="index" aria-current="@(currentController == "Courses" ? "page" : null)">Courses</a>
                 <a class="tab @(currentController == "Faqs" ? "tab-active text-primary font-semibold" : "")" asp-controller="Faqs" asp-action="index" aria-current="@(currentController == "Faqs" ? "page" : null)">FAQ</a>
