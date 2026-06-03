@@ -1,6 +1,5 @@
 @use "depends" as *;
 @use "animations";
-@use "regions";
 @use "vendor";
 
 @import "pretty-checkbox/dist/pretty-checkbox.css";
@@ -68,12 +67,6 @@ html {
     outline: 0;
     box-shadow: 0 0.02rem 0 0.1rem $legacy-secondary-focus-shadow;
   }
-}
-
-form .form-control:focus,
-form .form-control.focus {
-  border-color: $legacy-secondary-color;
-  box-shadow: 0 0.02rem 0 0.1rem $legacy-secondary-focus-shadow;
 }
 
 .tacos-select {
@@ -1380,24 +1373,6 @@ dialog.tacos-dialog .tacos-dialog__backdrop button {
 .tacos-tooltip {
   max-width: 16rem;
   transition: opacity 0.15s ease-in-out;
-}
-
-.tacos-alert__close {
-  padding: 0;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  cursor: pointer;
-  opacity: 0.65;
-
-  &:hover,
-  &:focus,
-  &:focus-visible,
-  &:active {
-    box-shadow: none;
-    opacity: 1;
-  }
 }
 
 .tacos-tooltip__content {
