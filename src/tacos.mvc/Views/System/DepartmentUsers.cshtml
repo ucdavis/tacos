@@ -7,7 +7,7 @@
     var departmentSelectItems = departments.Select(d => new SelectListItem() { Text = d.Name, Value = d.Id.ToString() });
 }
 
-<div class="tacos-page-shell tacos-page-stack">
+<div class="container tacos-page-stack">
 
     <h2 class="tacos-page-heading">Manage Department Roles</h2>
 
@@ -29,7 +29,7 @@
                 <tr>
                     <td>
                         <form method="post" asp-action="RemoveUserToDepartmentRole" asp-route-userId="@row.UserId" asp-route-departmentId="@row.DepartmentId" asp-antiforgery="true">
-                            <button class="tacos-btn tacos-btn--danger tacos-btn--icon-only" type="submit" aria-label="Remove @row.User.Name from @row.Department.Name" title="Remove @row.User.Name from @row.Department.Name">
+                            <button class="btn btn-error btn-square btn-sm" type="submit" aria-label="Remove @row.User.Name from @row.Department.Name" title="Remove @row.User.Name from @row.Department.Name">
                                 <i class="fas fa-trash" aria-hidden="true"></i>
                             </button>
                         </form>
@@ -45,7 +45,7 @@
         </table>
     </div>
 
-    <button type="button" class="tacos-btn tacos-btn--primary" onclick="document.getElementById('addUserToDepartmentRoleModal').showModal()">
+    <button type="button" class="btn btn-primary" onclick="document.getElementById('addUserToDepartmentRoleModal').showModal()">
         Add User to Department
     </button>
 
@@ -69,8 +69,8 @@
                     </div>
                 </div>
                 <div class="tacos-modal__footer">
-                    <button type="button" class="tacos-btn tacos-btn--secondary" onclick="this.closest('dialog').close()">Close</button>
-                    <button type="submit" class="tacos-btn tacos-btn--primary">Add User</button>
+                    <button type="button" class="btn" onclick="this.closest('dialog').close()">Close</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
                 </div>
             </form>
         </div>

@@ -116,38 +116,110 @@
       gap: 0.5rem;
     }
 
-    .dt-button,
-    .dt-button:visited {
+    .dt-buttons .dt-button,
+    .dt-buttons .dt-button:visited {
+      --btn-color: var(--color-primary);
+      --btn-fg: var(--color-primary-content);
+      --btn-p: 1rem;
+      --btn-bg: var(--btn-color);
+      --btn-border: var(--btn-bg);
+      --btn-shadow: 0 3px 2px -2px var(--btn-bg), 0 4px 3px -2px var(--btn-bg);
+      --size: calc(var(--size-field, 0.25rem) * 10);
+      --tw-prose-links: var(--btn-fg);
+
       align-items: center;
-      background-color: #f5e0a1 !important;
+      background-color: var(--btn-bg) !important;
       background-image: none !important;
-      border: 1px solid #f5e0a1 !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      color: $primary-color !important;
+      background-size: auto, calc(var(--noise) * 100%);
+      border-color: var(--btn-border) !important;
+      border-style: solid !important;
+      border-width: var(--border) !important;
+      border-start-start-radius: var(--join-ss, var(--radius-field)) !important;
+      border-start-end-radius: var(--join-se, var(--radius-field)) !important;
+      border-end-end-radius: var(--join-ee, var(--radius-field)) !important;
+      border-end-start-radius: var(--join-es, var(--radius-field)) !important;
+      box-shadow:
+        0 0.5px 0 0.5px oklch(100% 0 0 / calc(var(--depth) * 6%)) inset,
+        var(--btn-shadow) !important;
+      color: var(--btn-fg) !important;
       cursor: pointer;
       display: inline-flex;
+      flex-shrink: 0;
+      flex-wrap: nowrap;
       font: inherit;
+      font-size: var(--fontsize, 0.875rem);
+      font-weight: 600;
+      gap: 0.375rem;
+      height: var(--size);
       justify-content: center;
-      line-height: 1.5;
+      line-height: 1;
       margin: 0 !important;
-      min-height: 0;
-      padding: 0.5em 1em !important;
+      min-height: var(--size);
+      outline-color: var(--btn-color);
+      outline-offset: 2px;
+      padding-inline: var(--btn-p) !important;
+      text-align: center;
       text-decoration: none !important;
+      text-shadow: 0 0.5px oklch(100% 0 0 / calc(var(--depth) * 0.15));
+      touch-action: manipulation;
+      transition-duration: 0.2s;
+      transition-property: color, background-color, border-color, box-shadow;
+      transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+      user-select: none;
+      vertical-align: middle;
       white-space: nowrap;
     }
 
-    .dt-button:hover,
-    .dt-button:focus,
-    .dt-button:focus-visible,
-    .dt-button:active {
-      background-color: #faefce !important;
+    .dt-buttons .dt-button:hover,
+    .dt-buttons .dt-button:visited:hover {
+      --btn-bg: var(--btn-color);
+      background-color: var(--btn-bg) !important;
       background-image: none !important;
-      border-color: #faefce !important;
-      box-shadow: none !important;
-      color: $primary-color !important;
-      outline: 0;
+      border-color: var(--btn-border) !important;
+      color: var(--btn-fg) !important;
       text-decoration: none !important;
+    }
+
+    .dt-buttons .dt-button:focus,
+    .dt-buttons .dt-button:focus-visible {
+      box-shadow:
+        0 0.5px 0 0.5px oklch(100% 0 0 / calc(var(--depth) * 6%)) inset,
+        var(--btn-shadow) !important;
+      color: var(--btn-fg) !important;
+      isolation: isolate;
+      outline: 2px solid var(--btn-color);
+      text-decoration: none !important;
+    }
+
+    .dt-buttons .dt-button:active {
+      --btn-bg: var(--btn-color);
+      --btn-border: var(--btn-color);
+      --btn-shadow: 0 0 0 0 oklch(0% 0 0 / 0), 0 0 0 0 oklch(0% 0 0 / 0);
+      background-color: var(--btn-bg) !important;
+      background-image: none !important;
+      border-color: var(--btn-border) !important;
+      color: var(--btn-fg) !important;
+      translate: 0 0.5px;
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .dt-buttons .dt-button,
+      .dt-buttons .dt-button:visited {
+        --btn-border: color-mix(in oklab, var(--btn-bg), #000 calc(var(--depth) * 5%));
+        --btn-shadow:
+          0 3px 2px -2px color-mix(in oklab, var(--btn-bg) calc(var(--depth) * 30%), #0000),
+          0 4px 3px -2px color-mix(in oklab, var(--btn-bg) calc(var(--depth) * 30%), #0000);
+      }
+
+      .dt-buttons .dt-button:hover,
+      .dt-buttons .dt-button:visited:hover {
+        --btn-bg: color-mix(in oklab, var(--btn-color), #000 7%);
+      }
+
+      .dt-buttons .dt-button:active {
+        --btn-bg: color-mix(in oklab, var(--btn-color), #000 5%);
+        --btn-border: color-mix(in oklab, var(--btn-color), #000 7%);
+      }
     }
 
     .dataTables_paginate {
@@ -168,7 +240,7 @@
       background: #fff !important;
       border: 1px solid #dee2e6 !important;
       box-shadow: none !important;
-      color: #007bff !important;
+      color: $primary-color !important;
       display: inline-flex;
       justify-content: center;
       line-height: 1.25;
@@ -191,8 +263,8 @@
     }
 
     .dataTables_paginate .page-item.active .page-link {
-      background: #007bff !important;
-      border-color: #007bff !important;
+      background: $primary-color !important;
+      border-color: $primary-color !important;
       color: #fff !important;
       z-index: 1;
     }
@@ -204,7 +276,7 @@
       background: #e9ecef !important;
       border-color: #dee2e6 !important;
       box-shadow: none !important;
-      color: #007bff !important;
+      color: $primary-color !important;
       outline: 0;
       text-decoration: none !important;
     }
@@ -213,8 +285,8 @@
     .dataTables_paginate .page-item.active .page-link:focus,
     .dataTables_paginate .page-item.active .page-link:focus-visible,
     .dataTables_paginate .page-item.active .page-link:active {
-      background: #007bff !important;
-      border-color: #007bff !important;
+      background: $primary-color !important;
+      border-color: $primary-color !important;
       color: #fff !important;
     }
 
@@ -237,7 +309,7 @@
       background: #fff !important;
       border: 1px solid #dee2e6 !important;
       box-shadow: none !important;
-      color: #007bff !important;
+      color: $primary-color !important;
       display: inline-flex;
       justify-content: center;
       line-height: 1.25;
@@ -273,8 +345,8 @@
     .dataTables_paginate .paginate_button.current,
     .dataTables_paginate .paginate_button.current:hover,
     .dataTables_paginate .paginate_button.current:visited {
-      background: #007bff !important;
-      border-color: #007bff !important;
+      background: $primary-color !important;
+      border-color: $primary-color !important;
       color: #fff !important;
       z-index: 1;
     }
@@ -287,7 +359,7 @@
       background: #e9ecef !important;
       border-color: #dee2e6 !important;
       box-shadow: none !important;
-      color: #007bff !important;
+      color: $primary-color !important;
       outline: 0;
       text-decoration: none !important;
     }
@@ -300,7 +372,7 @@
     .ellipsis {
       background: #fff !important;
       border-color: #dee2e6 !important;
-      color: #007bff !important;
+      color: $primary-color !important;
       cursor: default !important;
       opacity: 1;
     }

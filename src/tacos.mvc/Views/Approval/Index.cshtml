@@ -1,7 +1,7 @@
 @using tacos.core.Resources
 @model tacos.core.Data.Request[]
 
-<div class="tacos-page-shell tacos-page-shell--full">
+<div class="container">
     <div>
         <table class="table tacos-page-table w-full" id="requestTable">
             <thead>
@@ -51,12 +51,12 @@
                                 <div class="flex flex-col items-start gap-2">
                                     <form asp-action="Edit" asp-route-id="@request.Id" method="POST">
                                         <input type="hidden" name="approved" value="true" />
-                                        <button type="submit" class="tacos-btn tacos-btn--primary approval-form-submit" onclick="document.getElementById('approvalModal').showModal()">
+                                        <button type="submit" class="btn btn-primary btn-sm approval-form-submit" onclick="document.getElementById('approvalModal').showModal()">
                                             <span class="approval-form-submit-text">Approve</span>
                                             <span class="approval-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
                                         </button>
                                     </form>
-                                    <button type="button" class="tacos-btn tacos-btn--primary" data-denial-dialog-trigger="true" onclick="document.getElementById('denialModal').showModal()">
+                                    <button type="button" class="btn btn-error btn-sm" data-denial-dialog-trigger="true" onclick="document.getElementById('denialModal').showModal()">
                                         Deny
                                     </button>
                                 </div>
@@ -106,8 +106,8 @@
                 </div>
             </div>
             <div class="tacos-modal__footer">
-                <button type="button" class="tacos-btn tacos-btn--secondary" onclick="this.closest('dialog').close()">Cancel</button>
-                <button type="submit" class="tacos-btn tacos-btn--primary deny-form-submit">
+                <button type="button" class="btn" onclick="this.closest('dialog').close()">Cancel</button>
+                <button type="submit" class="btn btn-primary deny-form-submit">
                     <span class="deny-form-submit-text">Deny Exception</span>
                     <span class="deny-form-submit-loading-icon" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i></span>
                 </button>

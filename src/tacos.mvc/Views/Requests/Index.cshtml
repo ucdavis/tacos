@@ -7,7 +7,7 @@
     var departments = ViewBag.Departments as IList<Department>;
 }
 
-<div class="tacos-page-shell tacos-page-stack">
+<div class="container tacos-page-stack">
 
     @{
         var departmentSelectItems = departments.Select(d => new SelectListItem()
@@ -31,7 +31,7 @@
                 <h4 class="tacos-page-heading">@department.Name</h4>
             </div>
             <div>
-                <a class="tacos-btn tacos-btn--primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Create New Submission</a>
+                <a class="btn btn-primary" asp-controller="Requests" asp-action="edit" asp-route-code="@department.Code" asp-route-jsAction="create">Create New Submission</a>
             </div>
         </div>
         
@@ -64,7 +64,7 @@
                             @request.SubmittedOn?.ToString("d")
                         </td>
                         <td class="tacos-page-table__actions">
-                            <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="tacos-btn tacos-btn--primary">
+                            <a asp-action="Edit" asp-route-id="@request.Id" asp-route-code="@request.Department.Code" asp-route-jsAction="edit" class="btn btn-primary btn-sm">
                                 <i class="fas fa-edit tacos-inline-icon-start"></i> Edit
                             </a>
                         </td>

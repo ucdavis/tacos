@@ -1,6 +1,5 @@
 @use "depends" as *;
 @use "animations";
-@use "regions";
 @use "vendor";
 
 @import "pretty-checkbox/dist/pretty-checkbox.css";
@@ -14,29 +13,6 @@ html {
 // Proxima Nova font faces are provided by the Gunrock import in `main.css`.
 // Duplicating them here with local relative URLs causes dev font requests to
 // fall through to the ASP.NET SPA proxy.
-
-
-
-// fix stupid ucdavis styles
-.btn {
-  border-radius: 0;
-  box-shadow: none;
-  height: auto;
-  min-height: 0;
-  padding: 0.5rem 1rem;
-  line-height: 1.5;
-
-  &.btn-link {
-    border: none;
-  }
-
-  &:hover,
-  &:active,
-  &:focus,
-  &:focus-visible {
-    box-shadow: none;
-  }
-}
 
 .tacos-section-gap {
   margin-bottom: 1.5rem;
@@ -53,119 +29,6 @@ html {
 
 .tacos-action-row--end {
   justify-content: flex-end;
-}
-
-.tacos-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  border-radius: 0;
-  box-shadow: none;
-  cursor: pointer;
-  font: inherit;
-  line-height: 1.5;
-  min-height: 0;
-  padding: 0.5em 1em;
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:hover,
-  &:focus,
-  &:focus-visible,
-  &:active {
-    box-shadow: none;
-    text-decoration: none;
-  }
-
-  &:focus-visible {
-    outline: 2px solid rgba(0, 123, 255, 0.25);
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
-  }
-}
-
-.tacos-btn--primary {
-  background-color: $primary-color;
-  border-color: $primary-color;
-  color: #fff;
-
-  &:hover,
-  &:active {
-    background-color: #2f5b8c;
-    border-color: #2f5b8c;
-    color: #fff;
-  }
-
-  &:disabled {
-    background-color: transparent;
-    border-color: $primary-color;
-    color: $primary-color;
-    opacity: 1;
-  }
-}
-
-.tacos-btn--secondary {
-  background-color: #f5e0a1;
-  border-color: transparent;
-  color: #004088;
-
-  &:hover,
-  &:active {
-    background-color: #faefce;
-    border-color: transparent;
-    color: #004088;
-  }
-
-  &:disabled {
-    background-color: transparent;
-    border-color: #f5e0a1;
-    color: #004088;
-    opacity: 1;
-  }
-}
-
-.tacos-btn--danger {
-  background-color: #ba0c2f;
-  border-color: #ba0c2f;
-  color: #fff;
-
-  &:hover,
-  &:active {
-    background-color: #f60334;
-    border-color: #f60334;
-    color: #fff;
-  }
-
-  &:disabled {
-    background-color: transparent;
-    border-color: #ba0c2f;
-    color: #ba0c2f;
-    opacity: 1;
-  }
-}
-
-.tacos-btn--icon-only {
-  padding-top: 0.82em;
-  padding-bottom: 0.82em;
-  padding-left: 1.065em;
-  padding-right: 1.065em;
-
-  > .fa,
-  > .far,
-  > .fas {
-    font-size: 1rem;
-    line-height: 1;
-  }
-}
-
-.tacos-btn__icon {
-  margin-left: 0.5rem;
 }
 
 .tacos-inline-icon-start {
@@ -195,19 +58,15 @@ html {
   background-clip: padding-box;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 
   &:focus {
     border-color: $legacy-secondary-color;
     outline: 0;
     box-shadow: 0 0.02rem 0 0.1rem $legacy-secondary-focus-shadow;
   }
-}
-
-form .form-control:focus,
-form .form-control.focus {
-  border-color: $legacy-secondary-color;
-  box-shadow: 0 0.02rem 0 0.1rem $legacy-secondary-focus-shadow;
 }
 
 .tacos-select {
@@ -321,252 +180,10 @@ form .form-control.focus {
   color: $secondary-font;
 }
 
-.tacos-site-nav {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0;
-}
-
-.tacos-site-nav__banner {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  flex-basis: 100%;
-  padding: 1.25rem 1.25rem 0.95rem;
-  font-size: 1.25rem;
-  color: #fff;
-  isolation: isolate;
-}
-
-.tacos-site-nav__banner::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background: url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
-    linear-gradient(to right, #183357, #d9b337);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.tacos-site-nav__brand {
-  display: block;
-  max-width: 10em;
-  font-size: inherit;
-}
-
-.tacos-site-nav__brand img {
-  display: block;
-  max-width: 100%;
-}
-
-.tacos-site-nav__toggle {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.75rem;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  padding: 0;
-  color: #fff;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  cursor: pointer;
-}
-
-.tacos-site-nav__toggle:hover,
-.tacos-site-nav__toggle:focus,
-.tacos-site-nav__toggle:focus-visible,
-.tacos-site-nav__toggle:active {
-  color: #fff;
-  background: transparent;
-  box-shadow: none;
-}
-
-.tacos-site-nav__panel {
-  display: none;
-  width: 100%;
-  color: $primary-color;
-  background-color: #fff;
-  border-bottom: 1px solid #d3dbe5;
-  box-shadow: none;
-}
-
-.tacos-site-nav__panel.is-open {
-  display: block;
-}
-
-.tacos-site-nav__inner {
-  display: flex;
-  flex-direction: column;
-}
-
-.tacos-site-nav__links {
-  width: 100%;
-}
-
-.tacos-site-nav__link {
-  display: block;
-  padding: 1rem 1.5rem;
-  color: $primary-color;
-  font-size: 0.965rem;
-  line-height: 1.55;
-  border-radius: 0;
-  text-decoration: none;
-}
-
-.tacos-site-nav__link:hover,
-.tacos-site-nav__link:focus,
-.tacos-site-nav__link:focus-visible,
-.tacos-site-nav__link:active {
-  color: $primary-color;
-  background-color: $legacy-secondary-color;
-  text-decoration: none;
-}
-
-.tacos-site-nav__link--active {
-  background-color: transparent;
-}
-
-.tacos-site-nav__user {
-  padding: 0 1.5rem 1rem;
-  color: $primary-color;
-  font-size: 1rem;
-  line-height: 1.55;
-  white-space: nowrap;
-}
-
-@media (min-width: 992px) {
-  .tacos-site-nav__toggle {
-    display: none;
-  }
-
-  .tacos-site-nav__panel {
-    display: block;
-  }
-
-  .tacos-site-nav__inner {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
-  }
-
-  .tacos-site-nav__links {
-    width: auto;
-    flex: 1 1 auto;
-  }
-
-  .tacos-site-nav__user {
-    padding: 0;
-    margin-left: 1rem;
-    text-align: right;
-    flex: 0 0 auto;
-  }
-}
-
-.tacos-home-panel {
-  background-color: #eef1f6;
-  padding: 5.5rem 1rem 6rem;
-}
-
-.tacos-home-panel__content {
-  max-width: 72rem;
-  margin: 0 auto;
-}
-
-.tacos-home-panel__intro {
-  margin-bottom: 3rem;
-  text-align: center;
-}
-
-.tacos-home-panel__title {
-  color: #002f6c;
-  font-size: clamp(3.5rem, 6vw, 4.75rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 0 0 1.5rem;
-}
-
-.tacos-home-panel__subtitle {
-  color: #4d4d4d;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0;
-}
-
-.tacos-home-panel__body {
-  max-width: 70rem;
-  margin: 0 auto;
-  color: $primary-font;
-  font-size: 1.15rem;
-  line-height: 1.75;
-}
-
-.tacos-home-panel__body p {
-  margin: 0 0 1.25rem;
-}
-
-.tacos-home-panel__section-title {
-  color: #0b3262;
-  font-size: 2.1rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 1rem;
-}
-
-.tacos-home-panel__section-title--link a {
-  color: #0f6ddf;
-  text-decoration: none;
-}
-
-.tacos-home-panel__section-title--link a:hover,
-.tacos-home-panel__section-title--link a:focus,
-.tacos-home-panel__section-title--link a:focus-visible {
-  color: #0f6ddf;
-  text-decoration: underline;
-}
-
-.tacos-home-panel__timeline {
-  list-style: none;
-  margin: 0 0 1.75rem;
-  padding: 0;
-}
-
-.tacos-home-panel__timeline li {
-  margin-bottom: 0.15rem;
-}
-
-.tacos-home-panel__actions {
-  margin-top: 2.25rem;
-  text-align: center;
-}
-
 hr {
   border: 0;
   border-top: 1px solid #d3dbe5;
   margin: 0;
-}
-
-.tacos-page-shell {
-  max-width: 1140px;
-  margin: 0 auto;
-  padding: 2.75rem 1rem 1.5rem;
-}
-
-.tacos-page-shell--full {
-  max-width: none;
-}
-
-.tacos-page-shell--flash {
-  padding-top: 1rem;
-  padding-bottom: 0;
 }
 
 .tacos-page-stack > * + * {
@@ -575,6 +192,71 @@ hr {
 
 .tacos-page-stack > .tacos-page-divider + * {
   margin-top: 0.75rem;
+}
+
+.tacos-circle-footer {
+  position: relative;
+  min-height: 10rem;
+  margin-top: 4rem;
+  overflow: hidden;
+}
+
+.tacos-circle-footer__gold,
+.tacos-circle-footer__blue {
+  display: none;
+  position: absolute;
+}
+
+.tacos-circle-footer__gold {
+  left: -8rem;
+  top: 0;
+}
+
+.tacos-circle-footer__blue {
+  right: -8rem;
+  bottom: -15.5rem;
+}
+
+.tacos-circle-footer__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+}
+
+.tacos-circle-footer__content a {
+  display: inline-flex;
+  justify-content: center;
+  max-width: min(100%, 26rem);
+}
+
+.tacos-circle-footer__logo {
+  display: block;
+  width: 66%;
+  height: auto;
+}
+
+.tacos-circle-footer__credit {
+  margin: 0.5rem 0 0;
+  color: $secondary-font;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.tacos-circle-footer__credit a {
+  margin-left: 0.25rem;
+  color: inherit;
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .tacos-circle-footer__gold,
+  .tacos-circle-footer__blue {
+    display: block;
+  }
 }
 
 .tacos-page-divider {
@@ -709,7 +391,7 @@ hr {
 }
 
 .tacos-course-search__button {
-  margin: 0.45rem;
+  margin: 0.7rem;
   border-radius: 0.6rem;
   padding-right: 1.5rem;
   padding-left: 1.5rem;
@@ -775,13 +457,7 @@ hr {
   }
 }
 
-.tacos-course-detail-page {
-  min-height: calc(100vh - 6rem);
-  background-color: #f3f4f6;
-}
-
 .tacos-course-detail {
-  max-width: 1320px;
   padding-top: 2.5rem;
   padding-bottom: 5rem;
   color: #061525;
@@ -1164,8 +840,8 @@ hr {
 }
 
 .tacos-link-list a {
-  color: #007bff;
-  text-decoration: none;
+  color: #0b3262;
+  text-decoration: underline;
 }
 
 .tacos-link-list a:hover,
@@ -1273,7 +949,7 @@ hr {
     flex-direction: column;
   }
 
-  .tacos-faq__header .tacos-btn {
+  .tacos-faq__header .btn {
     width: 100%;
   }
 }
@@ -1428,14 +1104,14 @@ hr {
   background-color: #bee5eb;
 }
 
-.tacos-page-table a:not(.tacos-btn) {
-  color: #007bff;
-  text-decoration: none;
+.tacos-page-table a:not(.btn) {
+  color: #0b3262;
+  text-decoration: underline;
 }
 
-.tacos-page-table a:not(.tacos-btn):hover,
-.tacos-page-table a:not(.tacos-btn):focus,
-.tacos-page-table a:not(.tacos-btn):focus-visible {
+.tacos-page-table a:not(.btn):hover,
+.tacos-page-table a:not(.btn):focus,
+.tacos-page-table a:not(.btn):focus-visible {
   color: #0056b3;
   text-decoration: underline;
 }
@@ -1498,30 +1174,6 @@ hr {
 
 .tacos-department-roles-table tbody td {
   vertical-align: middle;
-}
-
-@media (max-width: 767px) {
-  .tacos-home-panel {
-    padding-top: 3rem;
-    padding-bottom: 3.5rem;
-  }
-
-  .tacos-home-panel__intro {
-    margin-bottom: 2rem;
-  }
-
-  .tacos-home-panel__subtitle {
-    font-size: 1.4rem;
-  }
-
-  .tacos-home-panel__body {
-    font-size: 1rem;
-    line-height: 1.7;
-  }
-
-  .tacos-home-panel__section-title {
-    font-size: 1.8rem;
-  }
 }
 
 body.tacos-modal-open {
@@ -1723,24 +1375,6 @@ dialog.tacos-dialog .tacos-dialog__backdrop button {
   transition: opacity 0.15s ease-in-out;
 }
 
-.tacos-alert__close {
-  padding: 0;
-  color: inherit;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  cursor: pointer;
-  opacity: 0.65;
-
-  &:hover,
-  &:focus,
-  &:focus-visible,
-  &:active {
-    box-shadow: none;
-    opacity: 1;
-  }
-}
-
 .tacos-tooltip__content {
   position: relative;
   width: max-content;
@@ -1790,23 +1424,23 @@ dialog.tacos-dialog .tacos-dialog__backdrop button {
 }
 
 .table {
-    font-size: 1rem;
-    margin-top: 3rem;
-    margin-bottom: 5rem;
-    border-radius: 0;
+  font-size: 1rem;
+  margin-top: 3rem;
+  margin-bottom: 5rem;
+  border-radius: 0;
 
-    thead,
-    tbody,
-    tfoot {
-        font-size: inherit;
-        color: $primary-font;
-    }
+  thead,
+  tbody,
+  tfoot {
+    font-size: inherit;
+    color: $primary-font;
+  }
 
-    th,
-    td {
-        font-size: inherit;
-        vertical-align: baseline;
-    }
+  th,
+  td {
+    font-size: inherit;
+    vertical-align: baseline;
+  }
 }
 
 dt {
@@ -1869,7 +1503,8 @@ dd {
   inset: 0;
   z-index: -1;
   content: "";
-  background: url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
+  background:
+    url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
     linear-gradient(to right, #183357, #d9b337);
   background-repeat: no-repeat;
   background-size: cover;
@@ -1897,14 +1532,13 @@ dd {
   gap: 0.25rem;
 }
 
-.tacos-summary-bar__actions .tacos-btn {
+.tacos-summary-bar__actions .btn {
   font-size: 1rem;
 }
 
 .requests-table-scroll {
   overflow-x: auto;
 }
-
 
 table.requests {
   margin-top: 0;

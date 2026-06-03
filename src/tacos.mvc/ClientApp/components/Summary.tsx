@@ -23,13 +23,13 @@ export default class Summary extends React.PureComponent<IProps, {}> {
     public saveButtonRender = () => {
         return (
             <button
-                className="tacos-btn tacos-btn--primary"
+                className="btn btn-primary gap-2"
                 disabled={!this.props.canSave || this.props.isProcessing}
                 onClick={this.props.onSave}
                 type="button"
             >
                 Save Changes
-                <i className="far fa-save tacos-btn__icon" />
+                <i className="far fa-save" />
             </button>
         );
     };
@@ -37,13 +37,13 @@ export default class Summary extends React.PureComponent<IProps, {}> {
     public submitButtonRender = () => {
         return (
             <button
-                className="tacos-btn tacos-btn--primary"
+                className="btn btn-primary gap-2"
                 disabled={!this.props.canSubmit || this.props.isProcessing}
                 onClick={this.props.onSubmit}
                 type="button"
             >
                 Submit for Approval
-                <i className="far fa-thumbs-up tacos-btn__icon" />
+                <i className="far fa-thumbs-up" />
             </button>
         );
     };
@@ -63,7 +63,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
                         <div className="tacos-summary-bar__actions">
                             <button
                                 disabled={this.props.isProcessing}
-                                className="tacos-btn tacos-btn--danger"
+                                className="btn btn-error"
                                 onClick={this.props.onReset}
                                 type="button"
                             >

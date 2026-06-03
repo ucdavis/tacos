@@ -140,7 +140,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
                             {this.renderRevokeButton()}
                             <button
                                 type="button"
-                                className="tacos-btn tacos-btn--secondary"
+                                className="btn"
                                 onClick={this.revokedToggle}
                             >
                                 Cancel
@@ -155,7 +155,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
     private renderRevokeButton = () => {
         if (this.state.isRevoking) {
             return (
-                <button type="button" className="tacos-btn tacos-btn--secondary" disabled={true}>
+                <button type="button" className="btn" disabled={true}>
                     <i className="fas fa-spinner fa-pulse fa-lg tacos-inline-icon-start" />
                     Revoking...
                 </button>
@@ -164,7 +164,7 @@ export default class ExceptionDetail extends React.PureComponent<IProps, IState>
             return (
                 <button
                     type="button"
-                    className="tacos-btn tacos-btn--primary"
+                    className="btn btn-primary"
                     onClick={this.onRevokeClick}
                 >
                     Revoke Approval

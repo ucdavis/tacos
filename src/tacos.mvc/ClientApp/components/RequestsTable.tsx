@@ -926,7 +926,7 @@ function renderRemoveButton(row: IRequestTableRow, onRemove: (i: number) => void
     return (
         <button
             aria-label="Remove request"
-            className="tacos-btn tacos-btn--danger tacos-btn--icon-only"
+            className="btn btn-error btn-square btn-sm"
             data-remove-request-button="true"
             type="button"
             onClick={() => onRemove(row.originalIndex)}

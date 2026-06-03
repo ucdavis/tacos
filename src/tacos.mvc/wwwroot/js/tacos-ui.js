@@ -1,21 +1,64 @@
 (function () {
     "use strict";
 
-    function toggleCollapse(button) {
-        const targetSelector = button.getAttribute("data-tacos-collapse-target");
+    function getCollapseTarget(selector) {
+        if (!selector) {
+            return null;
+        }
 
-        if (!targetSelector) {
+        return document.querySelector(selector);
+    }
+
+    function getCollapseButtons(target) {
+        const targetId = target.getAttribute("id");
+
+        if (!targetId) {
+            return [];
+        }
+
+        return Array.from(document.querySelectorAll(`[data-tacos-collapse-target="#${targetId}"]`));
+    }
+
+    function syncOffcanvasBodyState() {
+        const hasOpenOffcanvas = document.querySelector("[data-tacos-offcanvas].is-open") !== null;
+        document.body.classList.toggle("tacos-nav-open", hasOpenOffcanvas);
+    }
+
+    function setCollapseState(target, isExpanded) {
+        target.classList.toggle("is-open", isExpanded);
+
+        getCollapseButtons(target).forEach((button) => {
+            button.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+        });
+
+        syncOffcanvasBodyState();
+    }
+
+    function closeCollapseTarget(target) {
+        if (!target) {
             return;
         }
 
-        const target = document.querySelector(targetSelector);
+        setCollapseState(target, false);
+    }
+
+    function toggleCollapse(button) {
+        const target = getCollapseTarget(button.getAttribute("data-tacos-collapse-target"));
 
         if (!target) {
             return;
         }
 
-        const isExpanded = target.classList.toggle("is-open");
-        button.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+        const isExpanded = !target.classList.contains("is-open");
+        setCollapseState(target, isExpanded);
+
+        if (isExpanded && target.matches("[data-tacos-offcanvas]")) {
+            const closeButton = target.querySelector(".tacos-nav-panel [data-tacos-collapse-close]");
+
+            if (closeButton instanceof HTMLElement) {
+                closeButton.focus();
+            }
+        }
     }
 
     function dismissAlert(button) {
@@ -88,11 +131,24 @@
             return;
         }
 
+        const collapseCloseButton = target.closest("[data-tacos-collapse-close]");
+
+        if (collapseCloseButton) {
+            closeCollapseTarget(getCollapseTarget(collapseCloseButton.getAttribute("data-tacos-collapse-close")));
+            return;
+        }
+
         const collapseButton = target.closest("[data-tacos-collapse-target]");
 
         if (collapseButton) {
             toggleCollapse(collapseButton);
             return;
+        }
+
+        const offcanvasLink = target.closest("[data-tacos-offcanvas] a");
+
+        if (offcanvasLink && !window.matchMedia("(min-width: 1024px)").matches) {
+            closeCollapseTarget(offcanvasLink.closest("[data-tacos-offcanvas]"));
         }
 
         const faqToggleButton = target.closest("[data-tacos-faq-toggle]");
@@ -122,4 +178,23 @@
             syncFaqToggle(root);
         }
     }, true);
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") {
+            return;
+        }
+
+        document.querySelectorAll("[data-tacos-offcanvas].is-open").forEach(closeCollapseTarget);
+    });
+
+    const desktopNavigationQuery = window.matchMedia("(min-width: 1024px)");
+    const closeOpenOffcanvas = () => {
+        document.querySelectorAll("[data-tacos-offcanvas].is-open").forEach(closeCollapseTarget);
+    };
+
+    if (desktopNavigationQuery.addEventListener) {
+        desktopNavigationQuery.addEventListener("change", closeOpenOffcanvas);
+    } else {
+        desktopNavigationQuery.addListener(closeOpenOffcanvas);
+    }
 })();

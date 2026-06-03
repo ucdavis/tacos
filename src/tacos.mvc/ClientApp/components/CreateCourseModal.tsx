@@ -67,8 +67,8 @@ export default class CreateCourseModal extends React.PureComponent<IProps, IStat
                     </div>
                 </ModalBody>
                 <ModalFooter className="tacos-modal-footer--split">
-                    <button type="button" className="tacos-btn tacos-btn--secondary" onClick={onClose}>Cancel</button>
-                    <button type="button" className="tacos-btn tacos-btn--primary" onClick={this.onSubmit}>Submit</button>
+                    <button type="button" className="btn" onClick={onClose}>Cancel</button>
+                    <button type="button" className="btn btn-primary" onClick={this.onSubmit}>Submit</button>
                 </ModalFooter>
             </Modal>
         );
