@@ -53,7 +53,7 @@
         setCollapseState(target, isExpanded);
 
         if (isExpanded && target.matches("[data-tacos-offcanvas]")) {
-            const closeButton = target.querySelector("[data-tacos-collapse-close]");
+            const closeButton = target.querySelector(".tacos-nav-panel [data-tacos-collapse-close]");
 
             if (closeButton instanceof HTMLElement) {
                 closeButton.focus();
