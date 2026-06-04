@@ -1,5 +1,5 @@
 import "./main.css";
-import "./css/site.scss";
+import "./css/site.css";
 
 import "./pages/EditSubmission";
 import "./pages/ManageCourseRebuild";
