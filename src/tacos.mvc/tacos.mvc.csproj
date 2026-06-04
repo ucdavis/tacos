@@ -5,6 +5,7 @@
     <UserSecretsId>29b48ffe-453c-4330-9044-5990df642806</UserSecretsId>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
     <SpaRoot>ClientApp\</SpaRoot>
     <DotNetWatchContentFiles>false</DotNetWatchContentFiles>
