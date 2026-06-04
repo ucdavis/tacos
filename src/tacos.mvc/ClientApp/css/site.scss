@@ -851,6 +851,178 @@ hr {
   text-decoration: underline;
 }
 
+.tacos-admin-dashboard__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #d3dbe5;
+}
+
+.tacos-admin-dashboard__eyebrow {
+  margin: 0 0 0.35rem;
+  color: $legacy-secondary-color;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.tacos-admin-dashboard__intro {
+  max-width: 44rem;
+  margin: 0.6rem 0 0;
+  color: $secondary-font;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.tacos-admin-dashboard__status {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 0.55rem;
+  padding-top: 0.2rem;
+  color: #0b3262;
+  font-weight: 700;
+}
+
+.tacos-admin-dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.tacos-admin-card {
+  --tacos-admin-card-accent: #0b3262;
+  position: relative;
+  display: grid;
+  min-height: 12rem;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.2rem;
+  padding: 1.2rem;
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #d3dbe5;
+  border-top: 4px solid var(--tacos-admin-card-accent);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.6rem 1.25rem rgba(11, 50, 98, 0.08);
+  color: $primary-font;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.tacos-admin-card:hover,
+.tacos-admin-card:focus,
+.tacos-admin-card:focus-visible {
+  border-top-color: var(--tacos-admin-card-accent);
+  box-shadow: 0 0.9rem 1.6rem rgba(11, 50, 98, 0.13);
+  color: $primary-font;
+  text-decoration: none;
+}
+
+.tacos-admin-card:focus-visible {
+  outline: 3px solid rgba(0, 123, 255, 0.25);
+  outline-offset: 0.25rem;
+}
+
+.tacos-admin-card__icon {
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  background-color: #eef3f8;
+  border-radius: 0.5rem;
+  color: #0b3262;
+  font-size: 1.25rem;
+}
+
+.tacos-admin-card__body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tacos-admin-card__kicker {
+  color: $secondary-font;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.tacos-admin-card__title {
+  color: #0b3262;
+  font-size: 1.28rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.tacos-admin-card__description {
+  color: $secondary-font;
+  line-height: 1.45;
+}
+
+.tacos-admin-card__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: #0b3262;
+  font-size: 1rem;
+}
+
+.tacos-admin-card--department {
+  --tacos-admin-card-accent: #008eaa;
+}
+
+.tacos-admin-card--department .tacos-admin-card__icon {
+  background-color: #e8f6f8;
+  color: #006b80;
+}
+
+.tacos-admin-card--department .tacos-admin-card__arrow {
+  color: #006b80;
+}
+
+.tacos-admin-card--rebuild {
+  --tacos-admin-card-accent: #ba0c2f;
+}
+
+.tacos-admin-card--rebuild .tacos-admin-card__icon {
+  background-color: #fff5f6;
+  color: #8a0923;
+}
+
+.tacos-admin-card--rebuild .tacos-admin-card__arrow {
+  color: #8a0923;
+}
+
+@media (max-width: 900px) {
+  .tacos-admin-dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tacos-admin-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .tacos-admin-dashboard__header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .tacos-admin-dashboard__status {
+    padding-top: 0;
+  }
+}
+
 .tacos-faq {
   max-width: 58rem;
 
