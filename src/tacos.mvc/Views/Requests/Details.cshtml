@@ -78,134 +78,136 @@
         </header>
 
         <dl class="tacos-request-ledger__list tacos-request-ledger__list--grid">
-            <div class="tacos-request-ledger__row">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--submitted-date">
                 <dt>Submitted Date</dt>
                 <dd class="tacos-request-ledger__definition">
                     <span class="tacos-request-ledger__value">@submittedOn</span>
                 </dd>
             </div>
 
-            <div class="tacos-request-ledger__row">
-                <dt>Submitted By</dt>
-                <dd class="tacos-request-ledger__definition">
-                    <span class="tacos-request-ledger__value">@(string.IsNullOrWhiteSpace(submittedBy) ? "No submitter recorded" : submittedBy)</span>
-                </dd>
-            </div>
-
-            <div class="tacos-request-ledger__row">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--suggested-ta">
                 <dt>Suggested TA %</dt>
                 <dd class="tacos-request-ledger__definition">
                     <span class="tacos-request-ledger__value">@Model.CalculatedTaTotal.ToString("f3")</span>
                 </dd>
             </div>
 
-            <div class="tacos-request-ledger__row">
-                <dt>Suggested Reader %</dt>
-                <dd class="tacos-request-ledger__definition">
-                    <span class="tacos-request-ledger__value">@Model.CalculatedReaderTotal.ToString("f3")</span>
-                </dd>
-            </div>
-
-            <div class="tacos-request-ledger__row">
-                <dt>Exception Requested?</dt>
-                <dd class="tacos-request-ledger__definition">
-                    <span class="tacos-request-ledger__value">@(Model.Exception ? "Yes" : "No")</span>
-                </dd>
-            </div>
-
-            @if (Model.Exception)
-            {
-                <div class="tacos-request-ledger__row">
-                    <dt>Requested TA %</dt>
-                    <dd class="tacos-request-ledger__definition">
-                        <span class="tacos-request-ledger__value">@Model.ExceptionTaTotal.ToString("f3")</span>
-                    </dd>
-                </div>
-
-                <div class="tacos-request-ledger__row">
-                    <dt>Requested Reader %</dt>
-                    <dd class="tacos-request-ledger__definition">
-                        <span class="tacos-request-ledger__value">@Model.ExceptionReaderTotal.ToString("f3")</span>
-                    </dd>
-                </div>
-
-                <div class="tacos-request-ledger__row">
-                    <dt>Requested Annual Offerings</dt>
-                    <dd class="tacos-request-ledger__definition">
-                        <span class="tacos-request-ledger__value">@Model.ExceptionAnnualCount.ToString("f3")</span>
-                    </dd>
-                </div>
-
-                <div class="tacos-request-ledger__row tacos-request-ledger__row--wide">
-                    <dt>Request</dt>
-                    <dd class="tacos-request-ledger__definition">
-                        <span class="tacos-request-ledger__value tacos-request-ledger__value--copy">@Model.ExceptionReason</span>
-                    </dd>
-                </div>
-
-                <div class="tacos-request-ledger__row">
-                    <dt>Reviewed?</dt>
-                    <dd class="tacos-request-ledger__definition">
-                        <span class="tacos-request-ledger__value">@(Model.Approved.HasValue ? "Yes" : "No")</span>
-                    </dd>
-                </div>
-
-                if (Model.Approved.HasValue)
-                {
-                    <div class="tacos-request-ledger__row">
-                        <dt>Approved?</dt>
-                        <dd class="tacos-request-ledger__definition">
-                            <span class="tacos-request-ledger__value">@(Model.Approved.Value ? "Yes" : "No")</span>
-                        </dd>
-                    </div>
-
-                    if (!string.IsNullOrWhiteSpace(Model.ApprovedComment))
-                    {
-                        <div class="tacos-request-ledger__row tacos-request-ledger__row--wide">
-                            <dt>Comment</dt>
-                            <dd class="tacos-request-ledger__definition">
-                                <span class="tacos-request-ledger__value tacos-request-ledger__value--copy">@Model.ApprovedComment</span>
-                            </dd>
-                        </div>
-                    }
-                }
-            }
-
-            <div class="tacos-request-ledger__row">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-ta">
                 <dt>Approved TA %</dt>
                 <dd class="tacos-request-ledger__definition">
                     <span class="tacos-request-ledger__value">@Model.ApprovedTaTotal.ToString("f3")</span>
                 </dd>
             </div>
 
-            <div class="tacos-request-ledger__row">
-                <dt>Approved Reader %</dt>
-                <dd class="tacos-request-ledger__definition">
-                    <span class="tacos-request-ledger__value">@Model.ApprovedReaderTotal.ToString("f3")</span>
-                </dd>
-            </div>
-
-            <div class="tacos-request-ledger__row">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-ta-fte">
                 <dt>Approved TA FTE</dt>
                 <dd class="tacos-request-ledger__definition">
                     <span class="tacos-request-ledger__value">@Model.ApprovedAnnualizedTaTotal.ToString("f3")</span>
                 </dd>
             </div>
 
-            <div class="tacos-request-ledger__row">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--submitted-by">
+                <dt>Submitted By</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@(string.IsNullOrWhiteSpace(submittedBy) ? "No submitter recorded" : submittedBy)</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--suggested-reader">
+                <dt>Suggested Reader %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.CalculatedReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-reader">
+                <dt>Approved Reader %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ApprovedReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-reader-fte">
                 <dt>Approved Reader FTE</dt>
                 <dd class="tacos-request-ledger__definition">
                     <span class="tacos-request-ledger__value">@Model.ApprovedAnnualizedReaderTotal.ToString("f3")</span>
                 </dd>
             </div>
 
-            <div class="tacos-request-ledger__row">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--exception-requested">
+                <dt>Exception Requested?</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@(Model.Exception ? "Yes" : "No")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--combined-total">
                 <dt>Combined Total</dt>
                 <dd class="tacos-request-ledger__definition">
                     <span class="tacos-request-ledger__value">@approvedCombinedTotal.ToString("f3")</span>
                 </dd>
             </div>
         </dl>
+
+        @if (Model.Exception)
+        {
+        <dl class="tacos-request-ledger__list tacos-request-ledger__list--grid tacos-request-ledger__list--exceptions">
+            <div class="tacos-request-ledger__row">
+                <dt>Requested TA %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ExceptionTaTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row">
+                <dt>Requested Reader %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ExceptionReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row">
+                <dt>Requested Annual Offerings</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ExceptionAnnualCount.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--wide">
+                <dt>Request</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value tacos-request-ledger__value--copy">@Model.ExceptionReason</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row">
+                <dt>Reviewed?</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@(Model.Approved.HasValue ? "Yes" : "No")</span>
+                </dd>
+            </div>
+
+            @if (Model.Approved.HasValue)
+            {
+                <div class="tacos-request-ledger__row">
+                    <dt>Approved?</dt>
+                    <dd class="tacos-request-ledger__definition">
+                        <span class="tacos-request-ledger__value">@(Model.Approved.Value ? "Yes" : "No")</span>
+                    </dd>
+                </div>
+
+                if (!string.IsNullOrWhiteSpace(Model.ApprovedComment))
+                {
+                    <div class="tacos-request-ledger__row tacos-request-ledger__row--wide">
+                        <dt>Comment</dt>
+                        <dd class="tacos-request-ledger__definition">
+                            <span class="tacos-request-ledger__value tacos-request-ledger__value--copy">@Model.ApprovedComment</span>
+                        </dd>
+                    </div>
+                }
+            }
+        </dl>
+        }
     </section>
 
     <section class="tacos-request-history" aria-labelledby="requestHistoryTitle">

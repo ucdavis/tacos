@@ -857,7 +857,7 @@ hr {
 }
 
 .tacos-request-course-info__item--wide {
-  grid-column: span 2;
+  grid-column: span 3;
 }
 
 .tacos-request-course-info__item dt,
@@ -866,17 +866,18 @@ hr {
 }
 
 .tacos-request-course-info__item dt {
-  color: #2f2f2f;
-  font-size: 0.98rem;
+  color: $primary-color;
+  font-size: 0.78rem;
   font-weight: 800;
   line-height: 1.25;
+  text-transform: uppercase;
 }
 
 .tacos-request-course-info__item dd {
-  margin-top: 0.45rem;
-  color: #303030;
-  font-size: 1.08rem;
-  font-weight: 500;
+  margin-top: 0.3rem;
+  color: #262626;
+  font-size: 0.98rem;
+  font-weight: 800;
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
@@ -990,9 +991,20 @@ hr {
 
 .tacos-request-ledger__list--grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 2rem;
-  padding: 0.3rem 1.5rem 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-areas:
+    "submitted-date submitted-by exception-requested"
+    "suggested-ta suggested-reader ."
+    "approved-ta approved-reader ."
+    "approved-ta-fte approved-reader-fte combined-total";
+  gap: 1.15rem 2.25rem;
+  padding: 1.25rem 1.5rem 1.4rem;
+}
+
+.tacos-request-ledger__list--exceptions {
+  border-top: 1px solid #dfe3e8;
+  grid-template-areas: none;
+  padding-top: 0.9rem;
 }
 
 .tacos-request-ledger__row {
@@ -1009,11 +1021,51 @@ hr {
 
 .tacos-request-ledger__list--grid .tacos-request-ledger__row {
   display: block;
-  padding: 0.75rem 0;
+  padding: 0;
 }
 
 .tacos-request-ledger__list--grid .tacos-request-ledger__row--wide {
   grid-column: 1 / -1;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--submitted-date {
+  grid-area: submitted-date;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--submitted-by {
+  grid-area: submitted-by;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--exception-requested {
+  grid-area: exception-requested;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--suggested-ta {
+  grid-area: suggested-ta;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--suggested-reader {
+  grid-area: suggested-reader;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--approved-ta {
+  grid-area: approved-ta;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--approved-reader {
+  grid-area: approved-reader;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--approved-ta-fte {
+  grid-area: approved-ta-fte;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--approved-reader-fte {
+  grid-area: approved-reader-fte;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--combined-total {
+  grid-area: combined-total;
 }
 
 .tacos-request-ledger__list--grid .tacos-request-ledger__row + .tacos-request-ledger__row {
@@ -1242,7 +1294,7 @@ hr {
   }
 
   .tacos-request-course-info__item--wide {
-    grid-column: span 1;
+    grid-column: span 2;
   }
 
   .tacos-request-ledger__header {
@@ -1284,6 +1336,13 @@ hr {
   .tacos-request-course-info__grid,
   .tacos-request-ledger__list--grid {
     grid-template-columns: 1fr;
+    grid-template-areas: none;
+  }
+
+  .tacos-request-ledger__list--grid .tacos-request-ledger__row {
+    grid-column: auto;
+    grid-row: auto;
+    grid-area: auto;
   }
 
   .tacos-request-course-info__item dt {
