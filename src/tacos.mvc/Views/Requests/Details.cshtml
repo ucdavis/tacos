@@ -3,137 +3,318 @@
 
 
 @{
-    var history = Model.History.OrderByDescending(h => h.UpdatedOn).Skip(1);
+    var history = Model.History.OrderByDescending(h => h.UpdatedOn).Skip(1).ToList();
+    var historyCountText = history.Count == 1 ? "1 previous update" : $"{history.Count} previous updates";
+    var courseType = CourseInfo.Types.TryGetValue(Model.CourseType, out var courseTypeName)
+        ? courseTypeName
+        : Model.CourseType;
+    var submittedOn = Model.SubmittedOn?.ToString("d") ?? "Not submitted";
+    var submittedBy = !string.IsNullOrWhiteSpace(Model.SubmittedBy) ? Model.SubmittedBy : Model.UpdatedBy;
+    var reviewStatus = Model.Approved.HasValue ? (Model.Approved.Value ? "Approved" : "Denied") : "Pending Review";
+    var approvedCombinedTotal = Model.ApprovedAnnualizedTaTotal + Model.ApprovedAnnualizedReaderTotal;
 }
 
-<div class="mx-auto max-w-6xl space-y-8 px-4 py-6">
-    <h3>Course Information</h3>
+<div class="container tacos-request-detail">
+    <section class="tacos-request-course-info" aria-labelledby="courseInformationTitle">
+        <header class="tacos-request-course-info__header">
+            <h1 id="courseInformationTitle" class="tacos-request-course-info__title">Course Information</h1>
+        </header>
 
-    <dl>
-        <dt>Course Number</dt>
-        <dd>@Model.CourseNumber</dd>
+        <dl class="tacos-request-course-info__grid">
+            <div class="tacos-request-course-info__item">
+                <dt>Course Number</dt>
+                <dd>
+                    @Model.CourseNumber
+                </dd>
+            </div>
 
-        <dt>Name</dt>
-        <dd>@Model.Course.Name</dd>
+            <div class="tacos-request-course-info__item tacos-request-course-info__item--wide">
+                <dt>Name</dt>
+                <dd>
+                    @Model.Course.Name
+                </dd>
+            </div>
 
-        <dt>Course Type <span class="tacos-text-muted">(as reported in request)</span></dt>
-        <dd>@CourseInfo.Types[Model.CourseType]</dd>
+            <div class="tacos-request-course-info__item">
+                <dt>Course Type</dt>
+                <dd>
+                    @courseType
+                </dd>
+            </div>
 
-        <dt>Average Enrollment</dt>
-        <dd>@Model.Course.AverageEnrollment</dd>
+            <div class="tacos-request-course-info__item">
+                <dt>Average Enrollment</dt>
+                <dd>
+                    @Model.Course.AverageEnrollment.ToString("0.##")
+                </dd>
+            </div>
 
-        <dt>Average Sections per Course</dt>
-        <dd>@Model.Course.AverageSectionsPerCourse</dd>
+            <div class="tacos-request-course-info__item">
+                <dt>Sections per Course</dt>
+                <dd>
+                    @Model.Course.AverageSectionsPerCourse.ToString("0.#")
+                </dd>
+            </div>
 
-        <dt>Times Offered per Year</dt>
-        <dd>@Model.Course.TimesOfferedPerYear</dd>
-    </dl>
-    
-    <h3>Request Details</h3>
-    
-    <dl>
-        <dt>Submitted Date</dt>
-        <dd>@Model.UpdatedOn.ToString("d")</dd>
+            <div class="tacos-request-course-info__item">
+                <dt>Times Offered</dt>
+                <dd>
+                    @Model.Course.TimesOfferedPerYear.ToString("0.#")
+                </dd>
+            </div>
+        </dl>
+    </section>
 
-        <dt>Submitted By</dt>
-        <dd>@Model.UpdatedBy</dd>
+    <section class="tacos-request-ledger tacos-request-ledger--compact" aria-labelledby="requestDetailsTitle">
+        <header class="tacos-request-ledger__header">
+            <div class="tacos-request-ledger__title-group">
+                <p class="tacos-request-ledger__eyebrow">Request Details</p>
+                <h2 id="requestDetailsTitle" class="tacos-request-ledger__title">Allocation Summary</h2>
+                <p class="tacos-request-ledger__subtitle">@reviewStatus</p>
+            </div>
+            <div class="tacos-request-ledger__badges" aria-label="Review status">
+                <span class="tacos-request-ledger__badge @(Model.Approved.HasValue ? (Model.Approved.Value ? "tacos-request-ledger__badge--good" : "tacos-request-ledger__badge--danger") : "tacos-request-ledger__badge--neutral")">@reviewStatus</span>
+            </div>
+        </header>
 
-        <dt>Suggested TA % per Course</dt>
-        <dd>@Model.CalculatedTaTotal.ToString("f3")</dd>
+        <dl class="tacos-request-ledger__list tacos-request-ledger__list--grid">
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--submitted-date">
+                <dt>Submitted Date</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@submittedOn</span>
+                </dd>
+            </div>
 
-        <dt>Suggested Reader % per Course</dt>
-        <dd>@Model.CalculatedReaderTotal.ToString("f3")</dd>
-        
-        <dt>Exception Requested?</dt>
-        <dd>@(Model.Exception ? "Yes" : "No")</dd>
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--suggested-ta">
+                <dt>Suggested TA %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.CalculatedTaTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-ta">
+                <dt>Approved TA %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ApprovedTaTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-ta-fte">
+                <dt>Approved TA FTE</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ApprovedAnnualizedTaTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--submitted-by">
+                <dt>Submitted By</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@(string.IsNullOrWhiteSpace(submittedBy) ? "No submitter recorded" : submittedBy)</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--suggested-reader">
+                <dt>Suggested Reader %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.CalculatedReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-reader">
+                <dt>Approved Reader %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ApprovedReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--approved-reader-fte">
+                <dt>Approved Reader FTE</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ApprovedAnnualizedReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--exception-requested">
+                <dt>Exception Requested?</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@(Model.Exception ? "Yes" : "No")</span>
+                </dd>
+            </div>
+
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--combined-total">
+                <dt>Combined Total</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@approvedCombinedTotal.ToString("f3")</span>
+                </dd>
+            </div>
+        </dl>
 
         @if (Model.Exception)
         {
-            <dt>Requested TA % per Course</dt>
-            <dd>@Model.ExceptionTaTotal.ToString("f3")</dd>
+        <dl class="tacos-request-ledger__list tacos-request-ledger__list--grid tacos-request-ledger__list--exceptions">
+            <div class="tacos-request-ledger__row">
+                <dt>Requested TA %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ExceptionTaTotal.ToString("f3")</span>
+                </dd>
+            </div>
 
-            <dt>Requested Reader % per Course</dt>
-            <dd>@Model.ExceptionReaderTotal.ToString("f3")</dd>
+            <div class="tacos-request-ledger__row">
+                <dt>Requested Reader %</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ExceptionReaderTotal.ToString("f3")</span>
+                </dd>
+            </div>
 
-            <dt>Requested Annual Course Offerings</dt>
-            <dd>@Model.ExceptionAnnualCount.ToString("f3")</dd>
+            <div class="tacos-request-ledger__row">
+                <dt>Requested Annual Offerings</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@Model.ExceptionAnnualCount.ToString("f3")</span>
+                </dd>
+            </div>
 
-            <dt>Request</dt>
-            <dd>@Model.ExceptionReason</dd>
+            <div class="tacos-request-ledger__row tacos-request-ledger__row--wide">
+                <dt>Request</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value tacos-request-ledger__value--copy">@Model.ExceptionReason</span>
+                </dd>
+            </div>
 
-            <dt>Reviewed?</dt>
-            <dd>@(Model.Approved.HasValue ? "Yes" : "No")</dd>
+            <div class="tacos-request-ledger__row">
+                <dt>Reviewed?</dt>
+                <dd class="tacos-request-ledger__definition">
+                    <span class="tacos-request-ledger__value">@(Model.Approved.HasValue ? "Yes" : "No")</span>
+                </dd>
+            </div>
 
-            if (Model.Approved.HasValue)
+            @if (Model.Approved.HasValue)
             {
-                <dt>Approved?</dt>
-                <dd>@(Model.Approved.Value ? "Yes" : "No")</dd>
+                <div class="tacos-request-ledger__row">
+                    <dt>Approved?</dt>
+                    <dd class="tacos-request-ledger__definition">
+                        <span class="tacos-request-ledger__value">@(Model.Approved.Value ? "Yes" : "No")</span>
+                    </dd>
+                </div>
 
                 if (!string.IsNullOrWhiteSpace(Model.ApprovedComment))
                 {
-                    <dt>Comment</dt>
-                    <dd>@Model.ApprovedComment</dd>
+                    <div class="tacos-request-ledger__row tacos-request-ledger__row--wide">
+                        <dt>Comment</dt>
+                        <dd class="tacos-request-ledger__definition">
+                            <span class="tacos-request-ledger__value tacos-request-ledger__value--copy">@Model.ApprovedComment</span>
+                        </dd>
+                    </div>
                 }
             }
+        </dl>
         }
+    </section>
 
-        <dt>Approved TA % per Course</dt>
-        <dd>@Model.ApprovedTaTotal.ToString("f3")</dd>
+    <section class="tacos-request-history" aria-labelledby="requestHistoryTitle">
+        <header class="tacos-request-history__header">
+            <div>
+                <h2 id="requestHistoryTitle">History of this request</h2>
+                <p>Previous request versions and review decisions.</p>
+            </div>
+            <span class="tacos-request-history__count">@historyCountText</span>
+        </header>
 
-        <dt>Approved Reader % per Course</dt>
-        <dd>@Model.ApprovedReaderTotal.ToString("f3")</dd>
+        @if (history.Any())
+        {
+            <div class="tacos-page-table-frame tacos-request-history__table-frame">
+                <table class="table tacos-page-table tacos-request-history__table w-full">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Suggested</th>
+                            <th>Requested</th>
+                            <th>Reason</th>
+                            <th>Review</th>
+                            <th>Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var h in history)
+                    {
+                        var historyCourseType = CourseInfo.Types.TryGetValue(h.CourseType, out var historyCourseTypeName)
+                            ? historyCourseTypeName
+                            : h.CourseType;
 
-        <dt>Approved Annualized TA FTE</dt>
-        <dd>@Model.ApprovedAnnualizedTaTotal.ToString("f3")</dd>
-
-        <dt>Approved Annualized Reader FTE</dt>
-        <dd>@Model.ApprovedAnnualizedReaderTotal.ToString("f3")</dd>
-
-        <dt>Approved Annualized Combined Total</dt>
-        <dd>@((Model.ApprovedAnnualizedTaTotal + Model.ApprovedAnnualizedReaderTotal).ToString("f3"))</dd>
-    </dl>
-
-
-    <h3>History of this request</h3>
-    
-    <div class="tacos-page-table-frame">
-        <table class="table tacos-page-table w-full">
-            <thead>
-                <tr>
-                    <th>Course Number</th>
-                    <th>Course Type</th>
-                    <th>Suggested TA</th>
-                    <th>Suggested Reader</th>
-                    <th>Requested TA</th>
-                    <th>Requested Reader</th>
-                    <th>Reason</th>
-                    <th>Reviewed?</th>
-                    <th>Approved?</th>
-                    <th>Approval Reason</th>
-                    <th>Updated On</th>
-                    <th>Updated By</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var h in history)
-            {
-                <tr>
-                    <td>@h.CourseNumber</td>
-                    <td>@CourseInfo.Types[h.CourseType]</td>
-                    <td>@h.CalculatedTaTotal.ToString("f3")</td>
-                    <td>@h.CalculatedReaderTotal.ToString("f3")</td>
-                    <td>@(h.Exception ? h.ExceptionTaTotal.ToString("f3") : "")</td>
-                    <td>@(h.Exception ? h.ExceptionReaderTotal.ToString("f3") : "")</td>
-                    <td>@(h.Exception ? h.ExceptionReason : "")</td>
-                    <td>@(h.Approved.HasValue ? "Yes" : "No")</td>
-                    <td>@(h.Approved.HasValue ? (h.Approved.Value ? "Yes" : "No") : "")</td>
-                    <td>@(h.Exception ? h.ApprovedComment : "")</td>
-                    <td>@h.UpdatedOn.ToString("G")</td>
-                    <td>@h.UpdatedBy</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+                        <tr>
+                            <td>
+                                <span class="tacos-request-history__primary">@h.CourseNumber</span>
+                                <span class="tacos-request-history__subtle">@historyCourseType</span>
+                            </td>
+                            <td>
+                                <span class="tacos-request-history__metric">
+                                    <span>TA</span>
+                                    @h.CalculatedTaTotal.ToString("f3")
+                                </span>
+                                <span class="tacos-request-history__metric">
+                                    <span>Reader</span>
+                                    @h.CalculatedReaderTotal.ToString("f3")
+                                </span>
+                            </td>
+                            <td>
+                                @if (h.Exception)
+                                {
+                                    <span class="tacos-request-history__metric">
+                                        <span>TA</span>
+                                        @h.ExceptionTaTotal.ToString("f3")
+                                    </span>
+                                    <span class="tacos-request-history__metric">
+                                        <span>Reader</span>
+                                        @h.ExceptionReaderTotal.ToString("f3")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="tacos-request-history__muted">No exception</span>
+                                }
+                            </td>
+                            <td class="tacos-request-history__reason">
+                                @if (h.Exception && !string.IsNullOrWhiteSpace(h.ExceptionReason))
+                                {
+                                    @h.ExceptionReason
+                                }
+                                else
+                                {
+                                    <span class="tacos-request-history__muted">No request reason</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="tacos-request-history__status-group">
+                                    <span class="tacos-request-history__status @(h.Approved.HasValue ? "tacos-request-history__status--good" : "tacos-request-history__status--neutral")">
+                                        @(h.Approved.HasValue ? "Reviewed" : "Pending")
+                                    </span>
+                                    @if (h.Approved.HasValue)
+                                    {
+                                        <span class="tacos-request-history__status @(h.Approved.Value ? "tacos-request-history__status--good" : "tacos-request-history__status--danger")">
+                                            @(h.Approved.Value ? "Approved" : "Denied")
+                                        </span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(h.ApprovedComment))
+                                {
+                                    <span class="tacos-request-history__note">@h.ApprovedComment</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="tacos-request-history__primary">@h.UpdatedOn.ToString("G")</span>
+                                <span class="tacos-request-history__subtle">@h.UpdatedBy</span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="tacos-request-history__empty">
+                <p>No previous history has been recorded for this request.</p>
+            </div>
+        }
+    </section>
 
 </div>

@@ -60,27 +60,6 @@ module.exports = env => {
                     ]
                 },
                 {
-                    test: /\.scss$/,
-                    use: [
-                        !isDevBuild ?
-                        MiniCssExtractPlugin.loader : {
-                            loader: 'style-loader'
-                        },
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                sourceMap: true,
-                            },
-                        },
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                sourceMap: true,
-                            },
-                        },
-                    ]
-                },
-                {
                     test: /\.(png|jpg|jpeg|gif|svg|woff)$/,
                     use: "url-loader?limit=25000"
                 }

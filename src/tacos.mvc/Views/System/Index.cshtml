@@ -1,19 +1,63 @@
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
+    ViewData["Title"] = "Admin";
 }
 
-<div class="container">
-    <ul class="tacos-link-list">
-        <li>
-            <a asp-action="SystemUsers">Manage System Roles</a>
-        </li>
-        <li>
-            <a asp-action="DepartmentUsers">Manage Department Users</a>
-        </li>
-        <li>
-            <a asp-action="ManageCourseRebuild">Rebuild Course List and Reset Submissions</a>
-        </li>
-    </ul>
+<div class="container tacos-page-stack tacos-admin-dashboard">
+    <header class="tacos-admin-dashboard__header">
+        <div>
+            <p class="tacos-admin-dashboard__eyebrow">Administration</p>
+            <h2 class="tacos-page-heading">Admin tools</h2>
+            <p class="tacos-admin-dashboard__intro">
+                System access, departmental assignments, and annual course data maintenance live here.
+            </p>
+        </div>
+        <div class="tacos-admin-dashboard__status" aria-label="Restricted admin area">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            <span>Admin area</span>
+        </div>
+    </header>
+
+    <nav class="tacos-admin-dashboard__grid" aria-label="Admin tools">
+        <a class="tacos-admin-card tacos-admin-card--system" asp-action="SystemUsers">
+            <span class="tacos-admin-card__icon" aria-hidden="true">
+                <i class="fas fa-users"></i>
+            </span>
+            <span class="tacos-admin-card__body">
+                <span class="tacos-admin-card__kicker">Roles</span>
+                <span class="tacos-admin-card__title">Manage System Roles</span>
+                <span class="tacos-admin-card__description">Update admin and reviewer permissions across TACOS.</span>
+            </span>
+            <span class="tacos-admin-card__arrow" aria-hidden="true">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+
+        <a class="tacos-admin-card tacos-admin-card--department" asp-action="DepartmentUsers">
+            <span class="tacos-admin-card__icon" aria-hidden="true">
+                <i class="fas fa-building"></i>
+            </span>
+            <span class="tacos-admin-card__body">
+                <span class="tacos-admin-card__kicker">Departments</span>
+                <span class="tacos-admin-card__title">Manage Department Users</span>
+                <span class="tacos-admin-card__description">Maintain department-level access for submission owners.</span>
+            </span>
+            <span class="tacos-admin-card__arrow" aria-hidden="true">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+
+        <a class="tacos-admin-card tacos-admin-card--rebuild" asp-action="ManageCourseRebuild">
+            <span class="tacos-admin-card__icon" aria-hidden="true">
+                <i class="fas fa-sync-alt"></i>
+            </span>
+            <span class="tacos-admin-card__body">
+                <span class="tacos-admin-card__kicker">Course data</span>
+                <span class="tacos-admin-card__title">Rebuild Course List and Reset Submissions</span>
+                <span class="tacos-admin-card__description">Refresh course records and reset annual submission data.</span>
+            </span>
+            <span class="tacos-admin-card__arrow" aria-hidden="true">
+                <i class="fas fa-arrow-right"></i>
+            </span>
+        </a>
+    </nav>
 </div>
