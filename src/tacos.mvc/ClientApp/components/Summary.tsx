@@ -37,7 +37,7 @@ export default class Summary extends React.PureComponent<IProps, {}> {
     public submitButtonRender = () => {
         return (
             <button
-                className="btn btn-primary gap-2"
+                className="btn btn-success gap-2"
                 disabled={!this.props.canSubmit || this.props.isProcessing}
                 onClick={this.props.onSubmit}
                 type="button"

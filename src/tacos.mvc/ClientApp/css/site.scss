@@ -1663,23 +1663,11 @@ dd {
 }
 
 .tacos-summary-bar__banner {
+  background: rgba(255, 255, 255, 0.75);
+  border-top: 1px solid #e9e3ee;
   font-size: 1.25rem;
   padding: 0.5em 1em;
-  position: relative;
-  color: #fff;
-  isolation: isolate;
-}
-
-.tacos-summary-bar__banner::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background:
-    url("https://ucdcdn.azureedge.net/public/media/global-header-bg.svg"),
-    linear-gradient(to right, #183357, #d9b337);
-  background-repeat: no-repeat;
-  background-size: cover;
+  color: $primary-font;
 }
 
 .tacos-summary-bar__content {
