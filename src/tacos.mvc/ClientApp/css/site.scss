@@ -814,6 +814,534 @@ hr {
   }
 }
 
+.tacos-request-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding-top: 0.5rem;
+  padding-bottom: 4rem;
+  color: $primary-font;
+}
+
+.tacos-request-course-info {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #dfe3e8;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.tacos-request-course-info__header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+.tacos-request-course-info__title {
+  margin: 0;
+  color: #262626;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.tacos-request-course-info__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.65rem 2.25rem;
+  margin: 0;
+  padding: 1rem 1.5rem 1.25rem;
+}
+
+.tacos-request-course-info__item {
+  min-width: 0;
+}
+
+.tacos-request-course-info__item--wide {
+  grid-column: span 2;
+}
+
+.tacos-request-course-info__item dt,
+.tacos-request-course-info__item dd {
+  margin: 0;
+}
+
+.tacos-request-course-info__item dt {
+  color: #2f2f2f;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.tacos-request-course-info__item dd {
+  margin-top: 0.45rem;
+  color: #303030;
+  font-size: 1.08rem;
+  font-weight: 500;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.tacos-request-ledger {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #dfe3e8;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.tacos-request-ledger__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem 1.35rem;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+.tacos-request-ledger--compact .tacos-request-ledger__header {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.tacos-request-ledger__title-group {
+  min-width: 0;
+}
+
+.tacos-request-ledger__eyebrow {
+  margin: 0 0 0.25rem;
+  color: $primary-color;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.tacos-request-ledger__title {
+  margin: 0;
+  color: #262626;
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.tacos-request-ledger--compact .tacos-request-ledger__title {
+  font-size: 1.45rem;
+}
+
+.tacos-request-ledger__subtitle {
+  margin: 0.45rem 0 0;
+  color: $secondary-font;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.tacos-request-ledger--compact .tacos-request-ledger__subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.92rem;
+}
+
+.tacos-request-ledger__badges {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  max-width: 20rem;
+}
+
+.tacos-request-ledger__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tacos-request-ledger__badge--good {
+  background-color: #2b6730;
+  color: #fff;
+}
+
+.tacos-request-ledger__badge--neutral {
+  background-color: #e9eef3;
+  color: #0b3262;
+}
+
+.tacos-request-ledger__badge--warning {
+  background-color: #e9eef3;
+  color: $primary-color;
+}
+
+.tacos-request-ledger__badge--danger {
+  background-color: #ba0c2f;
+  color: #fff;
+}
+
+.tacos-request-ledger__list {
+  margin: 0;
+}
+
+.tacos-request-ledger__list--grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 2rem;
+  padding: 0.3rem 1.5rem 0.9rem;
+}
+
+.tacos-request-ledger__row {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.5fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  padding: 1.05rem 1.5rem;
+}
+
+.tacos-request-ledger__row + .tacos-request-ledger__row {
+  border-top: 1px solid #dfe3e8;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row {
+  display: block;
+  padding: 0.75rem 0;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row--wide {
+  grid-column: 1 / -1;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row + .tacos-request-ledger__row {
+  border-top: 0;
+}
+
+.tacos-request-ledger__row dt {
+  margin: 0;
+  color: $primary-color;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__row dt {
+  font-size: 0.78rem;
+}
+
+.tacos-request-ledger__definition {
+  margin: 0;
+  min-width: 0;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__definition {
+  margin-top: 0.3rem;
+}
+
+.tacos-request-ledger__value {
+  min-width: 0;
+  color: #262626;
+  font-size: 1.12rem;
+  font-weight: 800;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.tacos-request-ledger--compact .tacos-request-ledger__value {
+  font-size: 0.98rem;
+}
+
+.tacos-request-ledger__value--copy {
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.tacos-request-ledger__list--grid .tacos-request-ledger__value--copy {
+  display: block;
+}
+
+.tacos-request-history {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #dfe3e8;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.tacos-request-history__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #dfe3e8;
+}
+
+.tacos-request-history__header h2 {
+  margin: 0;
+  color: #262626;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.tacos-request-history__header p {
+  margin: 0.25rem 0 0;
+  color: $secondary-font;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.tacos-request-history__count {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-height: 1.6rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background-color: #eef3f8;
+  color: $primary-color;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tacos-request-history__table-frame {
+  border: 0;
+}
+
+.tacos-request-history__table {
+  min-width: 64rem;
+  font-size: 0.92rem;
+}
+
+.tacos-request-history__table thead th {
+  background-color: #f6f8fb;
+  color: $primary-color;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.tacos-request-history__table th,
+.tacos-request-history__table td {
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+  vertical-align: top;
+}
+
+.tacos-request-history__primary,
+.tacos-request-history__subtle,
+.tacos-request-history__note,
+.tacos-request-history__metric {
+  display: block;
+}
+
+.tacos-request-history__primary {
+  color: #262626;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.tacos-request-history__subtle,
+.tacos-request-history__muted,
+.tacos-request-history__note {
+  color: $secondary-font;
+  line-height: 1.35;
+}
+
+.tacos-request-history__subtle {
+  margin-top: 0.25rem;
+}
+
+.tacos-request-history__metric {
+  color: #262626;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tacos-request-history__metric + .tacos-request-history__metric {
+  margin-top: 0.2rem;
+}
+
+.tacos-request-history__metric span {
+  display: inline-block;
+  min-width: 3.6rem;
+  color: $secondary-font;
+  font-weight: 700;
+}
+
+.tacos-request-history__reason {
+  max-width: 18rem;
+  color: #262626;
+  line-height: 1.45;
+}
+
+.tacos-request-history__status-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tacos-request-history__status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.35rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tacos-request-history__status--good {
+  background-color: #e7f2ef;
+  color: #218367;
+}
+
+.tacos-request-history__status--neutral {
+  background-color: #e9eef3;
+  color: #0b3262;
+}
+
+.tacos-request-history__status--danger {
+  background-color: #fff5f6;
+  color: #ba0c2f;
+}
+
+.tacos-request-history__note {
+  margin-top: 0.45rem;
+}
+
+.tacos-request-history__empty {
+  padding: 2rem 1.5rem;
+  background-color: #f6f8fb;
+  text-align: center;
+}
+
+.tacos-request-history__empty p {
+  margin: 0;
+  color: $secondary-font;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .tacos-request-course-info__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tacos-request-course-info__item--wide {
+    grid-column: span 1;
+  }
+
+  .tacos-request-ledger__header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .tacos-request-ledger__badges {
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+
+  .tacos-request-ledger__row {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .tacos-request-detail {
+    gap: 1.25rem;
+    padding-bottom: 3rem;
+  }
+
+  .tacos-request-course-info {
+    border-radius: 0.4rem;
+  }
+
+  .tacos-request-course-info__header,
+  .tacos-request-course-info__grid {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .tacos-request-course-info__title {
+    font-size: 1.2rem;
+  }
+
+  .tacos-request-course-info__grid,
+  .tacos-request-ledger__list--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tacos-request-course-info__item dt {
+    font-size: 0.9rem;
+  }
+
+  .tacos-request-course-info__item dd {
+    font-size: 1rem;
+  }
+
+  .tacos-request-course-info,
+  .tacos-request-ledger,
+  .tacos-request-history {
+    border-radius: 0.4rem;
+  }
+
+  .tacos-request-ledger__header,
+  .tacos-request-ledger__row,
+  .tacos-request-history__header {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .tacos-request-history__header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tacos-request-history__header h2 {
+    font-size: 1.2rem;
+  }
+
+  .tacos-request-ledger__title {
+    font-size: 1.65rem;
+  }
+
+  .tacos-request-ledger--compact .tacos-request-ledger__title {
+    font-size: 1.3rem;
+  }
+
+  .tacos-request-ledger__subtitle {
+    font-size: 0.98rem;
+  }
+
+  .tacos-request-ledger__list--grid {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .tacos-request-ledger__row dt {
+    font-size: 0.82rem;
+  }
+
+  .tacos-request-ledger__value {
+    font-size: 1rem;
+  }
+}
+
 .tacos-section-heading {
   margin: 0 0 1rem;
   color: #0b3262;
