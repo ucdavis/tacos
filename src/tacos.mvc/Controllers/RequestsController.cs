@@ -85,7 +85,21 @@ namespace tacos.mvc.Controllers
                 .Include(r => r.Course)
                 .Include(r => r.History)
                 .Where(r => departmentIds.Contains(r.DepartmentId))
+                .AsNoTracking()
                 .SingleAsync(x => x.Id == id);
+
+            ApplySupportTotals(
+                request,
+                _requestCalculationService.Calculate(
+                    request.Course,
+                    new RequestCalculationInput(
+                        request.CourseType,
+                        request.ExceptionTaTotal,
+                        request.ExceptionReaderTotal,
+                        request.ExceptionAnnualCount
+                    )
+                )
+            );
 
             return View(request);
         }
