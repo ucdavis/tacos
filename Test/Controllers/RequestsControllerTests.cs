@@ -584,6 +584,82 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Details_should_recalculate_summary_without_persisting_or_changing_history()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+            var course = CreateCourse("ECS 261", averageEnrollment: 250);
+            var request = new Request
+            {
+                Department = department,
+                DepartmentId = department.Id,
+                Course = course,
+                CourseNumber = course.Number,
+                CourseType = "MAN",
+                Exception = true,
+                ExceptionTaTotal = 1.5,
+                ExceptionReaderTotal = 0.25,
+                ExceptionAnnualCount = 3,
+                ExceptionAnnualizedTaTotal = 99,
+                ExceptionAnnualizedReaderTotal = 88,
+                CalculatedTaTotal = 77,
+                CalculatedReaderTotal = 66,
+                AnnualizedTaTotal = 55,
+                AnnualizedReaderTotal = 44,
+                History = new List<RequestHistory>
+                {
+                    new()
+                    {
+                        Department = department,
+                        DepartmentId = department.Id,
+                        CourseNumber = course.Number,
+                        CourseType = "MAN",
+                        Exception = true,
+                        ExceptionTaTotal = 2,
+                        ExceptionReaderTotal = 3,
+                        CalculatedTaTotal = 4,
+                        CalculatedReaderTotal = 5,
+                        AnnualizedTaTotal = 6,
+                        AnnualizedReaderTotal = 7,
+                        UpdatedOn = DateTime.UtcNow
+                    }
+                }
+            };
+
+            await SeedMembership(context, user, department);
+            context.Courses.Add(course);
+            context.Requests.Add(request);
+            await context.SaveChangesAsync();
+            context.ChangeTracker.Clear();
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Details(request.Id);
+
+            var view = result.ShouldBeOfType<ViewResult>();
+            var model = view.Model.ShouldBeOfType<Request>();
+            model.CalculatedTaTotal.ShouldBe(0.25);
+            model.CalculatedReaderTotal.ShouldBe(0.5);
+            model.AnnualizedTaTotal.ShouldBe(0.08333333333333333, 0.000001);
+            model.AnnualizedReaderTotal.ShouldBe(0.16666666666666666, 0.000001);
+            model.ExceptionAnnualizedTaTotal.ShouldBe(1.5);
+            model.ExceptionAnnualizedReaderTotal.ShouldBe(0.25);
+
+            var history = model.History.Single();
+            history.CalculatedTaTotal.ShouldBe(4);
+            history.CalculatedReaderTotal.ShouldBe(5);
+            history.AnnualizedTaTotal.ShouldBe(6);
+            history.AnnualizedReaderTotal.ShouldBe(7);
+
+            var storedRequest = await context.Requests.AsNoTracking().SingleAsync(r => r.Id == request.Id);
+            storedRequest.CalculatedTaTotal.ShouldBe(77);
+            storedRequest.CalculatedReaderTotal.ShouldBe(66);
+            storedRequest.AnnualizedTaTotal.ShouldBe(55);
+            storedRequest.AnnualizedReaderTotal.ShouldBe(44);
+        }
+
+        [Fact]
         public async Task Recalculate_should_return_server_calculated_totals_for_existing_courses()
         {
             await using var context = CreateContext();
