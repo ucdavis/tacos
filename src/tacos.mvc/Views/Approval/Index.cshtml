@@ -158,9 +158,30 @@
                 "fixedHeader": true,
                 "dom": window.TacosDataTables.dom.withButtons,
                 "buttons": [
-                    "excel"
+                    {
+                        "extend": "excel",
+                        "text": "Export",
+                        "exportOptions": {
+                            "modifier": {
+                                "search": "applied"
+                            }
+                        }
+                    },
+                    {
+                        "extend": "excel",
+                        "text": "Export All",
+                        "exportOptions": {
+                            "modifier": {
+                                "search": "none"
+                            }
+                        }
+                    }
                 ]
             });
+
+            function formatExportButtonText(label, rowCount) {
+                return label + ' ' + rowCount + ' ' + (rowCount === 1 ? 'row' : 'rows');
+            }
 
             table.rows().every(function() {
                 var encodedReason = this.data()[exceptionReasonColumnIndex];
@@ -183,6 +204,20 @@
 
                 this.child(reasonDetail).show();
                 this.child().addClass('tacos-approval-reason-row').children('td').addClass('tacos-approval-reason-cell');
+            });
+
+            function updateExportButtons() {
+                var filteredRowCount = table.rows({ "search": "applied" }).count();
+                var totalRowCount = table.rows({ "search": "none" }).count();
+
+                table.button(0).text(formatExportButtonText('Export', filteredRowCount));
+                table.button(1).text(formatExportButtonText('Export All', totalRowCount));
+                $(table.button(1).node()).toggle(filteredRowCount < totalRowCount);
+            }
+
+            updateExportButtons();
+            table.on('draw.dt', function() {
+                updateExportButtons();
             });
         });
 
