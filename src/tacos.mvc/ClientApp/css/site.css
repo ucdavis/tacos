@@ -2290,6 +2290,25 @@ hr {
   z-index: 2;
 }
 
+.dataTables_wrapper .tacos-datatable-table--native-sticky-header {
+  max-height: 70vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.dataTables_wrapper table.dataTable.tacos-approval-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #fff;
+  border-bottom: 1px solid #d3dbe5 !important;
+}
+
+.dataTables_wrapper table.dataTable.tacos-approval-table thead th:first-child {
+  z-index: 3;
+}
+
 .tacos-approval-table__reason-column {
   display: none;
 }

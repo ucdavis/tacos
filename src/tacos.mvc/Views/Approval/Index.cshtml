@@ -155,7 +155,6 @@
                         //"sortable": false
                     }
                 ],
-                "fixedHeader": true,
                 "dom": window.TacosDataTables.dom.withButtons,
                 "buttons": [
                     {
@@ -182,6 +181,8 @@
             function formatExportButtonText(label, rowCount) {
                 return label + ' ' + rowCount + ' ' + (rowCount === 1 ? 'row' : 'rows');
             }
+
+            $('#requestTable').closest('.tacos-datatable-table').addClass('tacos-datatable-table--native-sticky-header');
 
             table.rows().every(function() {
                 var encodedReason = this.data()[exceptionReasonColumnIndex];
