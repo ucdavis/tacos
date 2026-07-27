@@ -2269,6 +2269,73 @@ hr {
   background-color: #bee5eb;
 }
 
+.tacos-page-table--sticky-actions th:first-child,
+.tacos-page-table--sticky-actions td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  box-shadow: 1px 0 0 #d3dbe5;
+}
+
+.tacos-page-table--sticky-actions thead th:first-child {
+  z-index: 3;
+  background-color: #fff;
+}
+
+.tacos-page-table--sticky-actions tbody td:first-child {
+  background-color: #fff;
+}
+
+.tacos-page-table--sticky-actions tfoot td:first-child {
+  z-index: 2;
+}
+
+.dataTables_wrapper .tacos-datatable-table--native-sticky-header {
+  max-height: 70vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.dataTables_wrapper table.dataTable.tacos-approval-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #fff;
+  border-bottom: 1px solid #d3dbe5 !important;
+}
+
+.dataTables_wrapper table.dataTable.tacos-approval-table thead th:first-child {
+  z-index: 3;
+}
+
+.tacos-approval-table__reason-column,
+.tacos-approval-table__export-only-column {
+  display: none;
+}
+
+.tacos-approval-table tbody td.tacos-approval-reason-cell {
+  position: static;
+  left: auto;
+  z-index: auto;
+  padding: 0;
+  background-color: #f6f8fb;
+  box-shadow: none;
+}
+
+.tacos-approval-reason {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 0.8rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.tacos-approval-reason__label {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+
 .tacos-page-table a:not(.btn) {
   color: #0b3262;
   text-decoration: underline;
