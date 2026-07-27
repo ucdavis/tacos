@@ -2290,6 +2290,32 @@ hr {
   z-index: 2;
 }
 
+.tacos-approval-table__reason-column {
+  display: none;
+}
+
+.tacos-approval-table tbody td.tacos-approval-reason-cell {
+  position: static;
+  left: auto;
+  z-index: auto;
+  padding: 0;
+  background-color: #f6f8fb;
+  box-shadow: none;
+}
+
+.tacos-approval-reason {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 0.8rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.tacos-approval-reason__label {
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+
 .tacos-page-table a:not(.btn) {
   color: #0b3262;
   text-decoration: underline;

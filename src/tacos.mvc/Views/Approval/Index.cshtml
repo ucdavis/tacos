@@ -3,7 +3,7 @@
 
 <div class="container">
     <div>
-        <table class="table tacos-page-table tacos-page-table--sticky-actions w-full" id="requestTable">
+        <table class="table tacos-page-table tacos-page-table--sticky-actions tacos-approval-table w-full" id="requestTable">
             <thead>
                 <tr>
                     <th></th>
@@ -15,7 +15,7 @@
                     <th>Course Type</th>
                     <th>Average Sections</th>
                     <th>Average Enrollment</th>
-                    <th>Exception Reason</th>
+                    <th class="tacos-approval-table__reason-column">Exception Reason</th>
                     <th>Exception TA % per course</th>
                     <th>Exception Reader % per course</th>
                     <th>Exception Annual Count</th>
@@ -54,7 +54,7 @@
                         <td>@CourseInfo.Types[request.CourseType]</td>
                         <td>@request.Course.AverageSectionsPerCourse</td>
                         <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
-                        <td>@request.ExceptionReason</td>
+                        <td class="tacos-approval-table__reason-column">@request.ExceptionReason</td>
                         <td>@(request.Exception ? request.ExceptionTaTotal.ToString("f3") : "")</td>
                         <td>@(request.Exception ? request.ExceptionReaderTotal.ToString("f3") : "")</td>
                         <td>@(request.Exception ? request.ExceptionAnnualCount.ToString("f3"): "")</td>
@@ -143,6 +143,8 @@
 @section scripts {
     <script>
         $(function() {
+            var exceptionReasonColumnIndex = 9;
+
             var table = $('#requestTable').DataTable({
                 //"paging": false,
                 //"info": false,
@@ -158,6 +160,29 @@
                 "buttons": [
                     "excel"
                 ]
+            });
+
+            table.rows().every(function() {
+                var encodedReason = this.data()[exceptionReasonColumnIndex];
+                var exceptionReason = $('<div>').html(encodedReason).text().trim();
+
+                if (!exceptionReason) {
+                    return;
+                }
+
+                var reasonDetail = $('<div>', { "class": "tacos-approval-reason" });
+
+                $('<span>', {
+                    "class": "tacos-approval-reason__label",
+                    "text": "Exception Reason:"
+                }).appendTo(reasonDetail);
+                $('<span>', {
+                    "class": "max-w-3xl",
+                    "text": exceptionReason
+                }).appendTo(reasonDetail);
+
+                this.child(reasonDetail).show();
+                this.child().addClass('tacos-approval-reason-row').children('td').addClass('tacos-approval-reason-cell');
             });
         });
 
