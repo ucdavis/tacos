@@ -28,7 +28,7 @@ export default class CourseType extends React.PureComponent<IProps, {}> {
 
 export const CourseTypeOptions = [
     [ "STD", "Standard lecture with sections" ],
-    [ "WRT", "Grading intensive lecture with sections" ],
+    [ "WRT", "Grading intensive lecture classes with sections" ],
     [ "LAB", "Lab or Studio classes" ],
     [ "FLD", "Field classes" ],
     [ "AUTO", "Lecture only, automated grading" ],
