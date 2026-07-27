@@ -2309,7 +2309,8 @@ hr {
   z-index: 3;
 }
 
-.tacos-approval-table__reason-column {
+.tacos-approval-table__reason-column,
+.tacos-approval-table__export-only-column {
   display: none;
 }
 
