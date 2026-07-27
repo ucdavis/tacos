@@ -3,9 +3,10 @@
 
 <div class="container">
     <div>
-        <table class="table tacos-page-table w-full" id="requestTable">
+        <table class="table tacos-page-table tacos-page-table--sticky-actions w-full" id="requestTable">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Submission</th>
                     <th>Department</th>
                     <th>Submitter</th>
@@ -22,29 +23,12 @@
                     <th>Approved Reader % per course</th>
                     <th>Approved Annualized TA FTE</th>
                     <th>Approved Annualized Reader FTE</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var request in Model)
                 {
                     <tr data-id="@request.Id">
-                        <td>@request.Id</td>
-                        <td>@request.Department.Code</td>
-                        <td>@request.UpdatedBy</td>
-                        <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
-                        <td>@request.CourseNumber</td>
-                        <td>@CourseInfo.Types[request.CourseType]</td>
-                        <td>@request.Course.AverageSectionsPerCourse</td>
-                        <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
-                        <td>@request.ExceptionReason</td>
-                        <td>@(request.Exception ? request.ExceptionTaTotal.ToString("f3") : "")</td>
-                        <td>@(request.Exception ? request.ExceptionReaderTotal.ToString("f3") : "")</td>
-                        <td>@(request.Exception ? request.ExceptionAnnualCount.ToString("f3"): "")</td>
-                        <td>@request.ApprovedTaTotal.ToString("f3")</td>
-                        <td>@request.ApprovedReaderTotal.ToString("f3")</td>
-                        <td>@request.ApprovedAnnualizedTaTotal.ToString("f3")</td>
-                        <td>@request.ApprovedAnnualizedReaderTotal.ToString("f3")</td>
                         <td>
                             @if (!request.Approved.HasValue)
                             {
@@ -62,11 +46,28 @@
                                 </div>
                             }
                         </td>
+                        <td>@request.Id</td>
+                        <td>@request.Department.Code</td>
+                        <td>@request.UpdatedBy</td>
+                        <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
+                        <td>@request.CourseNumber</td>
+                        <td>@CourseInfo.Types[request.CourseType]</td>
+                        <td>@request.Course.AverageSectionsPerCourse</td>
+                        <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
+                        <td>@request.ExceptionReason</td>
+                        <td>@(request.Exception ? request.ExceptionTaTotal.ToString("f3") : "")</td>
+                        <td>@(request.Exception ? request.ExceptionReaderTotal.ToString("f3") : "")</td>
+                        <td>@(request.Exception ? request.ExceptionAnnualCount.ToString("f3"): "")</td>
+                        <td>@request.ApprovedTaTotal.ToString("f3")</td>
+                        <td>@request.ApprovedReaderTotal.ToString("f3")</td>
+                        <td>@request.ApprovedAnnualizedTaTotal.ToString("f3")</td>
+                        <td>@request.ApprovedAnnualizedReaderTotal.ToString("f3")</td>
                     </tr>
                 }
             </tbody>
             <tfoot>
                 <tr class="tacos-page-table__summary tacos-page-table__summary--info">
+                    <td>&nbsp;</td>
                     <td colspan="13"></td>
                     <td>Total:</td>
                     <td>
@@ -75,7 +76,6 @@
                     <td>
                         @Model.Sum(r => r.ApprovedAnnualizedReaderTotal).ToString("f3")
                     </td>
-                    <td>&nbsp;</td>
                 </tr>
             </tfoot>
         </table>
@@ -146,10 +146,10 @@
             var table = $('#requestTable').DataTable({
                 //"paging": false,
                 //"info": false,
-                "order": [[3, "desc"], [4, "asc"]],
+                "order": [[4, "desc"], [5, "asc"]],
                 "columnDefs": [
                     {
-                        "targets": [-1],
+                        "targets": [0],
                         //"sortable": false
                     }
                 ],
