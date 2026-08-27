@@ -3,7 +3,11 @@
 
 
 @{
-    var history = Model.History.OrderByDescending(h => h.UpdatedOn).Skip(1).ToList();
+    var history = Model.History
+        .OrderByDescending(h => h.UpdatedOn)
+        .ThenByDescending(h => h.Id)
+        .Skip(1)
+        .ToList();
     var historyCountText = history.Count == 1 ? "1 previous update" : $"{history.Count} previous updates";
     var courseType = CourseInfo.Types.TryGetValue(Model.CourseType, out var courseTypeName)
         ? courseTypeName
