@@ -7,7 +7,7 @@
         .OrderByDescending(h => h.UpdatedOn)
         .ThenByDescending(h => h.Id)
         .ToList();
-    var historyCountText = history.Count == 1 ? "1 previous update" : $"{history.Count} previous updates";
+    var historyCountText = history.Count == 1 ? "1 update" : $"{history.Count} updates";
     var courseType = CourseInfo.Types.TryGetValue(Model.CourseType, out var courseTypeName)
         ? courseTypeName
         : Model.CourseType;
