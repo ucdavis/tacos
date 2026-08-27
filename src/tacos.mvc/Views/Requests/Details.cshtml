@@ -6,7 +6,6 @@
     var history = Model.History
         .OrderByDescending(h => h.UpdatedOn)
         .ThenByDescending(h => h.Id)
-        .Skip(1)
         .ToList();
     var historyCountText = history.Count == 1 ? "1 previous update" : $"{history.Count} previous updates";
     var courseType = CourseInfo.Types.TryGetValue(Model.CourseType, out var courseTypeName)
@@ -218,7 +217,7 @@
         <header class="tacos-request-history__header">
             <div>
                 <h2 id="requestHistoryTitle">History of this request</h2>
-                <p>Previous request versions and review decisions.</p>
+                <p>Request and review decisions.</p>
             </div>
             <span class="tacos-request-history__count">@historyCountText</span>
         </header>
