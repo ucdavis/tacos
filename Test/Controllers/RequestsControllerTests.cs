@@ -660,6 +660,53 @@ namespace Test.Controllers
         }
 
         [Fact]
+        public async Task Details_should_redirect_with_department_error_when_user_cannot_access_request_department()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var allowedDepartment = CreateDepartment(1, "ECS");
+            var requestDepartment = CreateDepartment(2, "PLP");
+            var course = CreateCourse("PLP 101");
+            var request = new Request
+            {
+                Department = requestDepartment,
+                DepartmentId = requestDepartment.Id,
+                Course = course,
+                CourseNumber = course.Number
+            };
+
+            await SeedMembership(context, user, allowedDepartment);
+            context.Courses.Add(course);
+            context.Requests.Add(request);
+            await context.SaveChangesAsync();
+            context.ChangeTracker.Clear();
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Details(request.Id);
+
+            var redirect = result.ShouldBeOfType<RedirectToActionResult>();
+            redirect.ActionName.ShouldBe(nameof(RequestsController.Index));
+            controller.ErrorMessage.ShouldBe("You don't have access to Department PLP.");
+        }
+
+        [Fact]
+        public async Task Details_should_return_not_found_when_request_does_not_exist()
+        {
+            await using var context = CreateContext();
+            var user = CreateUser();
+            var department = CreateDepartment(1, "ECS");
+
+            await SeedMembership(context, user, department);
+
+            var controller = CreateController(context, user);
+
+            var result = await controller.Details(42);
+
+            result.ShouldBeOfType<NotFoundResult>();
+        }
+
+        [Fact]
         public async Task Recalculate_should_return_server_calculated_totals_for_existing_courses()
         {
             await using var context = CreateContext();
