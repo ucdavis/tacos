@@ -86,7 +86,23 @@ namespace tacos.mvc.Controllers
                 .Include(r => r.History)
                 .Where(r => departmentIds.Contains(r.DepartmentId))
                 .AsNoTracking()
-                .SingleAsync(x => x.Id == id);
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (request == null)
+            {
+                var requestDepartment = await _context.Requests
+                    .Where(r => r.Id == id)
+                    .Select(r => new { r.Department.Code })
+                    .SingleOrDefaultAsync();
+
+                if (requestDepartment == null)
+                {
+                    return NotFound();
+                }
+
+                ErrorMessage = $"You don't have access to Department {requestDepartment.Code}.";
+                return RedirectToAction(nameof(Index));
+            }
 
             ApplySupportTotals(
                 request,
