@@ -50,7 +50,11 @@
                         <td>@request.Department.Code</td>
                         <td>@request.UpdatedBy</td>
                         <td>@request.UpdatedOn.ToLocalTime().ToShortDateString()</td>
-                        <td>@request.CourseNumber</td>
+                        <td>
+                            <a asp-controller="Requests" asp-action="Details" asp-route-id="@request.Id" target="_blank" rel="noopener noreferrer">
+                                @request.CourseNumber
+                            </a>
+                        </td>
                         <td>@CourseInfo.Types[request.CourseType]</td>
                         <td>@request.Course.AverageSectionsPerCourse</td>
                         <td>@request.Course.AverageEnrollment.ToString("0.##")</td>
